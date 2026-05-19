@@ -29,8 +29,6 @@ code{font-family:'JetBrains Mono',monospace;font-size:13px}::-webkit-scrollbar{w
 .kpi__icon{width:40px;height:40px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
 .kpi__icon--orange{background:rgba(243,112,33,0.15);color:var(--brand)}.kpi__icon--red{background:rgba(255,71,87,0.15);color:var(--danger)}.kpi__icon--green{background:rgba(46,213,115,0.15);color:var(--success)}.kpi__icon--blue{background:rgba(59,130,246,0.15);color:var(--info)}
 .kpi__value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;letter-spacing:-0.02em;line-height:1}.kpi__label{font-size:13px;color:var(--text2)}
-.section{max-width:1400px;margin:0 auto;padding:40px 24px}
-.section__header{display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}.section__header h2{font-size:22px;font-weight:700}
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.chart-full{grid-column:1/-1}.chart-card{padding:20px}.chart-card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text2)}.chart-card canvas{max-height:280px;max-width:100%}
 .skeleton{background:linear-gradient(90deg,var(--elevated) 25%,var(--surface) 50%,var(--elevated) 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:var(--radius)}@keyframes shim{0%{background-position:200% 0}to{background-position:-200% 0}}
 .search-box{flex:1;min-width:240px;position:relative}.search-box input{width:100%;padding:12px 16px 12px 44px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:15px;transition:border-color var(--tf)}.search-box input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-glow);outline:none}.search-box .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}.search-box input::placeholder{color:var(--text3)}
@@ -54,7 +52,8 @@ td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle
 .side-nav{display:flex;flex-direction:column;gap:2px;padding:12px;flex:1}.side-link{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all var(--tf)}.side-link:hover,.side-link.active{color:var(--text);background:var(--elevated)}.side-link.active{color:var(--brand);background:rgba(243,112,33,0.08)}.side-link .link-badge{margin-left:auto;font-size:10px;padding:1px 6px;border-radius:var(--radius-full);background:var(--surface);color:var(--text3)}
 .side-footer{border-top:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center}
 .side-progress{width:100%;padding:0 12px}.side-progress .bar{height:4px;background:var(--surface);border-radius:4px;overflow:hidden}.side-progress .fill{height:100%;background:var(--brand);border-radius:4px;transition:width 0.5s ease}.side-progress .label{font-size:9px;color:var(--text3);margin-top:4px;text-align:center}
-body{padding-left:220px}@media(max-width:768px){.sidebar{width:60px;overflow:visible}.side-brand{padding:16px 0;justify-content:center}.side-title,.side-sub,.side-link span,.side-link .link-badge,.side-progress,.side-footer span{display:none}.side-link{justify-content:center;padding:12px 0}.side-footer{padding:8px 0}body{padding-left:60px}}@media(max-width:600px){.sidebar{width:100%;height:56px;bottom:0;top:auto;flex-direction:row;border-right:none;border-top:1px solid var(--border);overflow:visible;z-index:200}.side-brand{display:none}.side-nav{flex-direction:row;padding:0}.side-link{flex:1;justify-content:center;border-radius:0;min-height:56px;padding:0}.side-footer{display:none}body{padding-left:0;padding-bottom:56px}}
+body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:var(--bg);border-bottom:1px solid var(--border);padding:12px 24px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}#content{padding:0}.page{padding:40px 24px;max-width:1400px;margin:0 auto;display:block}.page[hidden]{display:none}
+@media(max-width:768px){.sidebar{width:60px;overflow:visible}.side-brand{padding:16px 0;justify-content:center}.side-title,.side-sub,.side-link span,.side-link .link-badge,.side-progress,.side-footer span{display:none}.side-link{justify-content:center;padding:12px 0}.side-footer{padding:8px 0}#filterBar{padding:10px 12px}body{padding-left:60px}}@media(max-width:600px){.sidebar{width:100%;height:56px;bottom:0;top:auto;flex-direction:row;border-right:none;border-top:1px solid var(--border);overflow:visible;z-index:200}.side-brand{display:none}.side-nav{flex-direction:row;padding:0}.side-link{flex:1;justify-content:center;border-radius:0;min-height:56px;padding:0}.side-footer{display:none}#filterBar{top:0;z-index:99;padding:8px 12px;position:sticky}.page{padding:20px 12px}body{padding-left:0;padding-bottom:56px}}
 .modal{position:fixed;inset:0;z-index:var(--z-modal);display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);padding:16px}.modal.open{display:flex}.modal-inner{background:var(--card);border-radius:var(--radius-lg);border:1px solid var(--border);max-width:1000px;width:100%;max-height:90vh;overflow-y:auto;display:grid;grid-template-columns:40% 60%;gap:24px;padding:24px;position:relative;animation:fadeScale 0.3s ease}@keyframes fadeScale{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
 .modal-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:20px;display:flex;align-items:center;justify-content:center;z-index:10}.modal-x:hover{background:var(--elevated);color:var(--text)}
 .modal-img{width:100%;aspect-ratio:3/4;object-fit:contain;border-radius:var(--radius-lg);background:var(--bg);border:1px solid var(--border)}.modal-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.modal-thumb{width:56px;height:56px;border-radius:var(--radius);border:2px solid transparent;cursor:pointer;overflow:hidden;transition:border-color var(--tf)}.modal-thumb:hover,.modal-thumb.active{border-color:var(--brand)}.modal-thumb img{width:100%;height:100%;object-fit:cover}
@@ -66,13 +65,13 @@ body{padding-left:220px}@media(max-width:768px){.sidebar{width:60px;overflow:vis
 <aside class="sidebar" role="navigation" aria-label="Navigation">
 <div class="side-brand"><div class="side-logo"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div><div class="side-title">RappelConso</div><div class="side-sub">Exploration alimentation</div></div></div>
 <nav class="side-nav">
-<a href="#dashboard" class="side-link active" data-section="dashboard">
+<a href="javascript:void(0)" class="side-link active" data-page="dashboard">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span><span class="link-badge" id="menuBadgeDash">—</span></a>
-<a href="#search" class="side-link" data-section="search">
+<a href="javascript:void(0)" class="side-link" data-page="search">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>Recherche</span><span class="link-badge">12945</span></a>
-<a href="#analyses" class="side-link" data-section="analyses">
+<a href="javascript:void(0)" class="side-link" data-page="analyses">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg><span>Analyses</span></a>
-<a href="#about" class="side-link" data-section="about">
+<a href="javascript:void(0)" class="side-link" data-page="about">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span>A propos</span></a>
 </nav>
 <div class="side-footer">
@@ -82,8 +81,38 @@ body{padding-left:220px}@media(max-width:768px){.sidebar{width:60px;overflow:vis
 </div>
 </aside>
 <main id="main">
-<section id="dashboard" class="section" aria-label="Dashboard">
-<div class="section__header"><h2>Tableau de bord</h2><span class="badge badge--white" id="dashTotalBadge">Chargement...</span><span class="badge badge--orange" id="cacheBadge">0/12945 en cache</span></div>
+<div id="filterBar">
+<div class="filter-row" style="flex-wrap:wrap">
+<div class="search-box" style="flex:2;min-width:200px">
+<svg class="search-icon icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+<input type="search" id="searchInput" placeholder="Marque, produit, motif..." autocomplete="off">
+</div>
+<select id="filterCat" class="filter-select"><option value="">Sous-categorie</option></select>
+<select id="filterRisk" class="filter-select"><option value="">Risque</option></select>
+<select id="filterLegal" class="filter-select"><option value="">Nature juridique</option></select>
+</div>
+<div class="filter-row" style="justify-content:space-between;flex-wrap:wrap">
+<div class="filter-chips" id="filterChips">
+<button class="chip active" data-chip="all">Tous</button>
+<button class="chip" data-chip="grave">Risque grave</button>
+<button class="chip" data-chip="bacterien">Risque bacterien</button>
+<button class="chip" data-chip="recent">30 derniers jours</button>
+</div>
+<div class="filter-row" style="gap:8px">
+<div class="date-presets" role="group">
+<button class="btn btn--ghost btn--sm active" data-days="0">Tout</button>
+<button class="btn btn--ghost btn--sm" data-days="30">30j</button>
+<button class="btn btn--ghost btn--sm" data-days="90">3 mois</button>
+<button class="btn btn--ghost btn--sm" data-days="180">6 mois</button>
+<button class="btn btn--ghost btn--sm" data-days="365">1 an</button>
+</div>
+<button id="clearFiltersBtn" class="btn btn--ghost btn--sm" style="color:var(--danger)">Effacer</button>
+</div>
+</div>
+</div>
+<div id="content">
+<div class="page" data-page="dashboard">
+<div class="section__header" style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap"><h2 style="font-size:22px;font-weight:700">Tableau de bord</h2><span class="badge badge--white" id="dashTotalBadge">Chargement...</span><span class="badge badge--orange" id="cacheBadge">0 fiches</span></div>
 <div class="kpi-grid">
 <div class="card kpi"><div class="kpi__icon kpi__icon--orange"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="kpi__value" id="kpiTotal">—</div><div class="kpi__label">Rappels en cache</div></div>
 <div class="card kpi"><div class="kpi__icon kpi__icon--red"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div><div class="kpi__value" id="kpiRisky">—</div><div class="kpi__label">Risques graves</div></div>
@@ -96,34 +125,9 @@ body{padding-left:220px}@media(max-width:768px){.sidebar{width:60px;overflow:vis
 <div class="chart-full card chart-card"><h3>Evolution mensuelle</h3><canvas id="chartTime"></canvas><div class="skeleton" style="height:260px" id="skelTime"></div></div>
 <div class="card chart-card"><h3>Top marques</h3><canvas id="chartBrand"></canvas><div class="skeleton" style="height:260px" id="skelBrand"></div></div>
 </div>
-</section>
-<section id="search" class="section" aria-label="Recherche">
-<div class="section__header"><h2>Recherche</h2><span class="badge badge--white" id="searchTotalBadge">0 resultats</span><span class="badge badge--blue" id="searchModeBadge">Mode: API</span></div>
-<div class="card" style="padding:16px">
-<div class="filter-row">
-<div class="search-box"><svg class="search-icon icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-<input type="search" id="searchInput" placeholder="Marque, produit, motif..." autocomplete="off"></div>
-<select id="filterCat" class="filter-select"><option value="">Sous-categorie</option></select>
-<select id="filterRisk" class="filter-select"><option value="">Risque</option></select>
-<select id="filterLegal" class="filter-select"><option value="">Nature juridique</option></select>
 </div>
-<div class="filter-chips" id="filterChips">
-<button class="chip active" data-chip="all">Tous</button>
-<button class="chip" data-chip="grave">Risque grave</button>
-<button class="chip" data-chip="bacterien">Risque bacterien</button>
-<button class="chip" data-chip="recent">30 derniers jours</button>
-</div>
-<div class="filter-row" style="justify-content:space-between;margin-top:8px">
-<div class="date-presets" role="group">
-<button class="btn btn--ghost btn--sm active" data-days="0">Tout</button>
-<button class="btn btn--ghost btn--sm" data-days="30">30j</button>
-<button class="btn btn--ghost btn--sm" data-days="90">3 mois</button>
-<button class="btn btn--ghost btn--sm" data-days="180">6 mois</button>
-<button class="btn btn--ghost btn--sm" data-days="365">1 an</button>
-</div>
-<button id="clearFiltersBtn" class="btn btn--ghost btn--sm" style="color:var(--danger)">Effacer tous les filtres</button>
-</div>
-</div>
+<div class="page" data-page="search" hidden>
+<div class="section__header" style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap"><h2 style="font-size:22px;font-weight:700">Recherche</h2><span class="badge badge--white" id="searchTotalBadge">0 resultats</span></div>
 <div id="loadingSearch" class="loading" style="display:none"><div class="spinner"></div><span>Recherche en cours...</span></div>
 <div id="searchContent"><div class="table-wrap"><table><thead><tr>
 <th data-col="sous_categorie_produit">Sous-cat<span class="sort-arrow">↓</span></th>
@@ -135,9 +139,9 @@ body{padding-left:220px}@media(max-width:768px){.sidebar{width:60px;overflow:vis
 <th></th></tr></thead><tbody id="searchBody"></tbody></table></div>
 <div id="searchEmpty" class="table-empty" style="display:none"><p>Aucun resultat</p></div>
 <div class="pagination" id="searchPagination"></div></div>
-</section>
-<section id="analyses" class="section" aria-label="Analyses">
-<div class="section__header"><h2>Analyses statistiques</h2><span class="badge badge--white" id="statsBadge">Donnees en cache</span></div>
+</div>
+<div class="page" data-page="analyses" hidden>
+<div class="section__header" style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap"><h2 style="font-size:22px;font-weight:700">Analyses statistiques</h2><span class="badge badge--white" id="statsBadge">Donnees filtrees</span></div>
 <div class="stats-grid">
 <div class="card stats-card"><h3>Saisonnalite</h3><canvas id="chartSeason"></canvas><div class="skeleton" style="height:220px" id="skelSeason"></div></div>
 <div class="card stats-card"><h3>Pareto 80/20</h3><div id="paretoContainer"><div class="skeleton" style="height:220px"></div></div></div>
@@ -145,20 +149,20 @@ body{padding-left:220px}@media(max-width:768px){.sidebar{width:60px;overflow:vis
 <div class="card stats-card"><h3>Test Chi2</h3><div id="chi2Container"><div class="skeleton" style="height:140px"></div></div></div>
 <div class="chart-full card stats-card"><h3>Tendance lineaire</h3><canvas id="chartTrend"></canvas><div class="skeleton" style="height:220px" id="skelTrend"></div></div>
 </div>
-</section>
-<section id="about" class="section" aria-label="A propos">
+</div>
+<div class="page" data-page="about" hidden>
 <div class="card" style="max-width:720px;margin:0 auto">
 <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">A propos</h2>
-<p style="font-size:14px;color:var(--text2);margin-bottom:16px">Cette application explore les 12 945 fiches de rappel de produits alimentaires publiees via l'API RappelConso. Les donnees sont chargees progressivement dans le cache navigateur (IndexedDB) a raison de ~500 fiches par visite.</p>
+<p style="font-size:14px;color:var(--text2);margin-bottom:16px">Cette application explore les 12 945 fiches de rappel de produits alimentaires publiees via l'API RappelConso. Les donnees sont chargees depuis un fichier statique <code>data.json</code>.</p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
 <div><strong>Source</strong><br><span style="color:var(--text2)">data.economie.gouv.fr</span></div>
 <div><strong>Categorie</strong><br><span style="color:var(--text2)">Alimentation</span></div>
 <div><strong>Fiches</strong><br><span style="color:var(--text2)">12 945 enregistrements</span></div>
 <div><strong>Cache</strong><br><span style="color:var(--text2)" id="aboutCache">0 / 12 945</span></div>
-<div><strong>Dashboard</strong><br><span style="color:var(--text2)">Donnees en cache</span></div>
-<div><strong>Recherche</strong><br><span style="color:var(--text2)">API temps reel + cache</span></div></div>
 </div>
-</section>
+</div>
+</div>
+</div>
 </main>
 <div id="detailModal" class="modal" role="dialog" aria-modal="true">
 <div class="modal-inner">
@@ -169,7 +173,7 @@ body{padding-left:220px}@media(max-width:768px){.sidebar{width:60px;overflow:vis
 <script>
 const DATA_URL = './data.json';
 const API='https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/rappelconso-v2-gtin-espaces';
-const STATE={records:[],facets:{cats:[],risks:[],legals:[]},query:'',days:0,chips:new Set(['all']),col:'date_publication',dir:'desc',page:1,limit:15,offset:0,total:0,latestDate:'',dataDate:''};
+const STATE={records:[],facets:{cats:[],risks:[],legals:[]},query:'',days:0,chips:new Set(['all']),col:'date_publication',dir:'desc',page:1,limit:15,offset:0,total:0,currentPage:'dashboard'};
 const MONTHS=['Jan','Fev','Mar','Avr','Mai','Juin','Juil','Aou','Sep','Oct','Nov','Dec'];
 function $(id){return document.getElementById(id)}
 function qsa(s){return document.querySelectorAll(s)}
@@ -197,9 +201,44 @@ const pop=(sel,arr)=>{const s=$(sel);s.innerHTML='<option value="">'+(sel==='fil
 arr.forEach(a=>{const v=Object.values(a)[0];const c=a['count(*)'];if(!v)return;const o=document.createElement('option');o.value=v;o.textContent=v+' ('+c+')';s.appendChild(o)})};
 if($('filterCat')){pop('filterCat',STATE.facets.cats);pop('filterRisk',STATE.facets.risks);pop('filterLegal',STATE.facets.legals)}}
 
-// Dashboard from all records
+// Global filtered view
+function getFilteredRecords(){
+let d=STATE.records;const q=$('searchInput').value.trim().toLowerCase();
+const cat=$('filterCat').value;const risk=$('filterRisk').value;const legal=$('filterLegal').value;
+STATE.query=q;
+if(STATE.days>0){const dd=new Date();dd.setDate(dd.getDate()-STATE.days);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=dd)}
+if(STATE.chips.has('grave')&&!risk)d=d.filter(r=>/grave|mortel|hospitalisation/i.test(r.risques_encourus||''));
+if(STATE.chips.has('bacterien')&&!risk)d=d.filter(r=>/bacterien|microbio|salmonelle|listeria|e.coli|coli/i.test(r.risques_encourus||''));
+if(STATE.chips.has('recent')&&STATE.days===0){const dd=new Date();dd.setDate(dd.getDate()-30);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=dd)}
+if(cat)d=d.filter(r=>r.sous_categorie_produit===cat);
+if(risk)d=d.filter(r=>r.risques_encourus===risk);
+if(legal)d=d.filter(r=>r.nature_juridique_rappel===legal);
+if(q)d=d.filter(r=>(r.marque_produit||'').toLowerCase().includes(q)||(r.libelle||'').toLowerCase().includes(q)||(r.motif_rappel||'').toLowerCase().includes(q)||(r.sous_categorie_produit||'').toLowerCase().includes(q));
+return d}
+
+// Re-render current page after filter change
+function onFilterChange(){
+const page=STATE.currentPage;
+if(page==='search'){STATE.page=1;doSearch(false)}
+else if(page==='dashboard')updateDashboard()
+else if(page==='analyses'){const d=getFilteredRecords();$('statsBadge').textContent=d.length+' fiches filtrées';renderStats(d);renderCharts(d)}}
+
+// Switch page from sidebar
+function switchPage(name){
+qsa('.side-link').forEach(x=>x.classList.toggle('active',x.dataset.page===name));
+qsa('.page').forEach(x=>x.hidden=x.dataset.page!==name);
+STATE.currentPage=name;
+if(name==='dashboard')updateDashboard()
+else if(name==='search')doSearch(true)
+else if(name==='analyses'){const d=getFilteredRecords();$('statsBadge').textContent=d.length+' fiches filtrées';renderStats(d)}
+else if(name==='about'){}}
+
+// Page nav clicks
+qsa('.side-link').forEach(a=>a.addEventListener('click',function(){switchPage(this.dataset.page)}));
+
+// Dashboard
 function updateDashboard(){
-const d=STATE.records;if(!d.length)return;const r=d.length;
+const d=getFilteredRecords();if(!d.length)return;const r=d.length;
 $('kpiTotal').textContent=r.toLocaleString('fr-FR');
 $('dashTotalBadge').textContent=r.toLocaleString('fr-FR')+' fiches';
 const serious=d.filter(x=>/grave|mortel|hospitalisation/i.test(x.risques_encourus||'')).length;$('kpiRisky').textContent=serious.toLocaleString('fr-FR');
@@ -221,7 +260,7 @@ const timeSorted=Object.entries(timeCnt).sort((a,b)=>a[0].localeCompare(b[0]));
 makeLine($('chartTime'),timeSorted.map(x=>x[0].slice(5)),timeSorted.map(x=>x[1]));
 const brandCnt={};data.forEach(d=>{const k=d.marque_produit;if(!k)return;brandCnt[k]=(brandCnt[k]||0)+1});
 const brandSorted=Object.entries(brandCnt).sort((a,b)=>b[1]-a[1]).slice(0,20);
-makeBar($('chartBrand'),brandSorted.map(x=>x[0].length>18?x[0].slice(0,18)+'...':x[0]),brandSorted.map(x=>x[1]));renderStats(data)}
+makeBar($('chartBrand'),brandSorted.map(x=>x[0].length>18?x[0].slice(0,18)+'...':x[0]),brandSorted.map(x=>x[1]));if(STATE.currentPage!=='analyses')renderStats(data)}
 
 function makeBar(c,labels,data){const h=labels.length>10;if(window.cm&&window.cm[c.id])window.cm[c.id].destroy();if(!window.cm)window.cm={};const id=document.documentElement.getAttribute('data-theme')==='dark';
 window.cm[c.id]=new Chart(c,{type:'bar',data:{labels,datasets:[{data,backgroundColor:labels.map((_,i)=>`hsla(${(i*25+15)%360},70%,50%,0.55)`),borderColor:labels.map((_,i)=>`hsla(${(i*25+15)%360},70%,45%,1)`),borderWidth:1}]},options:{indexAxis:h?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
@@ -231,25 +270,10 @@ function makeLine(c,labels,data){if(window.cm&&window.cm[c.id])window.cm[c.id].d
 const g=ctx.createLinearGradient(0,0,0,300);g.addColorStop(0,'rgba(243,112,33,0.25)');g.addColorStop(1,'rgba(243,112,33,0.01)');
 window.cm[c.id]=new Chart(c,{type:'line',data:{labels,datasets:[{data,borderColor:'#F37021',backgroundColor:g,fill:true,tension:0.35,pointRadius:2,pointHoverRadius:5,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
 
-// Search - FULLY LOCAL (all 12945 records)
+// Search - fully local on filtered records
 function doSearch(resetPage){
 if(resetPage)STATE.page=1;STATE.offset=(STATE.page-1)*STATE.limit;
-const q=$('searchInput').value.trim().toLowerCase();const cat=$('filterCat').value;const risk=$('filterRisk').value;const legal=$('filterLegal').value;
-STATE.query=q;const all=STATE.records;
-let filtered=all;
-// Apply date filter
-if(STATE.days>0){const d=new Date();d.setDate(d.getDate()-STATE.days);filtered=filtered.filter(r=>r.date_publication&&new Date(r.date_publication)>=d)}
-// Apply chip filters
-if(STATE.chips.has('grave')&&!risk)filtered=filtered.filter(r=>/grave|mortel|hospitalisation/i.test(r.risques_encourus||''));
-if(STATE.chips.has('bacterien')&&!risk)filtered=filtered.filter(r=>/bacterien|microbio|salmonelle|listeria|e.coli|coli/i.test(r.risques_encourus||''));
-if(STATE.chips.has('recent')&&STATE.days===0){const d=new Date();d.setDate(d.getDate()-30);filtered=filtered.filter(r=>r.date_publication&&new Date(r.date_publication)>=d)}
-// Apply dropdown filters
-if(cat)filtered=filtered.filter(r=>r.sous_categorie_produit===cat);
-if(risk)filtered=filtered.filter(r=>r.risques_encourus===risk);
-if(legal)filtered=filtered.filter(r=>r.nature_juridique_rappel===legal);
-// Apply text search
-if(q)filtered=filtered.filter(r=>(r.marque_produit||'').toLowerCase().includes(q)||(r.libelle||'').toLowerCase().includes(q)||(r.motif_rappel||'').toLowerCase().includes(q)||(r.sous_categorie_produit||'').toLowerCase().includes(q));
-// Sort
+const filtered=getFilteredRecords();
 filtered.sort((a,b)=>{const av=(a[STATE.col]||''),bv=(b[STATE.col]||'');return STATE.dir==='asc'?av.localeCompare(bv):bv.localeCompare(av)});
 STATE.total=filtered.length;
 const page=filtered.slice(STATE.offset,STATE.offset+STATE.limit);
@@ -273,29 +297,31 @@ const start=Math.max(1,p-2);const end=Math.min(pages,p+2);
 for(let i=start;i<=end;i++)h+='<button class="pag-btn'+(i===p?' active':'')+'" data-page="'+i+'">'+i+'</button>';
 h+='<button class="pag-btn" data-page="'+(p+1)+'" '+(p>=pages?'disabled':'')+'>&rsaquo;</button><button class="pag-btn" data-page="'+pages+'" '+(p>=pages?'disabled':'')+'>&raquo;</button><span class="pag-info">Page '+p+'/'+pages+'</span>';return h}
 
-// Chip filters
+// Filter events
 qsa('.chip').forEach(c=>c.addEventListener('click',function(){
 const v=this.dataset.chip;
 if(v==='all'){qsa('.chip').forEach(x=>x.classList.remove('active'));this.classList.add('active');STATE.chips=new Set(['all']);$('filterCat').value='';$('filterRisk').value='';$('filterLegal').value='';STATE.days=0;qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').classList.add('active')}
 else{STATE.chips.delete('all');qsa('.chip[data-chip="all"]').classList.remove('active');
 if(STATE.chips.has(v)){STATE.chips.delete(v);this.classList.remove('active')}else{STATE.chips.add(v);this.classList.add('active')}}
-STATE.page=1;doSearch(false)}));
+STATE.page=1;onFilterChange()}));
 $('clearFiltersBtn').addEventListener('click',function(){
 $('searchInput').value='';$('filterCat').value='';$('filterRisk').value='';$('filterLegal').value='';
 STATE.query='';STATE.days=0;STATE.chips=new Set(['all']);qsa('.chip').forEach(x=>x.classList.remove('active'));qsa('.chip[data-chip="all"]').classList.add('active');
 qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').classList.add('active');
-STATE.page=1;doSearch(false)});
+STATE.page=1;onFilterChange()});
 qsa('.date-presets .btn').forEach(b=>b.addEventListener('click',function(){
 qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));this.classList.add('active');
-STATE.days=parseInt(this.dataset.days);STATE.page=1;doSearch(false)}));
+STATE.days=parseInt(this.dataset.days);STATE.page=1;onFilterChange()}));
+$('searchInput').addEventListener('input',debounce(()=>{STATE.page=1;onFilterChange()},300));
+$('filterCat').addEventListener('change',()=>{STATE.page=1;onFilterChange()});
+$('filterRisk').addEventListener('change',()=>{STATE.page=1;onFilterChange()});
+$('filterLegal').addEventListener('change',()=>{STATE.page=1;onFilterChange()});
+
+// Table sort + pagination
 document.querySelector('#search thead').addEventListener('click',function(e){
 const th=e.target.closest('th');if(!th||!th.dataset.col)return;
 STATE.dir=(STATE.col===th.dataset.col&&STATE.dir==='asc')?'desc':'asc';STATE.col=th.dataset.col;
 qsa('#search thead th').forEach(t=>t.classList.remove('sorted'));th.classList.add('sorted');STATE.page=1;doSearch(false)});
-$('searchInput').addEventListener('input',debounce(()=>{STATE.page=1;doSearch(false)},300));
-$('filterCat').addEventListener('change',()=>{STATE.page=1;doSearch(false)});
-$('filterRisk').addEventListener('change',()=>{STATE.page=1;doSearch(false)});
-$('filterLegal').addEventListener('change',()=>{STATE.page=1;doSearch(false)});
 $('searchPagination').addEventListener('click',function(e){
 const btn=e.target.closest('.pag-btn');if(!btn||btn.disabled)return;
 STATE.page=parseInt(btn.dataset.page);doSearch(false);
@@ -371,12 +397,12 @@ const resp=await fetch(DATA_URL);
 if(!resp.ok)throw new Error('HTTP '+resp.status);
 const data=await resp.json();
 STATE.records=data;
-// Set data date from latest record
 if(data.length){STATE.dataDate=data[0].date_publication||'';}
 $('cacheBadge').textContent=data.length+' fiches chargees';
 $('dashTotalBadge').textContent=data.length.toLocaleString('fr-FR')+' fiches';
 $('menuBadgeDash').textContent=data.length>999?Math.round(data.length/1000)+'k':data.length;
 $('aboutCache').textContent=data.length+' / - (fichier statique)';
+$('progressFill').style.width='100%';$('progressLabel').textContent=data.length+' fiches';
 updateDashboard();doSearch(true);loadFacets();
 // Background: check API for newer records
 try{
@@ -385,16 +411,11 @@ if(latest.results&&latest.results.length){
 const apiDate=latest.results[0].date_publication;
 if(apiDate>STATE.dataDate){
 $('cacheBadge').textContent=data.length+' fiches + mise a jour disponible';
-// Load new records since data.json date
-const since=apiFetch('/records?limit=100&refine=categorie_produit:alimentation&order_by=date_publication+desc&where=date_publication%3E%22'+encodeURIComponent(STATE.dataDate)+'%22');
-// For simplicity, just show notification - user can refresh
 }}}
 catch(e){console.log('Update check skipped',e)}
 }catch(e){
 $('dashTotalBadge').textContent='Erreur chargement data.json';
 $('cacheBadge').textContent='Erreur: verifier DATA_URL ou CORS';
-// Fallback: try API batch
-$('cacheBadge').textContent+='. Fallback API...';
 loadFromApiFallback()}}
 
 async function loadFromApiFallback(){
@@ -406,10 +427,6 @@ STATE.records=all;updateDashboard();doSearch(true);loadFacets();
 $('cacheBadge').textContent='Fallback: '+all.length+' fiches via API';
 }catch(e){$('dashTotalBadge').textContent='Erreur de chargement'}}
 
-// Nav
-qsa('.side-link').forEach(a=>a.addEventListener('click',function(){qsa('.side-link').forEach(x=>x.classList.remove('active'));this.classList.add('active')}));
-const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)qsa('.side-link').forEach(a=>a.classList.toggle('active',a.dataset.section===e.target.id))})},{threshold:0.2});
-qsa('.section').forEach(s=>obs.observe(s));
 init();
 </script>
 </body>
