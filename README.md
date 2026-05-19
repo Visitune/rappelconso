@@ -69,6 +69,20 @@ with open("data.json", "w", encoding="utf-8") as f:
 
 > Le nombre de fiches est plafonné à 3 000 par l'API gratuite.
 
+> ⚡ Les appels API sont parallélisés via `Promise.all()` dans l'application pour un chargement en ~2s au lieu de 15-20s en séquentiel.
+
+### Compression du fichier data.json
+
+Le fichier `data.json` standard (tableau d'objets) est verbeux : les clés de propriétés sont répétées pour chaque enregistrement. Pour réduire la taille, utilisez le script de compression :
+
+```bash
+python scripts/compress_data.py
+```
+
+- Transforme le format en `{keys: [...], rows: [[...], ...]}` (tabulaire)
+- Réduction de ~42% (ex. 16,2 Mo → 9,3 Mo)
+- Compatible avec l'application (détection automatique du format)
+
 ### Automatisation (GitHub Actions)
 
 Un workflow peut être ajouté pour rafraîchir `data.json` périodiquement :
@@ -90,6 +104,7 @@ jobs:
         with: { python-version: '3.x' }
       - run: pip install requests
       - run: python scripts/update_data.py
+      - run: python scripts/compress_data.py  # compression ~42%
       - run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"

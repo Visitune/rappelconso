@@ -12,12 +12,15 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden;transition:background var(--t)}
 :root{--brand:#F37021;--brand-dark:#C85A10;--brand-glow:rgba(243,112,33,0.18);--bg:#0A0A0F;--surface:rgba(255,255,255,0.06);--elevated:rgba(255,255,255,0.10);--card:rgba(255,255,255,0.08);--card-hover:rgba(255,255,255,0.13);--border:rgba(255,255,255,0.10);--border-focus:rgba(243,112,33,0.45);--text:#E9EBF3;--text2:#9CA3B5;--text3:#5A6377;--success:#2ED573;--warning:#FFA502;--danger:#FF4757;--info:#3B82F6;--radius:10px;--radius-lg:14px;--radius-full:9999px;--shadow:0 4px 24px rgba(0,0,0,0.5);--shadow-brand:0 0 32px rgba(243,112,33,0.15);--t:0.3s ease;--tf:0.15s ease;--z-modal:400}
 [data-theme="light"]{--bg:#F0F2F5;--surface:rgba(0,0,0,0.03);--elevated:rgba(0,0,0,0.06);--card:rgba(255,255,255,0.85);--card-hover:rgba(255,255,255,0.95);--border:rgba(0,0,0,0.10);--text:#0B1120;--text2:#4B5563;--text3:#9CA3AF;--shadow:0 4px 16px rgba(0,0,0,0.10);--shadow-brand:0 0 24px rgba(243,112,33,0.15)}
 a{color:var(--brand)}button{cursor:pointer;font-family:inherit}input,select{font-family:inherit}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}::selection{background:var(--brand);color:#fff}
-code{font-family:'JetBrains Mono',monospace;font-size:13px}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--text3);border-radius:3px}
+[data-theme="light"] .theme-icon[data-theme-icon="sun"],
+[data-theme="dark"] .theme-icon[data-theme-icon="moon"]{display:inline-flex!important}
+[data-theme="light"] .theme-icon[data-theme-icon="moon"],
+[data-theme="dark"] .theme-icon[data-theme-icon="sun"]{display:none!important}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--text3);border-radius:3px}
 .icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:currentColor}.icon-sm{width:16px;height:16px}.icon-md{width:20px;height:20px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;min-height:44px;font-size:13px;font-weight:600;border-radius:var(--radius);border:1px solid transparent;transition:all var(--tf);white-space:nowrap;user-select:none}
 .btn:hover{transform:translateY(-1px)}.btn--primary{background:var(--brand);color:#fff;box-shadow:0 2px 12px rgba(243,112,33,0.3)}.btn--primary:hover{box-shadow:0 4px 20px rgba(243,112,33,0.4)}
@@ -77,7 +80,8 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <div class="side-footer">
 <div class="side-progress" id="progressWrap"><div class="bar"><div class="fill" id="progressFill" style="width:0%"></div></div><div class="label" id="progressLabel">Chargement...</div></div>
 <button id="themeBtn" class="btn btn--ghost btn--xs" aria-label="Theme">
-<svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></button>
+<svg class="icon icon-sm theme-icon" data-theme-icon="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg class="icon icon-sm theme-icon" data-theme-icon="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
 </div>
 </aside>
 <main id="main">
@@ -181,7 +185,7 @@ function esc(s){if(s==null)return'';const d=document.createElement('div');d.text
 function fmtDate(d){if(!d)return'—';const dt=new Date(d);return isNaN(dt)?'—':dt.toLocaleDateString('fr-FR')}
 function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
 function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('rc-theme',t)}
-function toggleTheme(){setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')}
+function toggleTheme(){const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';setTheme(t);if(window.cm){Object.values(window.cm).forEach(c=>{try{c.destroy()}catch(_){}});window.cm={}}if(STATE.records.length){updateDashboard();renderStats(getFilteredRecords())}}
 if(localStorage.getItem('rc-theme'))setTheme(localStorage.getItem('rc-theme'));
 $('themeBtn').addEventListener('click',toggleTheme);
 
@@ -206,10 +210,10 @@ function getFilteredRecords(){
 let d=STATE.records;const q=$('searchInput').value.trim().toLowerCase();
 const cat=$('filterCat').value;const risk=$('filterRisk').value;const legal=$('filterLegal').value;
 STATE.query=q;
-if(STATE.days>0){const dd=new Date();dd.setDate(dd.getDate()-STATE.days);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=dd)}
+if(STATE.days>0){const ref=STATE.dataDate?new Date(STATE.dataDate):new Date();ref.setDate(ref.getDate()-STATE.days);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=ref)}
 if(STATE.chips.has('grave')&&!risk)d=d.filter(r=>/grave|mortel|hospitalisation/i.test(r.risques_encourus||''));
 if(STATE.chips.has('bacterien')&&!risk)d=d.filter(r=>/bacterien|microbio|salmonelle|listeria|e.coli|coli/i.test(r.risques_encourus||''));
-if(STATE.chips.has('recent')&&STATE.days===0){const dd=new Date();dd.setDate(dd.getDate()-30);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=dd)}
+if(STATE.chips.has('recent')&&STATE.days===0){const ref=STATE.dataDate?new Date(STATE.dataDate):new Date();ref.setDate(ref.getDate()-30);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=ref)}
 if(cat)d=d.filter(r=>r.sous_categorie_produit===cat);
 if(risk)d=d.filter(r=>r.risques_encourus===risk);
 if(legal)d=d.filter(r=>r.nature_juridique_rappel===legal);
@@ -378,8 +382,9 @@ risks.forEach(r=>{const v=cr[c]?.[r]||0;const max=Math.max(1,...Object.values(cr
 ch+='</div>';$('corrContainer').innerHTML=ch;
 const cc={},rc={},j={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1;if(!j[c])j[c]={};j[c][r]=(j[c][r]||0)+1});
 const c2=Object.keys(cc).slice(0,10),r2=Object.keys(rc).slice(0,10),n=data.length;
+if(n<2||c2.length<2||r2.length<2){$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card" style="grid-column:1/-1"><div class="chi2-value" style="font-size:14px;color:var(--text2)">Analyse independante</div><div class="chi2-label">Pas assez de categories/risques distincts pour le test du Chi².</div></div></div><div class="stats-insight"><p>Le test du Chi² et le V de Cramer necessitent au moins 2 categories et 2 risques distincts.</p></div>'}else{
 let chi=0,df=(c2.length-1)*(r2.length-1);c2.forEach(c=>{r2.forEach(r=>{const e=(cc[c]*rc[r])/n,o=j[c]?.[r]||0;if(e>0)chi+=((o-e)**2)/e})});
-const cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card"><div class="chi2-value">'+chi.toFixed(2)+'</div><div class="chi2-label">Chi2</div></div><div class="card chi2-card"><div class="chi2-value">'+df+'</div><div class="chi2-label">DF</div></div><div class="card chi2-card"><div class="chi2-value">'+cv.toFixed(3)+'</div><div class="chi2-label">V.Cramer</div></div></div><div class="stats-insight"><p>'+(chi>(df>0?3.841:0)?'Significatif (p<0.05)':'Non significatif')+'</p></div>';
+const cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card"><div class="chi2-value">'+chi.toFixed(2)+'</div><div class="chi2-label">Chi² (independance)</div></div><div class="card chi2-card"><div class="chi2-value">'+df+'</div><div class="chi2-label">Degres de liberte</div></div><div class="card chi2-card"><div class="chi2-value">'+cv.toFixed(3)+'</div><div class="chi2-label">V de Cramer</div></div></div><div class="stats-insight"><p>'+(chi>3.841&&df>0?'Correlation significative (p<0.05) — la sous-categorie et le risque sont lies.':'Non significatif — les variations observees peuvent etre dues au hasard.')+'</p></div>'}
 const tc={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);tc[m]=(tc[m]||0)+1});
 const tr=Object.entries(tc).sort((a,b)=>a[0].localeCompare(b[0]));const vals=tr.map(x=>x[1]),labels=tr.map(x=>x[0].slice(5));
 if(vals.length<2){$('chartTrend').style.display='none';return}$('chartTrend').style.display='block';
@@ -396,7 +401,7 @@ try{
 const resp=await fetch(DATA_URL);
 if(!resp.ok)throw new Error('HTTP '+resp.status);
 const data=await resp.json();
-STATE.records=data;
+STATE.records=Array.isArray(data)?data:data.keys&&data.rows?data.rows.map(r=>Object.fromEntries(data.keys.map((k,i)=>[k,r[i]]))):[];
 if(data.length){STATE.dataDate=data[0].date_publication||'';}
 $('cacheBadge').textContent=data.length+' fiches chargees';
 $('dashTotalBadge').textContent=data.length.toLocaleString('fr-FR')+' fiches';
@@ -421,8 +426,8 @@ loadFromApiFallback()}}
 async function loadFromApiFallback(){
 try{
 const meta=await apiFetch('/records?limit=1&refine=categorie_produit:alimentation');
-const total=meta.total_count||0;const pages=Math.ceil(Math.min(total,3000)/100);const all=[];
-for(let i=0;i<pages;i++){const d=await apiFetch('/records?limit=100&offset='+(i*100)+'&refine=categorie_produit:alimentation&order_by=date_publication+desc');all.push(...(d.results||[]))}
+const total=meta.total_count||0;const pages=Math.ceil(Math.min(total,3000)/100);
+const all=(await Promise.all(Array.from({length:pages},(_,i)=>apiFetch('/records?limit=100&offset='+(i*100)+'&refine=categorie_produit:alimentation&order_by=date_publication+desc')))).flatMap(d=>d.results||[])
 STATE.records=all;updateDashboard();doSearch(true);loadFacets();
 $('cacheBadge').textContent='Fallback: '+all.length+' fiches via API';
 }catch(e){$('dashTotalBadge').textContent='Erreur de chargement'}}
