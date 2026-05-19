@@ -401,13 +401,13 @@ try{
 const resp=await fetch(DATA_URL);
 if(!resp.ok)throw new Error('HTTP '+resp.status);
 const data=await resp.json();
-STATE.records=Array.isArray(data)?data:data.keys&&data.rows?data.rows.map(r=>Object.fromEntries(data.keys.map((k,i)=>[k,r[i]]))):[];
-if(data.length){STATE.dataDate=data[0].date_publication||'';}
-$('cacheBadge').textContent=data.length+' fiches chargees';
-$('dashTotalBadge').textContent=data.length.toLocaleString('fr-FR')+' fiches';
-$('menuBadgeDash').textContent=data.length>999?Math.round(data.length/1000)+'k':data.length;
-$('aboutCache').textContent=data.length+' / - (fichier statique)';
-$('progressFill').style.width='100%';$('progressLabel').textContent=data.length+' fiches';
+const r=Array.isArray(data)?data:data.keys&&data.rows?data.rows.map(r=>Object.fromEntries(data.keys.map((k,i)=>[k,r[i]]))):[];STATE.records=r;
+if(r.length){STATE.dataDate=r[0].date_publication||'';}
+$('cacheBadge').textContent=r.length+' fiches chargees';
+$('dashTotalBadge').textContent=r.length.toLocaleString('fr-FR')+' fiches';
+$('menuBadgeDash').textContent=r.length>999?Math.round(r.length/1000)+'k':r.length;
+$('aboutCache').textContent=r.length+' / - (fichier statique)';
+$('progressFill').style.width='100%';$('progressLabel').textContent=r.length+' fiches';
 updateDashboard();doSearch(true);loadFacets();
 // Background: check API for newer records
 try{
@@ -415,7 +415,7 @@ const latest=await apiFetch('/records?limit=1&refine=categorie_produit:alimentat
 if(latest.results&&latest.results.length){
 const apiDate=latest.results[0].date_publication;
 if(apiDate>STATE.dataDate){
-$('cacheBadge').textContent=data.length+' fiches + mise a jour disponible';
+$('cacheBadge').textContent=r.length+' fiches + mise a jour disponible';
 }}}
 catch(e){console.log('Update check skipped',e)}
 }catch(e){
