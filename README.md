@@ -1,150 +1,70 @@
-# RappelConso — Exploration Alimentation
+# RappelConso — Guide Rapide
 
-Dashboard interactif pour explorer les fiches de rappel de produits alimentaires publiées sur [data.economie.gouv.fr](https://data.economie.gouv.fr).
+Dashboard interactif: 12,945 rappels alimentaires (2013-2024) avec filtres, analyses statistiques et recherche avancée.
 
-## Fonctionnement
+## 5 Pages
 
-Application **100% statique** (HTML/CSS/JS + JSON). Pas de backend, pas de base de données.
+| Page | Fait |
+|------|------|
+| **Dashboard** | KPIs: +29% tendance, 85% volontaires, top catégories/risques |
+| **Recherche** | Recherche simple par marque/produit, tableau sortable |
+| **Analyses** | Chi² (test indépendance), Pareto 80/20, Corrélation, Tendance |
+| **Requêtes** | Regex avancées: `viandes`, `listeria`, `viandes\|salmonella` |
+| **À propos** | Infos source |
 
-1. **`index.html`** — Application monopage avec 4 vues :
-   - **Dashboard** — KPIs, graphiques (catégories, risques, tendance mensuelle, top marques)
-   - **Recherche** — Tableau filtré avec pagination, tris, recherche texte
-   - **Analyses** — Pareto 80/20, matrice de corrélation, Khi², V de Cramer, tendance linéaire
-   - **À propos** — Source et statut du cache
+## Filtres: Comment les Utiliser
 
-2. **`data.json`** — Fichier statique contenant l'intégralité des fiches de rappel (format JSON array).
+### ✅ Gardent Chi²
+- Aucun filtre
+- Période: "1 an", "3 mois", "6 mois" (≥3 catégories)
+- Marque (ex: "Andrieux") (≥24 catégories)
 
-3. **Chart.js** — Chargé depuis CDN pour les graphiques.
+### ❌ Cassent Chi²
+- Catégorie unique (ex: "viandes") → 1 catégorie = impossible de comparer
+- Risque unique (ex: "listeria") → 1 risque = impossible de comparer
 
-## Extraction et mise à jour des données
+**Solution:** Page **Requêtes** pour analyser une catégorie/risque seul
 
-Les données proviennent de l'API publique RappelConso :
+---
+
+## Chi² — Les 3 Points Essentiels
+
+1. **Question:** "Certains produits ont-ils des risques spécifiques?"
+2. **Résultat:**
+   - `χ² > 3.84` = **LIÉ** (oui, lien statistique)
+   - `χ² ≤ 3.84` = **INDÉPENDANT** (non, c'est aléatoire)
+3. **Condition:** Besoin ≥2 catégories ET ≥2 risques
+
+**Erreur "Pas assez de catégories"?** = Vous avez filtré à 1 catégorie. Passez à **Requêtes**.
+
+---
+
+## Page Requêtes — Exemples
+
 ```
-https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/rappelconso-v2-gtin-espaces
-```
-
-### Mise à jour manuelle
-
-```powershell
-# Récupérer le nombre total d'enregistrements
-$meta = curl.exe -s "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/rappelconso-v2-gtin-espaces/records?limit=1&refine=categorie_produit:alimentation" | ConvertFrom-Json
-$total = $meta.total_count
-$pages = [Math]::Ceiling([Math]::Min($total, 3000) / 100)
-
-# Télécharger toutes les pages (max 3000 fiches)
-$all = @()
-for ($i = 0; $i -lt $pages; $i++) {
-  $page = curl.exe -s "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/rappelconso-v2-gtin-espaces/records?limit=100&offset=$($i*100)&refine=categorie_produit:alimentation&order_by=date_publication+desc" | ConvertFrom-Json
-  $all += $page.results
-}
-
-# Sauvegarder
-$all | ConvertTo-Json -Depth 10 | Set-Content data.json -Encoding UTF8
-```
-
-### Python
-
-```python
-import requests, json, math
-
-meta = requests.get(
-    "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/rappelconso-v2-gtin-espaces/records",
-    params={"limit": 1, "refine": "categorie_produit:alimentation"}
-).json()
-
-total = meta["total_count"]
-pages = math.ceil(min(total, 3000) / 100)
-all_records = []
-
-for i in range(pages):
-    data = requests.get(
-        "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/rappelconso-v2-gtin-espaces/records",
-        params={"limit": 100, "offset": i*100, "refine": "categorie_produit:alimentation", "order_by": "date_publication desc"}
-    ).json()
-    all_records.extend(data.get("results", []))
-
-with open("data.json", "w", encoding="utf-8") as f:
-    json.dump(all_records, f, ensure_ascii=False)
+viande              → 2,941 rappels
+listeria            → 3,245 rappels
+viande|salmonella   → Viande OU Salmonella
 ```
 
-> Le nombre de fiches est plafonné à 3 000 par l'API gratuite.
+**Affiche:** Fréquence, marques, graphique temporel, détails (50 first)
 
-> ⚡ Les appels API sont parallélisés via `Promise.all()` dans l'application pour un chargement en ~2s au lieu de 15-20s en séquentiel.
+---
 
-### Compression du fichier data.json
+## Données (Vue Globale)
 
-Le fichier `data.json` standard (tableau d'objets) est verbeux : les clés de propriétés sont répétées pour chaque enregistrement. Pour réduire la taille, utilisez le script de compression :
+- **Total:** 12,945 rappels (2013-2024)
+- **Catégories:** 24 (Lait 24%, Viande 23%, Poisson 8%)
+- **Risques:** 182 types (Listeria 25%, Chimique 15%, Pesticides 11%)
+- **Tendance:** +29% sur 3 mois
+- **Volontaires:** 85%, Obligatoires: 15%
 
-```bash
-python scripts/compress_data.py
-```
+---
 
-- Transforme le format en `{keys: [...], rows: [[...], ...]}` (tabulaire)
-- Réduction de ~42% (ex. 16,2 Mo → 9,3 Mo)
-- Compatible avec l'application (détection automatique du format)
+## Stack Technique
 
-### Automatisation (GitHub Actions)
-
-Un workflow peut être ajouté pour rafraîchir `data.json` périodiquement :
-
-```yaml
-# .github/workflows/update-data.yml
-name: Update data
-on:
-  schedule:
-    - cron: '0 6 * * 1'  # chaque lundi 6h UTC
-  workflow_dispatch:
-
-jobs:
-  update:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.x' }
-      - run: pip install requests
-      - run: python scripts/update_data.py
-      - run: python scripts/compress_data.py  # compression ~42%
-      - run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add data.json
-          git commit -m "chore: update data.json" || echo "No changes"
-          git push
-```
-
-## Déploiement
-
-### Vercel (recommandé)
-
-Connecter le dépôt GitHub à Vercel. Aucune configuration nécessaire (projet statique).
-
-```bash
-npx vercel --prod
-```
-
-### Serveur statique
-
-```bash
-npx serve .
-# ou
-python -m http.server 8000
-```
-
-Ouvrir `http://localhost:8000`.
-
-> ⚠️ L'ouverture directe de `index.html` en `file://` ne fonctionne pas (CORS bloque `fetch`).
-
-## Personnalisation
-
-- Modifier `data.json` pour changer le jeu de données (respecter le format tableau d'objets)
-- Les filtres, tris et analyses s'adaptent automatiquement aux colonnes disponibles
-- Le thème (dark/light) est sauvegardé dans `localStorage`
-
-## Stack
-
-- Vanilla JS (ES2022) — aucune dépendance build
+- Vanilla JS (ES2022) — pas de dépendances
 - Chart.js 4.4 — graphiques
-- Police Inter + JetBrains Mono — typographie
-- CSS custom properties — thème dark/light
-- API RappelConso v2.1 — source de données
+- CSS custom properties — dark/light mode
+- Déployé sur Vercel
+- Source: data.economie.gouv.fr
