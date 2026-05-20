@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -13,10 +13,10 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden;transition:background var(--t)}
-:root{--brand:#F37021;--brand-dark:#C85A10;--brand-glow:rgba(243,112,33,0.18);--bg:#0A0A0F;--surface:rgba(255,255,255,0.06);--elevated:rgba(255,255,255,0.10);--card:rgba(255,255,255,0.08);--card-hover:rgba(255,255,255,0.13);--border:rgba(255,255,255,0.10);--border-focus:rgba(243,112,33,0.45);--text:#E9EBF3;--text2:#9CA3B5;--text3:#5A6377;--success:#2ED573;--warning:#FFA502;--danger:#FF4757;--info:#3B82F6;--radius:10px;--radius-lg:14px;--radius-full:9999px;--shadow:0 4px 24px rgba(0,0,0,0.5);--shadow-brand:0 0 32px rgba(243,112,33,0.15);--t:0.3s ease;--tf:0.15s ease;--z-modal:400}
-[data-theme="light"]{--bg:#F0F2F5;--surface:rgba(0,0,0,0.03);--elevated:rgba(0,0,0,0.06);--card:rgba(255,255,255,0.85);--card-hover:rgba(255,255,255,0.95);--border:rgba(0,0,0,0.10);--text:#0B1120;--text2:#4B5563;--text3:#9CA3AF;--shadow:0 4px 16px rgba(0,0,0,0.10);--shadow-brand:0 0 24px rgba(243,112,33,0.15)}
+:root{--brand:#F37021;--brand-dark:#C85A10;--brand-glow:rgba(243,112,33,0.18);--bg:#0A0A0F;--surface:rgba(255,255,255,0.06);--elevated:rgba(255,255,255,0.10);--card:rgba(255,255,255,0.08);--card-hover:rgba(255,255,255,0.13);--border:rgba(255,255,255,0.10);--border-focus:rgba(243,112,33,0.45);--text:#E9EBF3;--text2:#9CA3B5;--text3:#7D8BA0;--success:#2ED573;--warning:#FFA502;--danger:#FF4757;--info:#3B82F6;--radius:10px;--radius-lg:14px;--radius-full:9999px;--shadow:0 4px 24px rgba(0,0,0,0.5);--shadow-brand:0 0 32px rgba(243,112,33,0.15);--t:0.3s ease;--tf:0.15s ease;--z-modal:400;--space-4:16px;--space-5:20px;--space-6:24px}
+[data-theme="light"]{--bg:#F0F2F5;--surface:rgba(0,0,0,0.03);--elevated:rgba(0,0,0,0.06);--card:rgba(255,255,255,0.85);--card-hover:rgba(255,255,255,0.95);--border:rgba(0,0,0,0.10);--text:#0B1120;--text2:#4B5563;--text3:#6B7280;--shadow:0 4px 16px rgba(0,0,0,0.10);--shadow-brand:0 0 24px rgba(243,112,33,0.15)}
 a{color:var(--brand)}button{cursor:pointer;font-family:inherit}input,select{font-family:inherit}
-:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}::selection{background:var(--brand);color:#fff}
+:focus-visible{outline:3px solid var(--brand);outline-offset:4px;border-radius:6px;box-shadow:0 0 0 6px rgba(243,112,33,0.15)}::selection{background:var(--brand);color:#fff}
 [data-theme="light"] .theme-icon[data-theme-icon="sun"],
 [data-theme="dark"] .theme-icon[data-theme-icon="moon"]{display:inline-flex!important}
 [data-theme="light"] .theme-icon[data-theme-icon="moon"],
@@ -25,14 +25,16 @@ a{color:var(--brand)}button{cursor:pointer;font-family:inherit}input,select{font
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;min-height:44px;font-size:13px;font-weight:600;border-radius:var(--radius);border:1px solid transparent;transition:all var(--tf);white-space:nowrap;user-select:none}
 .btn:hover{transform:translateY(-1px)}.btn--primary{background:var(--brand);color:#fff;box-shadow:0 2px 12px rgba(243,112,33,0.3)}.btn--primary:hover{box-shadow:0 4px 20px rgba(243,112,33,0.4)}
 .btn--ghost{background:transparent;color:var(--text2);border-color:var(--border)}.btn--ghost:hover{background:var(--elevated);color:var(--text)}.btn--sm{padding:8px 12px;min-height:36px;font-size:12px}.btn--xs{padding:4px 8px;min-height:28px;font-size:11px;border-radius:6px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;transition:background var(--t)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-5);transition:background var(--t)}.card__header{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text2)}.card__body{display:flex;flex-direction:column;gap:var(--space-4)}.card__loader,.card__empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;text-align:center}[aria-busy="true"] .card__loader{display:flex}[aria-busy="true"] .card__body{opacity:0.5;pointer-events:none}[data-state="empty"] .card__empty{display:flex}[data-state="empty"] .card__body{display:none}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-full);font-size:11px;font-weight:600;white-space:nowrap}
 .badge--orange{background:rgba(243,112,33,0.15);color:var(--brand)}.badge--red{background:rgba(255,71,87,0.15);color:var(--danger)}.badge--green{background:rgba(46,213,115,0.15);color:var(--success)}.badge--blue{background:rgba(59,130,246,0.15);color:var(--info)}.badge--yellow{background:rgba(255,165,2,0.15);color:var(--warning)}.badge--white{background:rgba(255,255,255,0.10);color:var(--text)}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}.kpi{display:flex;flex-direction:column;gap:8px;padding:20px}
+.page-header{display:flex;align-items:center;gap:16px;margin-bottom:var(--space-6);flex-wrap:wrap}.page-title{font-size:22px;font-weight:700;margin:0}.page-meta{display:flex;gap:8px;flex-wrap:wrap}
+.grid-responsive{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-6)}.grid-2col{grid-template-columns:repeat(2,1fr)}.grid-full{grid-column:1/-1}
+.kpi{display:flex;flex-direction:column;gap:8px;padding:var(--space-5)}
 .kpi__icon{width:40px;height:40px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
 .kpi__icon--orange{background:rgba(243,112,33,0.15);color:var(--brand)}.kpi__icon--red{background:rgba(255,71,87,0.15);color:var(--danger)}.kpi__icon--green{background:rgba(46,213,115,0.15);color:var(--success)}.kpi__icon--blue{background:rgba(59,130,246,0.15);color:var(--info)}
 .kpi__value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;letter-spacing:-0.02em;line-height:1}.kpi__label{font-size:13px;color:var(--text2)}
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.chart-full{grid-column:1/-1}.chart-card{padding:20px}.chart-card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text2)}.chart-card canvas{max-height:280px;max-width:100%}
+.chart-card{padding:var(--space-5)}.chart-card canvas{max-height:280px;max-width:100%}
 .skeleton{background:linear-gradient(90deg,var(--elevated) 25%,var(--surface) 50%,var(--elevated) 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:var(--radius)}@keyframes shim{0%{background-position:200% 0}to{background-position:-200% 0}}
 .search-box{flex:1;min-width:240px;position:relative}.search-box input{width:100%;padding:12px 16px 12px 44px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:15px;transition:border-color var(--tf)}.search-box input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-glow);outline:none}.search-box .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}.search-box input::placeholder{color:var(--text3)}
 .filter-select{padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;cursor:pointer;min-width:140px;transition:border-color var(--tf)}.filter-select:focus{border-color:var(--brand);outline:none}
@@ -56,7 +58,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle
 .side-footer{border-top:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center}
 .side-progress{width:100%;padding:0 12px}.side-progress .bar{height:4px;background:var(--surface);border-radius:4px;overflow:hidden}.side-progress .fill{height:100%;background:var(--brand);border-radius:4px;transition:width 0.5s ease}.side-progress .label{font-size:9px;color:var(--text3);margin-top:4px;text-align:center}
 body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:var(--bg);border-bottom:1px solid var(--border);padding:12px 24px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}#content{padding:0}.page{padding:40px 24px;max-width:1400px;margin:0 auto;display:block}.page[hidden]{display:none}
-@media(max-width:768px){.sidebar{width:60px;overflow:visible}.side-brand{padding:16px 0;justify-content:center}.side-title,.side-sub,.side-link span,.side-link .link-badge,.side-progress,.side-footer span{display:none}.side-link{justify-content:center;padding:12px 0}.side-footer{padding:8px 0}#filterBar{padding:10px 12px}body{padding-left:60px}}@media(max-width:600px){.sidebar{width:100%;height:56px;bottom:0;top:auto;flex-direction:row;border-right:none;border-top:1px solid var(--border);overflow:visible;z-index:200}.side-brand{display:none}.side-nav{flex-direction:row;padding:0}.side-link{flex:1;justify-content:center;border-radius:0;min-height:56px;padding:0}.side-footer{display:none}#filterBar{top:0;z-index:99;padding:8px 12px;position:sticky}.page{padding:20px 12px}body{padding-left:0;padding-bottom:56px}}
+@media(max-width:768px){.sidebar{width:60px;overflow:visible}.side-brand{padding:16px 0;justify-content:center}.side-title,.side-sub,.side-link span,.side-link .link-badge,.side-progress,.side-footer span{display:none}.side-link{justify-content:center;padding:12px 0}.side-footer{padding:8px 0}#filterBar{padding:10px 12px}body{padding-left:60px}.grid-2col{grid-template-columns:1fr}.page-header{flex-direction:column;align-items:flex-start}}@media(max-width:600px){.sidebar{width:100%;height:56px;bottom:0;top:auto;flex-direction:row;border-right:none;border-top:1px solid var(--border);overflow:visible;z-index:200}.side-brand{display:none}.side-nav{flex-direction:row;padding:0}.side-link{flex:1;justify-content:center;border-radius:0;min-height:56px;padding:0}.side-footer{display:none}#filterBar{top:0;z-index:99;padding:8px 12px;position:sticky}.page{padding:20px 12px}body{padding-left:0;padding-bottom:56px}}
 .modal{position:fixed;inset:0;z-index:var(--z-modal);display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);padding:16px}.modal.open{display:flex}.modal-inner{background:var(--card);border-radius:var(--radius-lg);border:1px solid var(--border);max-width:1000px;width:100%;max-height:90vh;overflow-y:auto;display:grid;grid-template-columns:40% 60%;gap:24px;padding:24px;position:relative;animation:fadeScale 0.3s ease}@keyframes fadeScale{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
 .modal-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:20px;display:flex;align-items:center;justify-content:center;z-index:10}.modal-x:hover{background:var(--elevated);color:var(--text)}
 .modal-img{width:100%;aspect-ratio:3/4;object-fit:contain;border-radius:var(--radius-lg);background:var(--bg);border:1px solid var(--border)}.modal-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.modal-thumb{width:56px;height:56px;border-radius:var(--radius);border:2px solid transparent;cursor:pointer;overflow:hidden;transition:border-color var(--tf)}.modal-thumb:hover,.modal-thumb.active{border-color:var(--brand)}.modal-thumb img{width:100%;height:100%;object-fit:cover}
@@ -68,18 +70,18 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <aside class="sidebar" role="navigation" aria-label="Navigation">
 <div class="side-brand"><div class="side-logo"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div><div class="side-title">RappelConso</div><div class="side-sub">Exploration alimentation</div></div></div>
 <nav class="side-nav">
-<a href="javascript:void(0)" class="side-link active" data-page="dashboard">
+<a href="javascript:void(0)" class="side-link active" data-page="dashboard" aria-current="page">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span><span class="link-badge" id="menuBadgeDash">—</span></a>
-<a href="javascript:void(0)" class="side-link" data-page="search">
+<a href="javascript:void(0)" class="side-link" data-page="search" aria-current="false">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>Recherche</span><span class="link-badge">12945</span></a>
-<a href="javascript:void(0)" class="side-link" data-page="analyses">
+<a href="javascript:void(0)" class="side-link" data-page="analyses" aria-current="false">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg><span>Analyses</span></a>
-<a href="javascript:void(0)" class="side-link" data-page="about">
+<a href="javascript:void(0)" class="side-link" data-page="about" aria-current="false">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span>A propos</span></a>
 </nav>
 <div class="side-footer">
 <div class="side-progress" id="progressWrap"><div class="bar"><div class="fill" id="progressFill" style="width:0%"></div></div><div class="label" id="progressLabel">Chargement...</div></div>
-<button id="themeBtn" class="btn btn--ghost btn--xs" aria-label="Theme">
+<button id="themeBtn" class="btn btn--ghost btn--xs" aria-label="Basculer theme">
 <svg class="icon icon-sm theme-icon" data-theme-icon="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg class="icon icon-sm theme-icon" data-theme-icon="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
 </div>
@@ -89,11 +91,11 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <div class="filter-row" style="flex-wrap:wrap">
 <div class="search-box" style="flex:2;min-width:200px">
 <svg class="search-icon icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-<input type="search" id="searchInput" placeholder="Marque, produit, motif..." autocomplete="off">
+<input type="search" id="searchInput" placeholder="Marque, produit, motif..." autocomplete="off" aria-label="Rechercher rappels">
 </div>
-<select id="filterCat" class="filter-select"><option value="">Sous-categorie</option></select>
-<select id="filterRisk" class="filter-select"><option value="">Risque</option></select>
-<select id="filterLegal" class="filter-select"><option value="">Nature juridique</option></select>
+<select id="filterCat" class="filter-select" aria-label="Filtrer par sous-categorie"><option value="">Sous-categorie</option></select>
+<select id="filterRisk" class="filter-select" aria-label="Filtrer par risque"><option value="">Risque</option></select>
+<select id="filterLegal" class="filter-select" aria-label="Filtrer par nature juridique"><option value="">Nature juridique</option></select>
 </div>
 <div class="filter-row" style="justify-content:space-between;flex-wrap:wrap">
 <div class="filter-chips" id="filterChips">
@@ -103,37 +105,37 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <button class="chip" data-chip="recent">30 derniers jours</button>
 </div>
 <div class="filter-row" style="gap:8px">
-<div class="date-presets" role="group">
+<div class="date-presets" role="group" aria-label="Presets periode">
 <button class="btn btn--ghost btn--sm active" data-days="0">Tout</button>
 <button class="btn btn--ghost btn--sm" data-days="30">30j</button>
 <button class="btn btn--ghost btn--sm" data-days="90">3 mois</button>
 <button class="btn btn--ghost btn--sm" data-days="180">6 mois</button>
 <button class="btn btn--ghost btn--sm" data-days="365">1 an</button>
 </div>
-<button id="clearFiltersBtn" class="btn btn--ghost btn--sm" style="color:var(--danger)">Effacer</button>
+<button id="clearFiltersBtn" class="btn btn--ghost btn--sm" style="color:var(--danger)" aria-label="Effacer tous les filtres">Effacer</button>
 </div>
 </div>
 </div>
 <div id="content">
 <div class="page" data-page="dashboard">
-<div class="section__header" style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap"><h2 style="font-size:22px;font-weight:700">Tableau de bord</h2><span class="badge badge--white" id="dashTotalBadge">Chargement...</span><span class="badge badge--orange" id="cacheBadge">0 fiches</span></div>
-<div class="kpi-grid">
+<div class="page-header"><h1 class="page-title">Tableau de bord</h1><div class="page-meta"><span class="badge badge--white" id="dashTotalBadge" aria-live="polite" aria-atomic="true">Chargement...</span><span class="badge badge--orange" id="cacheBadge" aria-live="polite" aria-atomic="true">0 fiches</span></div></div>
+<section class="grid-responsive">
 <div class="card kpi"><div class="kpi__icon kpi__icon--orange"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="kpi__value" id="kpiTotal">—</div><div class="kpi__label">Rappels en cache</div></div>
 <div class="card kpi"><div class="kpi__icon kpi__icon--red"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div><div class="kpi__value" id="kpiRisky">—</div><div class="kpi__label">Risques graves</div></div>
 <div class="card kpi"><div class="kpi__icon kpi__icon--green"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div><div class="kpi__value" id="kpiClosed">—</div><div class="kpi__label">Procedures closes</div></div>
 <div class="card kpi"><div class="kpi__icon kpi__icon--blue"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div><div class="kpi__value" id="kpiBrands">—</div><div class="kpi__label">Marques distinctes</div></div>
-</div>
-<div class="chart-grid" style="margin-top:24px">
-<div class="card chart-card"><h3>Sous-categories</h3><canvas id="chartCat"></canvas><div class="skeleton" style="height:260px" id="skelCat"></div></div>
-<div class="card chart-card"><h3>Risques identifies</h3><canvas id="chartRisk"></canvas><div class="skeleton" style="height:260px" id="skelRisk"></div></div>
-<div class="chart-full card chart-card"><h3>Evolution mensuelle</h3><canvas id="chartTime"></canvas><div class="skeleton" style="height:260px" id="skelTime"></div></div>
-<div class="card chart-card"><h3>Top marques</h3><canvas id="chartBrand"></canvas><div class="skeleton" style="height:260px" id="skelBrand"></div></div>
-</div>
+</section>
+<section class="grid-responsive grid-2col" style="margin-top:var(--space-6)">
+<div class="card chart-card"><div class="card__header">Sous-categories</div><canvas id="chartCat" class="card__body"></canvas><div class="skeleton" hidden id="skelCat"></div></div>
+<div class="card chart-card"><div class="card__header">Risques identifies</div><canvas id="chartRisk" class="card__body"></canvas><div class="skeleton" hidden id="skelRisk"></div></div>
+<div class="card chart-card grid-full"><div class="card__header">Evolution mensuelle</div><canvas id="chartTime" class="card__body"></canvas><div class="skeleton" hidden id="skelTime"></div></div>
+<div class="card chart-card"><div class="card__header">Top marques</div><canvas id="chartBrand" class="card__body"></canvas><div class="skeleton" hidden id="skelBrand"></div></div>
+</section>
 </div>
 <div class="page" data-page="search" id="search" hidden>
-<div class="section__header" style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap"><h2 style="font-size:22px;font-weight:700">Recherche</h2><span class="badge badge--white" id="searchTotalBadge">0 resultats</span></div>
+<div class="page-header"><h1 class="page-title">Recherche</h1><div class="page-meta"><span class="badge badge--white" id="searchTotalBadge" aria-live="polite" aria-atomic="true">0 resultats</span></div></div>
 <div id="loadingSearch" class="loading" style="display:none"><div class="spinner"></div><span>Recherche en cours...</span></div>
-<div id="searchContent"><div class="table-wrap"><table><thead><tr>
+<div id="searchContent"><div class="table-wrap"><table role="grid"><thead><tr>
 <th data-col="sous_categorie_produit">Sous-cat<span class="sort-arrow">↓</span></th>
 <th data-col="marque_produit">Marque<span class="sort-arrow">↓</span></th>
 <th data-col="libelle">Produit<span class="sort-arrow">↓</span></th>
@@ -142,21 +144,21 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <th data-col="motif_rappel">Motif<span class="sort-arrow">↓</span></th>
 <th></th></tr></thead><tbody id="searchBody"></tbody></table></div>
 <div id="searchEmpty" class="table-empty" style="display:none"><p>Aucun resultat</p></div>
-<div class="pagination" id="searchPagination"></div></div>
+<div class="pagination" id="searchPagination" role="navigation" aria-label="Pagination"></div></div>
 </div>
 <div class="page" data-page="analyses" hidden>
-<div class="section__header" style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap"><h2 style="font-size:22px;font-weight:700">Analyses statistiques</h2><span class="badge badge--white" id="statsBadge">Donnees filtrees</span></div>
-<div class="stats-grid">
-<div class="card stats-card"><h3>Saisonnalite</h3><canvas id="chartSeason"></canvas><div class="skeleton" style="height:220px" id="skelSeason"></div></div>
-<div class="card stats-card"><h3>Pareto 80/20</h3><div id="paretoContainer"><div class="skeleton" style="height:220px"></div></div></div>
-<div class="card stats-card"><h3>Matrice de correlation</h3><div id="corrContainer"><div class="skeleton" style="height:220px"></div></div></div>
-<div class="card stats-card"><h3>Test Chi2</h3><div id="chi2Container"><div class="skeleton" style="height:140px"></div></div></div>
-<div class="chart-full card stats-card"><h3>Tendance lineaire</h3><canvas id="chartTrend"></canvas><div class="skeleton" style="height:220px" id="skelTrend"></div></div>
-</div>
+<div class="page-header"><h1 class="page-title">Analyses statistiques</h1><div class="page-meta"><span class="badge badge--white" id="statsBadge" aria-live="polite" aria-atomic="true">Donnees filtrees</span></div></div>
+<section class="stats-grid">
+<div class="card stats-card" id="seasonality-card" aria-busy="false"><div class="card__header">🌤️ Saisonnalite</div><canvas id="chartSeason" class="card__body"></canvas><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="skeleton" hidden id="skelSeason"></div></div>
+<div class="card stats-card" id="pareto-card" aria-busy="false"><div class="card__header">📊 Pareto 80/20</div><div id="paretoContainer" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px"><p><strong>Explication:</strong> La loi de Pareto montre que 80% des rappels proviennent de 20% des categories. Les barres colorees indiquent le pourcentage cumulatif.</p></div></div>
+<div class="card stats-card" id="correlation-card" aria-busy="false"><div class="card__header">🔗 Matrice de correlation</div><div id="corrContainer" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px"><p><strong>Explication:</strong> Intensite des couleurs = force de correlation entre categories et risques. Plus orange = plus de co-occurrences.</p></div></div>
+<div class="card stats-card" id="chi2-card" aria-busy="false"><div class="card__header">📐 Test Chi2</div><div id="chi2Container" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px"><p><strong>Explication:</strong> Test d'independance: determinie si categorie et risque sont lies (p&lt;0.05). V de Cramer mesure la force (0=independant, 1=dependant).</p></div></div>
+<div class="card stats-card grid-full" id="trend-card" aria-busy="false"><div class="card__header">📈 Tendance lineaire</div><canvas id="chartTrend" class="card__body"></canvas><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="skeleton" hidden id="skelTrend"></div><div class="stats-insight" style="margin-top:12px"><p><strong>Explication:</strong> Ligne bleue = nombre reel de rappels par mois. Ligne orange = tendance mathematique avec pente (positive=hausse, negative=baisse).</p></div></div>
+</section>
 </div>
 <div class="page" data-page="about" hidden>
+<div class="page-header"><h1 class="page-title">A propos</h1></div>
 <div class="card" style="max-width:720px;margin:0 auto">
-<h2 style="font-size:20px;font-weight:700;margin-bottom:16px">A propos</h2>
 <p style="font-size:14px;color:var(--text2);margin-bottom:16px">Cette application explore les 12 945 fiches de rappel de produits alimentaires publiees via l'API RappelConso. Les donnees sont chargees depuis un fichier statique <code>data.json</code>.</p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
 <div><strong>Source</strong><br><span style="color:var(--text2)">data.economie.gouv.fr</span></div>
@@ -168,9 +170,9 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 </div>
 </div>
 </main>
-<div id="detailModal" class="modal" role="dialog" aria-modal="true">
+<div id="detailModal" class="modal" role="dialog" aria-modal="true" aria-label="Details fiche">
 <div class="modal-inner">
-<button class="modal-x" id="modalClose">&times;</button>
+<button class="modal-x" id="modalClose" aria-label="Fermer">&times;</button>
 <div id="modalLeft"><div class="skeleton" style="height:300px"></div></div>
 <div id="modalRight"><div class="skeleton" style="height:300px"></div></div>
 </div></div>
@@ -191,7 +193,6 @@ $('themeBtn').addEventListener('click',toggleTheme);
 
 async function apiFetch(path,retries=2){for(let i=0;i<=retries;i++){try{const r=await fetch(API+path);if(!r.ok&&r.status<500)throw new Error('API '+r.status);if(!r.ok)continue;return await r.json()}catch(e){if(i===retries)throw e;await new Promise(r=>setTimeout(r,1e3*(i+1)))}}throw new Error('API unreachable')}
 
-// Load facets using group_by
 async function loadFacets(){try{
 const[cats,risks,legals]=await Promise.all([
 apiFetch('/records?select=sous_categorie_produit,count(*)&group_by=sous_categorie_produit&limit=50&refine=categorie_produit:alimentation&order_by=count(*) desc'),
@@ -205,7 +206,6 @@ const pop=(sel,arr)=>{const s=$(sel);s.innerHTML='<option value="">'+(sel==='fil
 arr.forEach(a=>{const v=Object.values(a)[0];const c=a['count(*)'];if(!v)return;const o=document.createElement('option');o.value=v;o.textContent=v+' ('+c+')';s.appendChild(o)})};
 if($('filterCat')){pop('filterCat',STATE.facets.cats);pop('filterRisk',STATE.facets.risks);pop('filterLegal',STATE.facets.legals)}}
 
-// Global filtered view
 function getFilteredRecords(){
 let d=STATE.records;const q=$('searchInput').value.trim().toLowerCase();
 const cat=$('filterCat').value;const risk=$('filterRisk').value;const legal=$('filterLegal').value;
@@ -220,16 +220,14 @@ if(legal)d=d.filter(r=>r.nature_juridique_rappel===legal);
 if(q)d=d.filter(r=>(r.marque_produit||'').toLowerCase().includes(q)||(r.libelle||'').toLowerCase().includes(q)||(r.motif_rappel||'').toLowerCase().includes(q)||(r.sous_categorie_produit||'').toLowerCase().includes(q));
 return d}
 
-// Re-render current page after filter change
 function onFilterChange(){
 const page=STATE.currentPage;
 if(page==='search'){STATE.page=1;doSearch(false)}
 else if(page==='dashboard')updateDashboard()
 else if(page==='analyses'){const d=getFilteredRecords();$('statsBadge').textContent=d.length+' fiches filtrées';renderStats(d);renderCharts(d)}}
 
-// Switch page from sidebar
 function switchPage(name){
-qsa('.side-link').forEach(x=>x.classList.toggle('active',x.dataset.page===name));
+qsa('.side-link').forEach(x=>{x.classList.toggle('active',x.dataset.page===name);x.setAttribute('aria-current',x.dataset.page===name?'page':'false')});
 qsa('.page').forEach(x=>x.hidden=x.dataset.page!==name);
 STATE.currentPage=name;
 if(name==='dashboard')updateDashboard()
@@ -237,10 +235,8 @@ else if(name==='search')doSearch(true)
 else if(name==='analyses'){const d=getFilteredRecords();$('statsBadge').textContent=d.length+' fiches filtrées';renderStats(d)}
 else if(name==='about'){}}
 
-// Page nav clicks
 qsa('.side-link').forEach(a=>a.addEventListener('click',function(){switchPage(this.dataset.page)}));
 
-// Dashboard
 function updateDashboard(){
 const d=getFilteredRecords();if(!d.length)return;const r=d.length;
 $('kpiTotal').textContent=r.toLocaleString('fr-FR');
@@ -251,7 +247,6 @@ const brands=new Set(d.map(x=>x.marque_produit).filter(Boolean));$('kpiBrands').
 renderCharts(d)}
 
 function renderCharts(data){
-qsa('#dashboard .skeleton').forEach(s=>s.style.display='none');
 const catCnt={};data.forEach(d=>{const k=d.sous_categorie_produit||'Autre';catCnt[k]=(catCnt[k]||0)+1});
 const catSorted=Object.entries(catCnt).sort((a,b)=>b[1]-a[1]).slice(0,15);
 makeBar($('chartCat'),catSorted.map(x=>x[0].length>22?x[0].slice(0,22)+'...':x[0]),catSorted.map(x=>x[1]));
@@ -274,7 +269,6 @@ function makeLine(c,labels,data){if(window.cm&&window.cm[c.id])window.cm[c.id].d
 const g=ctx.createLinearGradient(0,0,0,300);g.addColorStop(0,'rgba(243,112,33,0.25)');g.addColorStop(1,'rgba(243,112,33,0.01)');
 window.cm[c.id]=new Chart(c,{type:'line',data:{labels,datasets:[{data,borderColor:'#F37021',backgroundColor:g,fill:true,tension:0.35,pointRadius:2,pointHoverRadius:5,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
 
-// Search - fully local on filtered records
 function doSearch(resetPage){
 if(resetPage)STATE.page=1;STATE.offset=(STATE.page-1)*STATE.limit;
 const filtered=getFilteredRecords();
@@ -292,7 +286,7 @@ results.forEach(r=>{
 const tr=document.createElement('tr');tr.style.cursor='pointer';
 const cat=r.sous_categorie_produit||'';const risk=r.risques_encourus||'';
 const riskClass=/grave|mortel|hospitalisation/i.test(risk)?'badge--red':/bacterien|microbio|salmonelle|listeria|e.coli|coli/i.test(risk)?'badge--yellow':'badge--blue';
-tr.innerHTML='<td><span class="badge badge--orange">'+esc(cat.slice(0,20))+'</span></td><td>'+esc(r.marque_produit||'')+'</td><td>'+esc(r.libelle||r.modeles_ou_references||'')+'</td><td><span class="badge '+riskClass+'">'+esc(risk.slice(0,28))+'</span></td><td style="white-space:nowrap">'+fmtDate(r.date_publication)+'</td><td>'+esc((r.motif_rappel||'').slice(0,40))+'</td><td><button class="btn btn--ghost btn--sm" data-id="'+r.id+'" aria-label="Detail">Detail</button></td>';tbody.appendChild(tr)})}
+tr.innerHTML='<td><span class="badge badge--orange">'+esc(cat.slice(0,20))+'</span></td><td>'+esc(r.marque_produit||'')+'</td><td>'+esc(r.libelle||r.modeles_ou_references||'')+'</td><td><span class="badge '+riskClass+'">'+esc(risk.slice(0,28))+'</span></td><td style="white-space:nowrap">'+fmtDate(r.date_publication)+'</td><td>'+esc((r.motif_rappel||'').slice(0,40))+'</td><td><button class="btn btn--ghost btn--sm" data-id="'+r.id+'" aria-label="Voir details">Detail</button></td>';tbody.appendChild(tr)})}
 
 function renderPagination(total){
 const p=STATE.page;const per=STATE.limit;const pages=Math.ceil(total/per);if(pages<=1)return'';
@@ -301,7 +295,6 @@ const start=Math.max(1,p-2);const end=Math.min(pages,p+2);
 for(let i=start;i<=end;i++)h+='<button class="pag-btn'+(i===p?' active':'')+'" data-page="'+i+'">'+i+'</button>';
 h+='<button class="pag-btn" data-page="'+(p+1)+'" '+(p>=pages?'disabled':'')+'>&rsaquo;</button><button class="pag-btn" data-page="'+pages+'" '+(p>=pages?'disabled':'')+'>&raquo;</button><span class="pag-info">Page '+p+'/'+pages+'</span>';return h}
 
-// Filter events
 qsa('.chip').forEach(c=>c.addEventListener('click',function(){
 const v=this.dataset.chip;
 if(v==='all'){qsa('.chip').forEach(x=>x.classList.remove('active'));this.classList.add('active');STATE.chips=new Set(['all']);$('filterCat').value='';$('filterRisk').value='';$('filterLegal').value='';STATE.days=0;qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').classList.add('active')}
@@ -321,7 +314,6 @@ $('filterCat').addEventListener('change',()=>{STATE.page=1;onFilterChange()});
 $('filterRisk').addEventListener('change',()=>{STATE.page=1;onFilterChange()});
 $('filterLegal').addEventListener('change',()=>{STATE.page=1;onFilterChange()});
 
-// Table sort + pagination
 document.querySelector('#search thead').addEventListener('click',function(e){
 const th=e.target.closest('th');if(!th||!th.dataset.col)return;
 STATE.dir=(STATE.col===th.dataset.col&&STATE.dir==='asc')?'desc':'asc';STATE.col=th.dataset.col;
@@ -332,7 +324,6 @@ STATE.page=parseInt(btn.dataset.page);doSearch(false);
 window.scrollTo({top:$('search').offsetTop-80,behavior:'smooth'})});
 document.addEventListener('click',function(e){const b=e.target.closest('[data-id]');if(b&&b.dataset.id)openModal(b.dataset.id)});
 
-// Modal
 async function openModal(id){
 $('detailModal').classList.add('open');document.body.style.overflow='hidden';
 $('modalLeft').innerHTML='<div class="loading"><div class="spinner"></div></div>';$('modalRight').innerHTML='<div class="loading"><div class="spinner"></div></div>';
@@ -364,9 +355,7 @@ $('modalClose').addEventListener('click',()=>{$('detailModal').classList.remove(
 $('detailModal').addEventListener('click',function(e){if(e.target===this){this.classList.remove('open');document.body.style.overflow=''}});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){$('detailModal').classList.remove('open');document.body.style.overflow=''}});
 
-// Stats
 function renderStats(data){
-qsa('#analyses .skeleton').forEach(s=>s.style.display='none');
 const m=Array(12).fill(0);data.forEach(d=>{if(!d.date_publication)return;const dt=new Date(d.date_publication);if(!isNaN(dt))m[dt.getMonth()]++});makeBar($('chartSeason'),MONTHS,m);
 const cnt={};data.forEach(d=>{const k=d.sous_categorie_produit||'Autre';cnt[k]=(cnt[k]||0)+1});
 const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);const total=sorted.reduce((s,x)=>s+x[1],0);
@@ -384,7 +373,7 @@ const cc={},rc={},j={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre
 const c2=Object.keys(cc).slice(0,10),r2=Object.keys(rc).slice(0,10),n=data.length;
 if(n<2||c2.length<2||r2.length<2){$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card" style="grid-column:1/-1"><div class="chi2-value" style="font-size:14px;color:var(--text2)">Analyse independante</div><div class="chi2-label">Pas assez de categories/risques distincts pour le test du Chi².</div></div></div><div class="stats-insight"><p>Le test du Chi² et le V de Cramer necessitent au moins 2 categories et 2 risques distincts.</p></div>'}else{
 let chi=0,df=(c2.length-1)*(r2.length-1);c2.forEach(c=>{r2.forEach(r=>{const e=(cc[c]*rc[r])/n,o=j[c]?.[r]||0;if(e>0)chi+=((o-e)**2)/e})});
-const cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card"><div class="chi2-value">'+chi.toFixed(2)+'</div><div class="chi2-label">Chi² (independance)</div></div><div class="card chi2-card"><div class="chi2-value">'+df+'</div><div class="chi2-label">Degres de liberte</div></div><div class="card chi2-card"><div class="chi2-value">'+cv.toFixed(3)+'</div><div class="chi2-label">V de Cramer</div></div></div><div class="stats-insight"><p>'+(chi>3.841&&df>0?'Correlation significative (p<0.05) — la sous-categorie et le risque sont lies.':'Non significatif — les variations observees peuvent etre dues au hasard.')+'</p></div>'}
+const cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card"><div class="chi2-value">'+chi.toFixed(2)+'</div><div class="chi2-label">Chi² (independance)</div></div><div class="card chi2-card"><div class="chi2-value">'+df+'</div><div class="chi2-label">Degres de liberte</div></div><div class="card chi2-card"><div class="chi2-value">'+cv.toFixed(3)+'</div><div class="chi2-label">V de Cramer</div></div></div><div class="stats-insight"><p>'+(chi>3.841&&df>0?'Correlation significative (p&lt;0.05) — la sous-categorie et le risque sont lies.':'Non significatif — les variations observees peuvent etre dues au hasard.')+'</p></div>'}
 const tc={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);tc[m]=(tc[m]||0)+1});
 const tr=Object.entries(tc).sort((a,b)=>a[0].localeCompare(b[0]));const vals=tr.map(x=>x[1]),labels=tr.map(x=>x[0].slice(5));
 if(vals.length<2){$('chartTrend').style.display='none';return}$('chartTrend').style.display='block';
@@ -394,7 +383,6 @@ const isDark=document.documentElement.getAttribute('data-theme')==='dark';
 if(window.cm&&window.cm.chartTrend)window.cm.chartTrend.destroy();
 window.cm.chartTrend=new Chart($('chartTrend'),{type:'line',data:{labels,datasets:[{label:'Rappels',data:vals,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.3,pointRadius:2},{label:'Tendance (pente='+slope.toFixed(2)+')',data:trend,borderColor:'#F37021',borderWidth:2,borderDash:[5,5],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10},padding:12}}},scales:{x:{grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
 
-// Init: load data.json then check API for updates
 async function init(){
 $('dashTotalBadge').textContent='Chargement data.json...';
 try{
@@ -406,9 +394,10 @@ if(data.length){STATE.dataDate=data[0].date_publication||'';}
 $('cacheBadge').textContent=data.length+' fiches chargees';
 $('dashTotalBadge').textContent=data.length.toLocaleString('fr-FR')+' fiches';
 $('menuBadgeDash').textContent=data.length>999?Math.round(data.length/1000)+'k':data.length;
-$('aboutCache').textContent=data.length+' / - (fichier statique)';
+$('aboutCache').textContent=data.length+' / 12945 (fichier statique)';
 $('progressFill').style.width='100%';$('progressLabel').textContent=data.length+' fiches';
 updateDashboard();doSearch(true);loadFacets();
+if(STATE.records.length)renderStats(STATE.records);
 try{
 const latest=await apiFetch('/records?limit=1&refine=categorie_produit:alimentation&order_by=date_publication+desc');
 if(latest.results&&latest.results.length){
