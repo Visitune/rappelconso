@@ -49,8 +49,8 @@ td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.stats-card{padding:20px}.stats-card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text2);display:flex;align-items:center;gap:8px}.stats-card canvas{max-height:260px}
 .stats-insight{padding:14px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--brand);margin-top:10px}.stats-insight p{font-size:13px;color:var(--text2)}
 .pareto-chart{display:flex;flex-direction:column;gap:6px;padding:6px 0}.pareto-bar{display:flex;align-items:center;gap:10px}.pareto-bar__label{min-width:80px;font-size:11px;color:var(--text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pareto-bar__track{flex:1;height:16px;background:var(--surface);border-radius:var(--radius-full);overflow:hidden}.pareto-bar__fill{height:100%;border-radius:var(--radius-full);transition:width 1s ease}.pareto-bar__val{font-size:11px;color:var(--text3);min-width:32px;text-align:right;font-family:'JetBrains Mono',monospace}
-.corr-grid{display:grid;gap:2px;font-size:11px;overflow-x:auto}.corr-cell{padding:6px 10px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-family:'JetBrains Mono',monospace;min-height:28px;transition:transform var(--tf)}.corr-cell--header{color:var(--text2);font-weight:600;font-size:10px}.corr-cell:hover{transform:scale(1.1)}
-.chi2-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:14px}.chi2-card{padding:14px;text-align:center}.chi2-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700}.chi2-label{font-size:11px;color:var(--text3);margin-top:6px}
+.corr-grid{display:grid;gap:2px;font-size:12px}.corr-cell{padding:8px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-family:'JetBrains Mono',monospace;min-height:40px;transition:all var(--tf);border:1px solid rgba(255,255,255,0.02)}.corr-cell:hover{transform:scale(1.05);box-shadow:0 0 8px rgba(243,112,33,0.2)}.corr-cell--header{color:var(--text2);font-weight:700;font-size:11px;background:var(--elevated)}.corr-cell:hover{transform:scale(1.1)}
+.chi2-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:0}.chi2-card{padding:20px;text-align:center;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}.chi2-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--brand);margin-bottom:8px}.chi2-label{font-size:12px;color:var(--text2);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:16px;color:var(--text3)}.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 .blob-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.04}.blob-1{width:600px;height:600px;background:var(--brand);top:-10%;right:-5%;animation:float 12s ease-in-out infinite}.blob-2{width:400px;height:400px;background:#3B82F6;bottom:-5%;left:-5%;animation:float 10s ease-in-out infinite 2s}.blob-3{width:300px;height:300px;background:#2ED573;bottom:30%;right:10%;animation:float 14s ease-in-out infinite 4s}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
 .sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;z-index:100;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}.side-brand{padding:24px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}.side-logo{width:36px;height:36px;border-radius:var(--radius);background:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0}.side-title{font-weight:700;font-size:15px}.side-sub{font-size:10px;color:var(--text3);margin-top:2px}
@@ -159,13 +159,47 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <div class="pagination" id="searchPagination" role="navigation" aria-label="Pagination"></div></div>
 </div>
 <div class="page" data-page="analyses" hidden>
-<div class="page-header"><h1 class="page-title">Analyses statistiques</h1><div class="page-meta"><span class="badge badge--white" id="statsBadge" aria-live="polite" aria-atomic="true">Donnees filtrees</span></div></div>
-<section class="stats-grid">
-<div class="card stats-card" id="seasonality-card" aria-busy="false"><div class="card__header">📅 Saisonnalité (Rappels par Mois)</div><canvas id="chartSeason" class="card__body"></canvas><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="skeleton" hidden id="skelSeason"></div></div>
-<div class="card stats-card" id="pareto-card" aria-busy="false"><div class="card__header">📊 Pareto 80/20</div><div id="paretoContainer" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px"><p><strong>Explication:</strong> La loi de Pareto montre que 80% des rappels proviennent de 20% des categories. Les barres colorees indiquent le pourcentage cumulatif.</p></div></div>
-<div class="card stats-card" id="correlation-card" aria-busy="false"><div class="card__header">🔗 Matrice de correlation</div><div id="corrContainer" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px"><p><strong>Explication:</strong> Intensite des couleurs = force de correlation entre categories et risques. Plus orange = plus de co-occurrences.</p></div></div>
-<div class="card stats-card" id="chi2-card" aria-busy="false"><div class="card__header">📐 Test Chi2</div><div id="chi2Container" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px"><p><strong>Explication:</strong> Test d'independance: determinie si categorie et risque sont lies (p&lt;0.05). V de Cramer mesure la force (0=independant, 1=dependant).</p></div></div>
-<div class="card stats-card grid-full" id="trend-card" aria-busy="false"><div class="card__header">📈 Tendance lineaire</div><canvas id="chartTrend" class="card__body"></canvas><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="skeleton" hidden id="skelTrend"></div><div class="stats-insight" style="margin-top:12px"><p><strong>Explication:</strong> Ligne bleue = nombre reel de rappels par mois. Ligne orange = tendance mathematique avec pente (positive=hausse, negative=baisse).</p></div></div>
+<div class="page-header"><h1 class="page-title">Analyses Statistiques Détaillées</h1><div class="page-meta"><span class="badge badge--white" id="statsBadge" aria-live="polite" aria-atomic="true">Donnees filtrees</span></div></div>
+
+<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
+<div class="card stats-card" id="seasonality-card" aria-busy="false"><div class="card__header">📅 Saisonnalité Mensuelle</div><canvas id="chartSeason" class="card__body"></canvas><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="skeleton" hidden id="skelSeason"></div><div class="stats-insight" style="margin-top:12px;font-size:13px"><p>Distribution des rappels par mois. Identifie les périodes de risque élevé.</p></div></div>
+
+<div class="card stats-card" id="pareto-card" aria-busy="false"><div class="card__header">📊 Loi de Pareto (80/20)</div><div id="paretoContainer" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px;font-size:13px"><p>80% des rappels proviennent de ~20% des catégories. Les plus critiques concentrent l'essentiel des risques.</p></div></div>
+</section>
+
+<div class="card stats-card" style="margin-bottom:var(--space-6)" id="correlation-card" aria-busy="false">
+<div class="card__header" style="margin-bottom:16px">🔗 Matrice de Corrélation — Catégories × Risques</div>
+<div id="corrContainer" class="card__body" style="overflow-x:auto;padding:0"><div class="skeleton" hidden></div></div>
+<div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
+<div class="stats-insight" style="margin-top:16px;font-size:13px;padding:0 20px 20px 20px">
+<p><strong>Lecture:</strong> Chaque cellule = nombre de rappels. Couleur orange = forte concentration. Permet d'identifier les paires catégorie-risque critiques.</p>
+<p style="margin-top:8px;color:var(--text3)">💡 Exemple: Les produits laitiers rencontrent principalement Listeria; les céréales rencontrent d'autres contaminants.</p>
+</div>
+</div>
+
+<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)">
+<div class="card stats-card" id="chi2-card" aria-busy="false">
+<div class="card__header">📐 Analyse d'Indépendance (Chi²)</div>
+<div id="chi2Container" class="card__body"><div class="skeleton" hidden></div></div>
+<div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
+<div class="stats-insight" style="margin-top:12px;font-size:13px">
+<p><strong>Interprétation:</strong></p>
+<p style="margin-top:6px">• <strong>Chi²</strong> = Mesure du lien entre catégorie et risque</p>
+<p>• <strong>V de Cramer</strong> = Force (0 = indépendant, 1 = fortement lié)</p>
+<p style="margin-top:6px;color:var(--text3)">Si p&lt;0.05 → Lien statistiquement significatif</p>
+</div>
+</div>
+
+<div class="card stats-card" id="trend-card" aria-busy="false">
+<div class="card__header">📈 Tendance Temporelle (Régression Linéaire)</div>
+<canvas id="chartTrend" class="card__body" style="max-height:280px"></canvas>
+<div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
+<div class="skeleton" hidden id="skelTrend"></div>
+<div class="stats-insight" style="margin-top:12px;font-size:13px">
+<p><strong>Lecture:</strong> Ligne bleue = observations réelles. Ligne orange pointillée = tendance mathématique.</p>
+<p style="margin-top:6px">La pente indique si les rappels augmentent (↗) ou diminuent (↘) sur la période.</p>
+</div>
+</div>
 </section>
 </div>
 <div class="page" data-page="about" hidden>
@@ -410,12 +444,12 @@ let cumul=0;let ph='<div class="pareto-chart">';
 sorted.slice(0,15).forEach(([k,v])=>{cumul+=v;const p=v/total*100;ph+='<div class="pareto-bar"><span class="pareto-bar__label">'+esc(k)+'</span><div class="pareto-bar__track"><div class="pareto-bar__fill" style="width:'+p+'%;background:'+(cumul/total*100<=80?'var(--brand)':'var(--text3)')+'"></div></div><span class="pareto-bar__val">'+p.toFixed(1)+'%</span></div>'});
 ph+='</div>';$('paretoContainer').innerHTML=ph;
 const cr={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';if(!cr[c])cr[c]={};cr[c][r]=(cr[c][r]||0)+1});
-const cats=Object.keys(cr).sort((a,b)=>Object.values(cr[b]||{}).reduce((s,x)=>s+x,0)-Object.values(cr[a]||{}).reduce((s,x)=>s+x,0)).slice(0,8);const risks=Object.entries(Object.fromEntries(data.map(d=>[d.risques_encourus||'Non specifie',1]))).map(x=>x[0]).sort().slice(0,8);
-const id=document.documentElement.getAttribute('data-theme')==='dark';let ch='<div class="corr-grid" style="grid-template-columns:140px repeat('+risks.length+',minmax(100px,1fr));gap:1px;overflow-x:auto"><div class="corr-cell corr-cell--header"></div>';
-risks.forEach(r=>{const label=r.length>14?r.slice(0,14)+'...':r;ch+='<div class="corr-cell corr-cell--header" title="'+esc(r)+'">'+esc(label)+'</div>'});
-cats.forEach(c=>{const clabel=c.length>14?c.slice(0,14)+'...':c;ch+='<div class="corr-cell corr-cell--header" title="'+esc(c)+'">'+esc(clabel)+'</div>';
-risks.forEach(r=>{const v=cr[c]?.[r]||0;const max=Math.max(1,...Object.values(cr[c]||{}));const ins=v/max;ch+='<div class="corr-cell" style="background:'+(id?'rgba(243,112,33,'+(ins*0.7)+')':'rgba(243,112,33,'+(ins*0.5)+')')+';color:'+(ins>0.4?'#fff':'var(--text2)')+'" title="'+esc(c)+' × '+esc(r)+': '+v+' cas">'+v+'</div>'})});
-ch+='</div>';$('corrContainer').innerHTML=ch;
+const cats=Object.keys(cr).sort((a,b)=>Object.values(cr[b]||{}).reduce((s,x)=>s+x,0)-Object.values(cr[a]||{}).reduce((s,x)=>s+x,0)).slice(0,6);const risks=Object.entries(Object.fromEntries(data.map(d=>[d.risques_encourus||'Non specifie',1]))).map(x=>x[0]).sort((a,b)=>{const ca=data.filter(d=>d.risques_encourus===a).length;const cb=data.filter(d=>d.risques_encourus===b).length;return cb-ca}).slice(0,6);
+const id=document.documentElement.getAttribute('data-theme')==='dark';let ch='<div style="overflow-x:auto;display:block"><div class="corr-grid" style="grid-template-columns:180px repeat('+risks.length+',140px);gap:2px;width:fit-content;min-width:100%"><div class="corr-cell corr-cell--header" style="font-weight:600;padding:12px 8px"></div>';
+risks.forEach(r=>{ch+='<div class="corr-cell corr-cell--header" style="font-weight:600;padding:12px 8px;white-space:normal;word-break:break-word;min-height:60px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px" title="'+esc(r)+'">'+esc(r.length>20?r.slice(0,20)+'...':r)+'</div>'});
+cats.forEach(c=>{ch+='<div class="corr-cell corr-cell--header" style="font-weight:600;padding:12px 8px;text-align:left;white-space:normal;word-break:break-word" title="'+esc(c)+'">'+esc(c.length>25?c.slice(0,25)+'...':c)+'</div>';
+risks.forEach(r=>{const v=cr[c]?.[r]||0;const max=Math.max(1,...Object.values(cr[c]||{}));const ins=v/max;const cellBg=v===0?'var(--surface)':'rgba(243,112,33,'+(id?ins*0.7:ins*0.5)+')';ch+='<div class="corr-cell" style="background:'+cellBg+';color:'+(ins>0.4?'#fff':'var(--text2)')+';min-height:50px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px" title="'+esc(c)+' × '+esc(r)+': '+v+' rappel'+(v>1?'s':'')+' ">'+v+'</div>'})});
+ch+='</div></div>';$('corrContainer').innerHTML=ch;
 const cc={},rc={},j={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1;if(!j[c])j[c]={};j[c][r]=(j[c][r]||0)+1});
 const c2=Object.keys(cc).slice(0,10),r2=Object.keys(rc).slice(0,10),n=data.length;
 if(n<2||c2.length<2||r2.length<2){$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card" style="grid-column:1/-1"><div class="chi2-value" style="font-size:14px;color:var(--text2)">Analyse independante</div><div class="chi2-label">Pas assez de categories/risques distincts pour le test du Chi².</div></div></div><div class="stats-insight"><p>Le test du Chi² et le V de Cramer necessitent au moins 2 categories et 2 risques distincts.</p></div>'}else{
