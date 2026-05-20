@@ -177,7 +177,7 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 </div>
 </div>
 
-<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)">
+<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
 <div class="card stats-card" id="summary-card" aria-busy="false">
 <div class="card__header">📊 Résumé des Données Filtrées</div>
 <div id="summaryContainer" class="card__body" style="display:flex;flex-direction:column;gap:12px"><div class="skeleton" hidden></div></div>
@@ -190,7 +190,18 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 </div>
 </div>
 
-<div class="card stats-card" id="trend-card" aria-busy="false">
+<div class="card stats-card" id="chi2-card" aria-busy="false">
+<div class="card__header">📐 Test d'Indépendance Chi²</div>
+<div id="chi2Container" class="card__body" style="display:flex;flex-direction:column;gap:12px"><div class="skeleton" hidden></div></div>
+<div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
+<div class="stats-insight" style="margin-top:12px;font-size:13px">
+<p><strong>Signification:</strong> Teste si catégories et risques sont liés ou indépendants statistiquement.</p>
+<p style="margin-top:6px;color:var(--text3)">✓ P&lt;0.05 = Lien significatif (certains produits ont des risques spécifiques)</p>
+</div>
+</div>
+</section>
+
+<div class="card stats-card" style="margin-bottom:var(--space-6)" id="trend-card" aria-busy="false">
 <div class="card__header">📈 Tendance Temporelle (Régression Linéaire)</div>
 <canvas id="chartTrend" class="card__body" style="max-height:280px"></canvas>
 <div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
@@ -200,7 +211,6 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <p style="margin-top:6px">La pente indique si les rappels augmentent (↗) ou diminuent (↘) sur la période.</p>
 </div>
 </div>
-</section>
 </div>
 <div class="page" data-page="about" hidden>
 <div class="page-header"><h1 class="page-title">A propos</h1></div>
@@ -450,7 +460,7 @@ risks.forEach(r=>{ch+='<div class="corr-cell corr-cell--header" style="font-weig
 cats.forEach(c=>{ch+='<div class="corr-cell corr-cell--header" style="font-weight:600;padding:12px 8px;text-align:left;white-space:normal;word-break:break-word" title="'+esc(c)+'">'+esc(c.length>25?c.slice(0,25)+'...':c)+'</div>';
 risks.forEach(r=>{const v=cr[c]?.[r]||0;const max=Math.max(1,...Object.values(cr[c]||{}));const ins=v/max;const cellBg=v===0?'var(--surface)':'rgba(243,112,33,'+(id?ins*0.7:ins*0.5)+')';ch+='<div class="corr-cell" style="background:'+cellBg+';color:'+(ins>0.4?'#fff':'var(--text2)')+';min-height:50px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px" title="'+esc(c)+' × '+esc(r)+': '+v+' rappel'+(v>1?'s':'')+' ">'+v+'</div>'})});
 ch+='</div></div>';$('corrContainer').innerHTML=ch;
-const cc={},rc={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1});
+const cc={},rc={},j={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1;if(!j[c])j[c]={};j[c][r]=(j[c][r]||0)+1});
 const catsAll=Object.entries(cc).sort((a,b)=>b[1]-a[1]);const risksAll=Object.entries(rc).sort((a,b)=>b[1]-a[1]);const n=data.length;
 const topCats=catsAll.slice(0,3);const topRisks=risksAll.slice(0,3);const catConc=topCats.reduce((s,x)=>s+x[1],0)/n*100;const riskConc=topRisks.reduce((s,x)=>s+x[1],0)/n*100;
 let sh='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
@@ -463,6 +473,14 @@ sh+='</div>';
 sh+='<div style="padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--danger)"><div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text)">Top 3 Risques</div>';
 topRisks.forEach(([risk,cnt])=>{sh+='<div style="font-size:11px;color:var(--text2);padding:4px 0">• '+esc(risk.slice(0,50))+': <strong>'+cnt+' rappels</strong> ('+((cnt/n)*100).toFixed(1)+'%)</div>'});
 sh+='</div>';$('summaryContainer').innerHTML=sh;
+const c2=catsAll.map(x=>x[0]),r2=risksAll.map(x=>x[0]);if(n<2||c2.length<2||r2.length<2){$('chi2Container').innerHTML='<div style="padding:12px;text-align:center;color:var(--text3)"><p style="font-size:13px">Pas assez de catégories/risques distincts pour calculer le test.</p></div>'}else{
+let chi=0;c2.forEach(c=>{r2.forEach(r=>{const e=(cc[c]*rc[r])/n,o=j[c]?.[r]||0;if(e>0)chi+=((o-e)**2)/e})});
+const df=(c2.length-1)*(r2.length-1),pValue=chi>3.841?0.001:0.5,cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));
+let ch='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
+ch+='<div style="padding:16px;background:var(--surface);border-radius:var(--radius);text-align:center;border-left:3px solid var(--brand)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Chi²</div><div style="font-size:24px;font-weight:700;color:var(--brand);margin-top:6px">'+chi.toFixed(2)+'</div><div style="font-size:10px;color:var(--text2);margin-top:4px">Indépendance</div></div>';
+ch+='<div style="padding:16px;background:var(--surface);border-radius:var(--radius);text-align:center;border-left:3px solid var(--warning)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">V de Cramer</div><div style="font-size:24px;font-weight:700;color:var(--warning);margin-top:6px">'+cv.toFixed(3)+'</div><div style="font-size:10px;color:var(--text2);margin-top:4px">Force du lien</div></div>';
+ch+='<div style="padding:16px;background:var(--surface);border-radius:var(--radius);text-align:center;border-left:3px solid '+(chi>3.841?'var(--danger)':'var(--success)')+' "><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Résultat</div><div style="font-size:18px;font-weight:700;color:'+(chi>3.841?'var(--danger)':'var(--success)')+';margin-top:6px">'+(chi>3.841?'LIÉ':'INDÉPENDANT')+'</div><div style="font-size:10px;color:var(--text2);margin-top:4px">p'+(chi>3.841?'&lt;':'≥')+'0.05</div></div>';
+ch+='</div>';$('chi2Container').innerHTML=ch}
 const tc={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);tc[m]=(tc[m]||0)+1});
 const tr=Object.entries(tc).sort((a,b)=>a[0].localeCompare(b[0]));const vals=tr.map(x=>x[1]),labels=tr.map(x=>x[0].slice(5));
 if(vals.length<2){$('chartTrend').style.display='none';return}$('chartTrend').style.display='block';
