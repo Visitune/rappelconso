@@ -76,6 +76,8 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>Recherche</span><span class="link-badge">12945</span></a>
 <a href="javascript:void(0)" class="side-link" data-page="analyses" aria-current="false">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg><span>Analyses</span></a>
+<a href="javascript:void(0)" class="side-link" data-page="query" aria-current="false">
+<svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg><span>Requêtes</span></a>
 <a href="javascript:void(0)" class="side-link" data-page="about" aria-current="false">
 <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span>A propos</span></a>
 </nav>
@@ -252,6 +254,60 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 </div>
 </section>
 </div>
+<div class="page" data-page="query" hidden>
+<div class="page-header"><h1 class="page-title">Requêtes Avancées — Exploration par Produit/Risque</h1><div class="page-meta"><span class="badge badge--white" id="queryResultsBadge" aria-live="polite" aria-atomic="true">0 resultats</span></div></div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
+<div class="card"><div class="card__header">🔍 Filtrer par Type de Produit</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div><label for="queryProduct" style="font-size:12px;color:var(--text3);text-transform:uppercase;font-weight:600">Produit (regex)</label><input type="text" id="queryProduct" placeholder="Ex: viande, lait, cereal..." style="width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px" aria-label="Filtrer produits par regex"></div>
+<button class="btn btn--primary btn--sm" id="queryProductBtn">Interroger Produits</button>
+<div id="productResultsInfo" style="font-size:12px;color:var(--text3);padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--brand);display:none"></div>
+</div>
+</div>
+
+<div class="card"><div class="card__header">⚠️ Filtrer par Type de Risque</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div><label for="queryRisk" style="font-size:12px;color:var(--text3);text-transform:uppercase;font-weight:600">Risque (regex)</label><input type="text" id="queryRisk" placeholder="Ex: listeria, salmonella, pesticide..." style="width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px" aria-label="Filtrer risques par regex"></div>
+<button class="btn btn--primary btn--sm" id="queryRiskBtn">Interroger Risques</button>
+<div id="riskResultsInfo" style="font-size:12px;color:var(--text3);padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--danger);display:none"></div>
+</div>
+</div>
+</div>
+
+<div class="card" style="margin-bottom:var(--space-6)"><div class="card__header">🔗 Corrélation: Produit × Risque</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div><label for="queryCorrProd" style="font-size:12px;color:var(--text3);text-transform:uppercase;font-weight:600">Produit 1 (regex)</label><input type="text" id="queryCorrProd" placeholder="Ex: viande" style="width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px" aria-label="Produit pour corrélation"></div>
+<div><label for="queryCorrRisk" style="font-size:12px;color:var(--text3);text-transform:uppercase;font-weight:600">Risque (regex)</label><input type="text" id="queryCorrRisk" placeholder="Ex: listeria" style="width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px" aria-label="Risque pour corrélation"></div>
+<button class="btn btn--primary btn--sm" id="queryCorrBtn">Analyser Corrélation</button>
+<div id="corrResultsInfo" style="font-size:12px;color:var(--text3);padding:12px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--info);display:none"></div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
+<div class="card"><div class="card__header">📊 Récurrence par Marque</div>
+<div id="recurrenceByBrandContainer" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto"></div>
+<div class="stats-insight" style="margin-top:12px;font-size:12px;color:var(--text3)"><p>Nombre de rappels par marque dans la sélection.</p></div>
+</div>
+
+<div class="card"><div class="card__header">📈 Fréquence Temporelle</div>
+<canvas id="queryChartTime"></canvas>
+<div class="stats-insight" style="margin-top:12px;font-size:12px;color:var(--text3)"><p>Évolution mensuelle des rappels pour la requête actuelle.</p></div>
+</div>
+</div>
+
+<div class="card" style="margin-bottom:var(--space-6)"><div class="card__header">📋 Résultats Détaillés</div>
+<div class="table-wrap" style="margin-top:12px"><table role="grid"><thead><tr>
+<th>Catégorie</th>
+<th>Marque</th>
+<th>Produit</th>
+<th>Risque</th>
+<th>Date</th>
+</tr></thead><tbody id="queryTableBody"></tbody></table></div>
+<div id="queryEmpty" class="table-empty" style="display:none;padding:40px">Aucun résultat. Ajuste ta requête.</div>
+</div>
+</div>
+
 <div class="page" data-page="about" hidden>
 <div class="page-header"><h1 class="page-title">A propos</h1></div>
 <div class="card" style="max-width:720px;margin:0 auto">
@@ -544,6 +600,53 @@ const isDark=document.documentElement.getAttribute('data-theme')==='dark';
 if(window.cm&&window.cm.chartTrend)window.cm.chartTrend.destroy();
 window.cm.chartTrend=new Chart($('chartTrend'),{type:'line',data:{labels,datasets:[{label:'Rappels',data:vals,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.3,pointRadius:2},{label:'Tendance (pente='+slope.toFixed(2)+')',data:trend,borderColor:'#F37021',borderWidth:2,borderDash:[5,5],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10},padding:12}}},scales:{x:{grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
 
+function normalizeRisks(riskStr){if(!riskStr)return[];return riskStr.split('|').map(r=>r.trim()).filter(r=>r.length>0)}
+
+function queryByProduct(regex_pattern){
+try{const re=new RegExp(regex_pattern,'i');const results=STATE.records.filter(d=>{const p=d.sous_categorie_produit||'';const b=d.marque_produit||'';return re.test(p)||re.test(b)});
+const brands={};results.forEach(d=>{const b=d.marque_produit||'Sans marque';brands[b]=(brands[b]||0)+1});
+const topBrands=Object.entries(brands).sort((a,b)=>b[1]-a[1]).slice(0,10);
+let html='<div style="font-size:12px;color:var(--text3);padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--brand)"><strong>'+results.length+' rappels</strong> correspondent à "<strong>'+esc(regex_pattern)+'</strong>"<br/>Distinct marques: <strong>'+Object.keys(brands).length+'</strong></div>';
+$('productResultsInfo').innerHTML=html;$('productResultsInfo').style.display='block';
+renderQueryResults(results)}catch(e){alert('Regex invalide: '+e.message)}}
+
+function queryByRisk(regex_pattern){
+try{const re=new RegExp(regex_pattern,'i');const results=[];STATE.records.forEach(d=>{const risks=normalizeRisks(d.risques_encourus||'');if(risks.some(r=>re.test(r))){results.push(d)}});
+const risks={};results.forEach(d=>{const rk=normalizeRisks(d.risques_encourus||'');rk.forEach(r=>{if(re.test(r))risks[r]=(risks[r]||0)+1})});
+const topRisks=Object.entries(risks).sort((a,b)=>b[1]-a[1]).slice(0,5);
+let html='<div style="font-size:12px;color:var(--text3);padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--danger)"><strong>'+results.length+' rappels</strong> pour "<strong>'+esc(regex_pattern)+'</strong>"<br/>Top risques: '+topRisks.map(r=>r[0].substring(0,30)+'('+r[1]+')').join(', ')+'</div>';
+$('riskResultsInfo').innerHTML=html;$('riskResultsInfo').style.display='block';
+renderQueryResults(results)}catch(e){alert('Regex invalide: '+e.message)}}
+
+function queryCorrélation(prodPattern,riskPattern){
+try{const prodRe=new RegExp(prodPattern,'i'),riskRe=new RegExp(riskPattern,'i');
+const results=STATE.records.filter(d=>{const p=d.sous_categorie_produit||'';const b=d.marque_produit||'';const risks=normalizeRisks(d.risques_encourus||'');return(prodRe.test(p)||prodRe.test(b))&&risks.some(r=>riskRe.test(r))});
+const freq=results.length,pct=STATE.records.length>0?((freq/STATE.records.length)*100).toFixed(2):0;
+const cats={};results.forEach(d=>{const c=d.sous_categorie_produit||'Autre';cats[c]=(cats[c]||0)+1});
+const topCats=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,3);
+let html='<div style="font-size:12px;color:var(--text3);padding:12px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--info)"><div><strong>Corrélation:</strong> "'+esc(prodPattern)+'" × "'+esc(riskPattern)+'"</div><div style="margin-top:8px"><strong>Fréquence:</strong> <strong style="color:var(--brand)">'+freq+'</strong> rappels ('+pct+'% de la base)</div><div style="margin-top:4px"><strong>Catégories:</strong> '+topCats.map(c=>c[0].substring(0,25)+'('+c[1]+')').join(', ')+'</div><div style="margin-top:4px;font-size:11px;color:var(--text3)">✓ Plus haute fréquence = lien plus fort</div></div>';
+$('corrResultsInfo').innerHTML=html;$('corrResultsInfo').style.display='block';
+renderQueryResults(results)}catch(e){alert('Regex invalide: '+e.message)}}
+
+function renderQueryResults(results){
+$('queryResultsBadge').textContent=results.length+' resultats';
+if(results.length===0){$('queryTableBody').innerHTML='';$('queryEmpty').style.display='block';return}
+$('queryEmpty').style.display='none';
+let rows='';results.slice(0,50).forEach(d=>{rows+='<tr><td style="font-size:12px">'+esc(d.sous_categorie_produit||'—')+'</td><td style="font-size:12px">'+esc(d.marque_produit||'—')+'</td><td style="font-size:12px">'+esc(d.libelle?.substring(0,40)||'—')+'</td><td style="font-size:12px">'+esc((d.risques_encourus||'—').substring(0,40))+'</td><td style="font-size:11px;color:var(--text3)">'+fmtDate(d.date_publication)+'</td></tr>'});
+$('queryTableBody').innerHTML=rows;
+const brands={};results.forEach(d=>{const b=d.marque_produit||'Sans marque';brands[b]=(brands[b]||0)+1});
+const topBrands=Object.entries(brands).sort((a,b)=>b[1]-a[1]).slice(0,8);
+let brandHtml='';topBrands.forEach(([b,c])=>{brandHtml+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:12px"><span>'+esc(b.substring(0,35))+'</span><span style="font-weight:600;color:var(--brand)">'+c+'</span></div>'});
+$('recurrenceByBrandContainer').innerHTML=brandHtml||'Aucune marque';
+const tc={};results.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);tc[m]=(tc[m]||0)+1});
+const tr=Object.entries(tc).sort((a,b)=>a[0].localeCompare(b[0]));const vals=tr.map(x=>x[1]),labels=tr.map(x=>x[0].slice(5));
+if(vals.length>1&&$('queryChartTime')){
+const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+if(window.cm&&window.cm.queryChartTime)window.cm.queryChartTime.destroy();
+window.cm=window.cm||{};
+window.cm.queryChartTime=new Chart($('queryChartTime'),{type:'bar',data:{labels,datasets:[{label:'Rappels',data:vals,backgroundColor:'rgba(243,112,33,0.6)',borderColor:'var(--brand)',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}}},scales:{y:{beginAtZero:true,grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'}}}}})}
+}
+
 async function init(){
 $('dashTotalBadge').textContent='Chargement data.json...';
 try{
@@ -580,6 +683,12 @@ const all=(await Promise.all(Array.from({length:pages},(_,i)=>apiFetch('/records
 STATE.records=all;updateDashboard();doSearch(true);loadFacets();
 $('cacheBadge').textContent='Fallback: '+all.length+' fiches via API';
 }catch(e){$('dashTotalBadge').textContent='Erreur de chargement'}}
+
+$('queryProductBtn').addEventListener('click',()=>{const val=$('queryProduct').value.trim();if(!val){alert('Entrez un motif de recherche (regex)');return}queryByProduct(val)});
+$('queryProduct').addEventListener('keypress',(e)=>{if(e.key==='Enter')$('queryProductBtn').click()});
+$('queryRiskBtn').addEventListener('click',()=>{const val=$('queryRisk').value.trim();if(!val){alert('Entrez un motif de risque (regex)');return}queryByRisk(val)});
+$('queryRisk').addEventListener('keypress',(e)=>{if(e.key==='Enter')$('queryRiskBtn').click()});
+$('queryCorrBtn').addEventListener('click',()=>{const prod=$('queryCorrProd').value.trim(),risk=$('queryCorrRisk').value.trim();if(!prod||!risk){alert('Entrez un produit ET un risque');return}queryCorrélation(prod,risk)});
 
 init();
 </script>
