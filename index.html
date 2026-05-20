@@ -211,6 +211,46 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <p style="margin-top:6px">La pente indique si les rappels augmentent (↗) ou diminuent (↘) sur la période.</p>
 </div>
 </div>
+
+<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
+<div class="card stats-card" id="trend-indicator" aria-busy="false">
+<div class="card__header">🚨 Indicateur de Croissance (3 mois)</div>
+<div id="trendIndicatorContainer" class="card__body" style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px"><div class="skeleton" hidden></div></div>
+<div class="stats-insight" style="margin-top:12px;font-size:13px">
+<p><strong>Signification:</strong> Mesure l'accélération des rappels. Positif = volume en hausse, négatif = baisse.</p>
+<p style="margin-top:6px;color:var(--text3)">Une hausse soudaine indique potentiellement un problème systémique identifié.</p>
+</div>
+</div>
+
+<div class="card stats-card" id="compliance-card" aria-busy="false">
+<div class="card__header">✅ Indice de Conformité Volontaire</div>
+<div id="complianceContainer" class="card__body" style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px"><div class="skeleton" hidden></div></div>
+<div class="stats-insight" style="margin-top:12px;font-size:13px">
+<p><strong>Signification:</strong> % des rappels volontaires = autoréglementation de l'industrie.</p>
+<p style="margin-top:6px;color:var(--text3)">Plus élevé = meilleure autorégulation, moins d'interventions gouvernementales.</p>
+</div>
+</div>
+</section>
+
+<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)">
+<div class="card stats-card" id="risk-severity" aria-busy="false">
+<div class="card__header">🔴 Matrice Sévérité × Fréquence</div>
+<div id="riskSeverityContainer" class="card__body"><div class="skeleton" hidden></div></div>
+<div class="stats-insight" style="margin-top:12px;font-size:13px">
+<p><strong>Lecture:</strong> Classe les risques par sévérité (CRITIQUE vs MODÉRÉ) et fréquence.</p>
+<p style="margin-top:6px">CRITIQUE EN HAUT À GAUCHE = Priorité absolue.</p>
+</div>
+</div>
+
+<div class="card stats-card" id="category-risk" aria-busy="false">
+<div class="card__header">📦 Risque Dominant par Catégorie</div>
+<div id="categoryRiskContainer" class="card__body"><div class="skeleton" hidden></div></div>
+<div class="stats-insight" style="margin-top:12px;font-size:13px">
+<p><strong>Lecture:</strong> Montre quel risque domine dans chaque catégorie de produit.</p>
+<p style="margin-top:6px">Permet d'identifier les contrôles nécessaires par secteur.</p>
+</div>
+</div>
+</section>
 </div>
 <div class="page" data-page="about" hidden>
 <div class="page-header"><h1 class="page-title">A propos</h1></div>
@@ -484,6 +524,20 @@ ch+='</div>';$('chi2Container').innerHTML=ch}
 const tc={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);tc[m]=(tc[m]||0)+1});
 const tr=Object.entries(tc).sort((a,b)=>a[0].localeCompare(b[0]));const vals=tr.map(x=>x[1]),labels=tr.map(x=>x[0].slice(5));
 if(vals.length<2){$('chartTrend').style.display='none';return}$('chartTrend').style.display='block';
+const recent3m=vals.slice(-3).reduce((s,x)=>s+x,0)/3;const prev3m=vals.slice(-6,-3).reduce((s,x)=>s+x,0)/3;const trendPct=((recent3m-prev3m)/prev3m*100).toFixed(1);
+const trendEmoji=trendPct>0?'📈':'📉';const trendColor=trendPct>0?'var(--danger)':'var(--success)';
+let th='<div style="text-align:center;padding:20px"><div style="font-size:36px;font-weight:700;color:'+trendColor+'">'+trendEmoji+' '+trendPct+'%</div><div style="font-size:14px;color:var(--text2);margin-top:12px">'+(trendPct>0?'AUGMENTATION':'DIMINUTION')+'</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+recent3m.toFixed(0)+' rappels/mois actuellement<br/>vs '+prev3m.toFixed(0)+' précédemment</div></div>';
+$('trendIndicatorContainer').innerHTML=th;
+const voluntary=data.filter(r=>r.nature_juridique_rappel==='volontaire (sans arrêté préfectoral)').length;const voluntary_pct=(voluntary/data.length*100).toFixed(1);
+let ch='<div style="text-align:center;padding:20px"><div style="font-size:36px;font-weight:700;color:var(--success)">'+voluntary_pct+'%</div><div style="font-size:14px;color:var(--text2);margin-top:12px">Volontaires</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+voluntary+'/'+data.length+' rappels<br/>= Bonne autorégulation</div></div>';
+$('complianceContainer').innerHTML=ch;
+const riskByCat={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Unknown';if(!riskByCat[c])riskByCat[c]={};riskByCat[c][r]=(riskByCat[c][r]||0)+1});
+const criticalRisks=/listeria|salmonella|e.coli|stec|botulisme/i;const risksAll=Object.entries(Object.fromEntries(data.map(d=>[d.risques_encourus,1]))).map(x=>x[0]);let rsh='<div style="display:flex;flex-direction:column;gap:8px">';
+risksAll.slice(0,6).forEach(risk=>{const isCritical=criticalRisks.test(risk);const cnt=data.filter(d=>d.risques_encourus===risk).length;const pct=(cnt/data.length*100).toFixed(1);const badge=isCritical?'🔴 CRITIQUE':'🟡 MODÉRÉ';rsh+='<div style="padding:10px;background:var(--surface);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-size:11px;font-weight:600">'+badge+'</div><div style="font-size:11px;color:var(--text2);margin-top:2px">'+risk.substring(0,35)+'</div></div><div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--brand)">'+pct+'%</div><div style="font-size:10px;color:var(--text3)">'+cnt+'</div></div></div>'});
+rsh+='</div>';$('riskSeverityContainer').innerHTML=rsh;
+const topCats3=Object.entries(riskByCat).sort((a,b)=>Object.values(b[1]).reduce((s,x)=>s+x,0)-Object.values(a[1]).reduce((s,x)=>s+x,0)).slice(0,5);let crsh='<div style="display:flex;flex-direction:column;gap:8px">';
+topCats3.forEach(([cat,risks])=>{const topRisk=Object.entries(risks).sort((a,b)=>b[1]-a[1])[0];const pct=(topRisk[1]/Object.values(risks).reduce((s,x)=>s+x,0)*100).toFixed(0);crsh+='<div style="padding:10px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--brand)"><div style="font-size:12px;font-weight:600;color:var(--text)">'+cat+'</div><div style="font-size:11px;color:var(--text2);margin-top:4px">→ '+topRisk[0].substring(0,40)+'</div><div style="font-size:10px;color:var(--text3);margin-top:2px">'+pct+'% des rappels de cette catégorie</div></div>'});
+crsh+='</div>';$('categoryRiskContainer').innerHTML=crsh;
 const nn=vals.length,idx=vals.map((_,i)=>i),mx=idx.reduce((a,b)=>a+b)/nn,my=vals.reduce((a,b)=>a+b)/nn;let num=0,den=0;idx.forEach(i=>{num+=(i-mx)*(vals[i]-my);den+=(i-mx)**2});
 const slope=den?num/den:0,intercept=my-slope*mx,trend=vals.map((_,i)=>intercept+slope*i);
 const isDark=document.documentElement.getAttribute('data-theme')==='dark';
