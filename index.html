@@ -118,19 +118,31 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 </div>
 <div id="content">
 <div class="page" data-page="dashboard">
-<div class="page-header"><h1 class="page-title">Tableau de bord</h1><div class="page-meta"><span class="badge badge--white" id="dashTotalBadge" aria-live="polite" aria-atomic="true">Chargement...</span><span class="badge badge--orange" id="cacheBadge" aria-live="polite" aria-atomic="true">0 fiches</span></div></div>
+<div class="page-header"><h1 class="page-title">Tableau de bord — Rappels Alimentaires</h1><div class="page-meta"><span class="badge badge--white" id="dashTotalBadge" aria-live="polite" aria-atomic="true">Chargement...</span><span class="badge badge--orange" id="cacheBadge" aria-live="polite" aria-atomic="true">0 fiches</span></div></div>
+
 <section class="grid-responsive">
 <div class="card kpi"><div class="kpi__icon kpi__icon--orange"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="kpi__value" id="kpiTotal">—</div><div class="kpi__label">Rappels en cache</div></div>
 <div class="card kpi"><div class="kpi__icon kpi__icon--red"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div><div class="kpi__value" id="kpiRisky">—</div><div class="kpi__label">Risques graves</div></div>
 <div class="card kpi"><div class="kpi__icon kpi__icon--green"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div><div class="kpi__value" id="kpiClosed">—</div><div class="kpi__label">Procedures closes</div></div>
 <div class="card kpi"><div class="kpi__icon kpi__icon--blue"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div><div class="kpi__value" id="kpiBrands">—</div><div class="kpi__label">Marques distinctes</div></div>
+<div class="card kpi"><div class="kpi__icon kpi__icon--orange"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg></div><div class="kpi__value" id="kpiRate">—</div><div class="kpi__label">Taux fermeture</div></div>
+<div class="card kpi"><div class="kpi__icon kpi__icon--yellow"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L22 7v10c0 5-10 8-10 8s-10-3-10-8V7l10-5z"/><path d="M9 12l3 3 5-5"/></svg></div><div class="kpi__value" id="kpiSeverity">—</div><div class="kpi__label">% Grave/Mortel</div></div>
 </section>
-<section class="grid-responsive grid-2col" style="margin-top:var(--space-6)">
-<div class="card chart-card"><div class="card__header">Sous-categories</div><canvas id="chartCat" class="card__body"></canvas><div class="skeleton" hidden id="skelCat"></div></div>
-<div class="card chart-card"><div class="card__header">Risques identifies</div><canvas id="chartRisk" class="card__body"></canvas><div class="skeleton" hidden id="skelRisk"></div></div>
-<div class="card chart-card grid-full"><div class="card__header">Evolution mensuelle</div><canvas id="chartTime" class="card__body"></canvas><div class="skeleton" hidden id="skelTime"></div></div>
-<div class="card chart-card"><div class="card__header">Top marques</div><canvas id="chartBrand" class="card__body"></canvas><div class="skeleton" hidden id="skelBrand"></div></div>
+
+<section style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-6);margin-top:var(--space-6)">
+<div class="card chart-card"><div class="card__header">👥 Top 10 Catégories</div><canvas id="chartCat" class="card__body"></canvas><div class="skeleton" hidden id="skelCat"></div></div>
+<div class="card chart-card"><div class="card__header">⚠️ Distribution Risques</div><canvas id="chartRisk" class="card__body"></canvas><div class="skeleton" hidden id="skelRisk"></div></div>
+<div class="card chart-card"><div class="card__header">📋 Nature Juridique</div><canvas id="chartLegal" class="card__body"></canvas><div class="skeleton" hidden id="skelLegal"></div></div>
+
+<div class="card chart-card" style="grid-column:span 2"><div class="card__header">📈 Évolution Temporelle</div><canvas id="chartTime" class="card__body"></canvas><div class="skeleton" hidden id="skelTime"></div></div>
+<div class="card chart-card"><div class="card__header">🏆 Top 5 Marques</div><div id="topBrandsContainer" class="card__body" style="flex-direction:column;gap:8px"></div></div>
+
+<div class="card chart-card" style="grid-column:span 1"><div class="card__header">⏱️ Marques Actives</div><canvas id="chartBrandCount" class="card__body"></canvas><div class="skeleton" hidden id="skelBrandCount"></div></div>
+<div class="card chart-card" style="grid-column:span 2"><div class="card__header">🔥 Catégories Critiques</div><div id="criticalCatsContainer" class="card__body" style="display:flex;flex-direction:column;gap:12px"></div></div>
+
+<div class="card chart-card" style="grid-column:1/-1;padding:20px"><div class="card__header">📊 Insights & Tendances</div><div id="insightsContainer" class="card__body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px"></div></div>
 </section>
+
 </div>
 <div class="page" data-page="search" id="search" hidden>
 <div class="page-header"><h1 class="page-title">Recherche</h1><div class="page-meta"><span class="badge badge--white" id="searchTotalBadge" aria-live="polite" aria-atomic="true">0 resultats</span></div></div>
@@ -244,22 +256,51 @@ $('dashTotalBadge').textContent=r.toLocaleString('fr-FR')+' fiches';
 const serious=d.filter(x=>/grave|mortel|hospitalisation/i.test(x.risques_encourus||'')).length;$('kpiRisky').textContent=serious.toLocaleString('fr-FR');
 const closed=d.filter(x=>{if(!x.date_de_fin_de_la_procedure_de_rappel)return false;const dt=new Date(x.date_de_fin_de_la_procedure_de_rappel);return!isNaN(dt)}).length;$('kpiClosed').textContent=closed.toLocaleString('fr-FR');
 const brands=new Set(d.map(x=>x.marque_produit).filter(Boolean));$('kpiBrands').textContent=brands.size.toLocaleString('fr-FR');
+const closedRate=r>0?((closed/r)*100).toFixed(0):'0';$('kpiRate').textContent=closedRate+'%';
+const sevPct=r>0?((serious/r)*100).toFixed(0):'0';$('kpiSeverity').textContent=sevPct+'%';
 renderCharts(d)}
 
 function renderCharts(data){
 const catCnt={};data.forEach(d=>{const k=d.sous_categorie_produit||'Autre';catCnt[k]=(catCnt[k]||0)+1});
-const catSorted=Object.entries(catCnt).sort((a,b)=>b[1]-a[1]).slice(0,15);
+const catSorted=Object.entries(catCnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
 makeBar($('chartCat'),catSorted.map(x=>x[0].length>22?x[0].slice(0,22)+'...':x[0]),catSorted.map(x=>x[1]));
+
 const riskCnt={};data.forEach(d=>{const k=d.risques_encourus||'Non specifie';riskCnt[k]=(riskCnt[k]||0)+1});
-const riskSorted=Object.entries(riskCnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
+const riskSorted=Object.entries(riskCnt).sort((a,b)=>b[1]-a[1]).slice(0,8);
 const riskColors=riskSorted.map(([k])=>/grave|mortel|hospitalisation/i.test(k)?'#FF4757':/bacterien|microbio|salmonelle|listeria|e.coli|coli/i.test(k)?'#FFA502':'#3B82F6');
 makeDoughnut($('chartRisk'),riskSorted.map(x=>x[0].length>25?x[0].slice(0,25)+'...':x[0]),riskSorted.map(x=>x[1]),riskColors);
+
+const legalCnt={};data.forEach(d=>{const k=d.nature_juridique_rappel||'Autre';legalCnt[k]=(legalCnt[k]||0)+1});
+const legalSorted=Object.entries(legalCnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
+makeDoughnut($('chartLegal'),legalSorted.map(x=>x[0].length>20?x[0].slice(0,20)+'...':x[0]),legalSorted.map(x=>x[1]),['#F37021','#3B82F6','#2ED573','#FFA502','#FF4757','#9b59b6']);
+
 const timeCnt={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);timeCnt[m]=(timeCnt[m]||0)+1});
 const timeSorted=Object.entries(timeCnt).sort((a,b)=>a[0].localeCompare(b[0]));
 makeLine($('chartTime'),timeSorted.map(x=>x[0].slice(5)),timeSorted.map(x=>x[1]));
+
 const brandCnt={};data.forEach(d=>{const k=d.marque_produit;if(!k)return;brandCnt[k]=(brandCnt[k]||0)+1});
-const brandSorted=Object.entries(brandCnt).sort((a,b)=>b[1]-a[1]).slice(0,20);
-makeBar($('chartBrand'),brandSorted.map(x=>x[0].length>18?x[0].slice(0,18)+'...':x[0]),brandSorted.map(x=>x[1]));if(STATE.currentPage!=='analyses')renderStats(data)}
+const brandSorted=Object.entries(brandCnt).sort((a,b)=>b[1]-a[1]).slice(0,5);
+const topBrandsHtml=brandSorted.map(([b,c],i)=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--surface);border-radius:var(--radius)"><span style="font-weight:600;color:var(--text);flex:1">'+esc(b.slice(0,25))+'</span><span style="font-family:\'JetBrains Mono\';font-size:13px;color:var(--brand)">'+c+'</span></div>').join('');
+$('topBrandsContainer').innerHTML=topBrandsHtml;
+
+const brandCountMap=brandCnt;const brandCountVal=Object.values(brandCountMap);makeBar($('chartBrandCount'),Object.keys(brandCountMap).map(x=>x.slice(0,12)+'...').slice(0,8),Object.values(brandCountMap).slice(0,8));
+
+const graveCnt=data.filter(x=>/grave|mortel|hospitalisation/i.test(x.risques_encourus||'')).length;
+const criticalCats={};data.forEach(d=>{if(!/grave|mortel|hospitalisation/i.test(d.risques_encourus||''))return;const k=d.sous_categorie_produit||'Autre';criticalCats[k]=(criticalCats[k]||0)+1});
+const criticalSorted=Object.entries(criticalCats).sort((a,b)=>b[1]-a[1]).slice(0,6);
+const criticalHtml=criticalSorted.map(([cat,cnt])=>{const pct=(cnt/graveCnt*100).toFixed(1);return '<div style="border-left:3px solid #FF4757;padding-left:12px"><div style="font-weight:600;color:var(--text)">'+esc(cat.slice(0,30))+'</div><div style="font-size:12px;color:var(--text2)">'+cnt+' cas graves ('+pct+'%)</div></div>'}).join('');
+$('criticalCatsContainer').innerHTML=criticalHtml;
+
+const closed=data.filter(x=>{if(!x.date_de_fin_de_la_procedure_de_rappel)return false;const dt=new Date(x.date_de_fin_de_la_procedure_de_rappel);return!isNaN(dt)}).length;
+const closedRate=((closed/data.length)*100).toFixed(1);
+const insightsHtml=`
+<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Taux de fermeture</div><div style="font-size:20px;font-weight:700;color:var(--success);margin-top:4px">${closedRate}%</div><div style="font-size:12px;color:var(--text2);margin-top:4px">${closed}/${data.length} procedures closes</div></div>
+<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Risques graves</div><div style="font-size:20px;font-weight:700;color:var(--danger);margin-top:4px">${graveCnt}</div><div style="font-size:12px;color:var(--text2);margin-top:4px">${(graveCnt/data.length*100).toFixed(1)}% des rappels</div></div>
+<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Categorie dominante</div><div style="font-size:14px;font-weight:700;color:var(--brand);margin-top:4px">${esc(catSorted[0][0].slice(0,20))}</div><div style="font-size:12px;color:var(--text2);margin-top:4px">${catSorted[0][1]} rappels (${(catSorted[0][1]/data.length*100).toFixed(1)}%)</div></div>
+`;
+$('insightsContainer').innerHTML=insightsHtml;
+
+if(STATE.currentPage!=='analyses')renderStats(data)}
 
 function makeBar(c,labels,data){const h=labels.length>10;if(window.cm&&window.cm[c.id])window.cm[c.id].destroy();if(!window.cm)window.cm={};const id=document.documentElement.getAttribute('data-theme')==='dark';
 window.cm[c.id]=new Chart(c,{type:'bar',data:{labels,datasets:[{data,backgroundColor:labels.map((_,i)=>`hsla(${(i*25+15)%360},70%,50%,0.55)`),borderColor:labels.map((_,i)=>`hsla(${(i*25+15)%360},70%,45%,1)`),borderWidth:1}]},options:{indexAxis:h?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
