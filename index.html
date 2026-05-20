@@ -178,15 +178,15 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 </div>
 
 <section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)">
-<div class="card stats-card" id="chi2-card" aria-busy="false">
-<div class="card__header">📐 Analyse d'Indépendance (Chi²)</div>
-<div id="chi2Container" class="card__body"><div class="skeleton" hidden></div></div>
+<div class="card stats-card" id="summary-card" aria-busy="false">
+<div class="card__header">📊 Résumé des Données Filtrées</div>
+<div id="summaryContainer" class="card__body" style="display:flex;flex-direction:column;gap:12px"><div class="skeleton" hidden></div></div>
 <div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
 <div class="stats-insight" style="margin-top:12px;font-size:13px">
-<p><strong>Interprétation:</strong></p>
-<p style="margin-top:6px">• <strong>Chi²</strong> = Mesure du lien entre catégorie et risque</p>
-<p>• <strong>V de Cramer</strong> = Force (0 = indépendant, 1 = fortement lié)</p>
-<p style="margin-top:6px;color:var(--text3)">Si p&lt;0.05 → Lien statistiquement significatif</p>
+<p><strong>Clés:</strong></p>
+<p style="margin-top:6px">• <strong>Concentration</strong> = % des données dans le top 3</p>
+<p>• <strong>Diversité</strong> = nombre de catégories/risques distincts</p>
+<p style="margin-top:6px;color:var(--text3)">Plus concentré = moins de variété, risques plus prévisibles</p>
 </div>
 </div>
 
@@ -450,11 +450,19 @@ risks.forEach(r=>{ch+='<div class="corr-cell corr-cell--header" style="font-weig
 cats.forEach(c=>{ch+='<div class="corr-cell corr-cell--header" style="font-weight:600;padding:12px 8px;text-align:left;white-space:normal;word-break:break-word" title="'+esc(c)+'">'+esc(c.length>25?c.slice(0,25)+'...':c)+'</div>';
 risks.forEach(r=>{const v=cr[c]?.[r]||0;const max=Math.max(1,...Object.values(cr[c]||{}));const ins=v/max;const cellBg=v===0?'var(--surface)':'rgba(243,112,33,'+(id?ins*0.7:ins*0.5)+')';ch+='<div class="corr-cell" style="background:'+cellBg+';color:'+(ins>0.4?'#fff':'var(--text2)')+';min-height:50px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px" title="'+esc(c)+' × '+esc(r)+': '+v+' rappel'+(v>1?'s':'')+' ">'+v+'</div>'})});
 ch+='</div></div>';$('corrContainer').innerHTML=ch;
-const cc={},rc={},j={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1;if(!j[c])j[c]={};j[c][r]=(j[c][r]||0)+1});
-const c2=Object.keys(cc).slice(0,10),r2=Object.keys(rc).slice(0,10),n=data.length;
-if(n<2||c2.length<2||r2.length<2){$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card" style="grid-column:1/-1"><div class="chi2-value" style="font-size:14px;color:var(--text2)">Analyse independante</div><div class="chi2-label">Pas assez de categories/risques distincts pour le test du Chi².</div></div></div><div class="stats-insight"><p>Le test du Chi² et le V de Cramer necessitent au moins 2 categories et 2 risques distincts.</p></div>'}else{
-let chi=0,df=(c2.length-1)*(r2.length-1);c2.forEach(c=>{r2.forEach(r=>{const e=(cc[c]*rc[r])/n,o=j[c]?.[r]||0;if(e>0)chi+=((o-e)**2)/e})});
-const cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));$('chi2Container').innerHTML='<div class="chi2-cards"><div class="card chi2-card"><div class="chi2-value">'+chi.toFixed(2)+'</div><div class="chi2-label">Chi² (independance)</div></div><div class="card chi2-card"><div class="chi2-value">'+df+'</div><div class="chi2-label">Degres de liberte</div></div><div class="card chi2-card"><div class="chi2-value">'+cv.toFixed(3)+'</div><div class="chi2-label">V de Cramer</div></div></div><div class="stats-insight"><p>'+(chi>3.841&&df>0?'Correlation significative (p&lt;0.05) — Categories et risques sont DEPENDANTS. Certains produits ont des risques specifiques.':'Non significatif — Categories et risques independants. Chaque type rencontre tous les risques.')+'</p></div>'}
+const cc={},rc={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1});
+const catsAll=Object.entries(cc).sort((a,b)=>b[1]-a[1]);const risksAll=Object.entries(rc).sort((a,b)=>b[1]-a[1]);const n=data.length;
+const topCats=catsAll.slice(0,3);const topRisks=risksAll.slice(0,3);const catConc=topCats.reduce((s,x)=>s+x[1],0)/n*100;const riskConc=topRisks.reduce((s,x)=>s+x[1],0)/n*100;
+let sh='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
+sh+='<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Categories distinctes</div><div style="font-size:22px;font-weight:700;color:var(--brand);margin-top:6px">'+catsAll.length+'</div><div style="font-size:11px;color:var(--text2);margin-top:4px">Top 3 = '+catConc.toFixed(1)+'% des rappels</div></div>';
+sh+='<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Types de risques</div><div style="font-size:22px;font-weight:700;color:var(--danger);margin-top:6px">'+risksAll.length+'</div><div style="font-size:11px;color:var(--text2);margin-top:4px">Top 3 = '+riskConc.toFixed(1)+'% des rappels</div></div>';
+sh+='</div>';
+sh+='<div style="padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--brand)"><div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text)">Top 3 Catégories</div>';
+topCats.forEach(([cat,cnt])=>{sh+='<div style="font-size:11px;color:var(--text2);padding:4px 0">• '+esc(cat.slice(0,40))+': <strong>'+cnt+' rappels</strong> ('+((cnt/n)*100).toFixed(1)+'%)</div>'});
+sh+='</div>';
+sh+='<div style="padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--danger)"><div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text)">Top 3 Risques</div>';
+topRisks.forEach(([risk,cnt])=>{sh+='<div style="font-size:11px;color:var(--text2);padding:4px 0">• '+esc(risk.slice(0,50))+': <strong>'+cnt+' rappels</strong> ('+((cnt/n)*100).toFixed(1)+'%)</div>'});
+sh+='</div>';$('summaryContainer').innerHTML=sh;
 const tc={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);tc[m]=(tc[m]||0)+1});
 const tr=Object.entries(tc).sort((a,b)=>a[0].localeCompare(b[0]));const vals=tr.map(x=>x[1]),labels=tr.map(x=>x[0].slice(5));
 if(vals.length<2){$('chartTrend').style.display='none';return}$('chartTrend').style.display='block';
