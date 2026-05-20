@@ -100,8 +100,8 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <div class="filter-row" style="justify-content:space-between;flex-wrap:wrap">
 <div class="filter-chips" id="filterChips">
 <button class="chip active" data-chip="all">Tous</button>
-<button class="chip" data-chip="grave">Risque grave</button>
-<button class="chip" data-chip="bacterien">Risque bacterien</button>
+<button class="chip" data-chip="grave">Contamination bacterienne</button>
+<button class="chip" data-chip="bacterien">Rappels obligatoires</button>
 <button class="chip" data-chip="recent">30 derniers jours</button>
 </div>
 <div class="filter-row" style="gap:8px">
@@ -122,11 +122,11 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 
 <section class="grid-responsive">
 <div class="card kpi"><div class="kpi__icon kpi__icon--orange"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="kpi__value" id="kpiTotal">—</div><div class="kpi__label">Rappels en cache</div></div>
-<div class="card kpi"><div class="kpi__icon kpi__icon--red"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div><div class="kpi__value" id="kpiRisky">—</div><div class="kpi__label">Risques graves</div></div>
-<div class="card kpi"><div class="kpi__icon kpi__icon--green"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div><div class="kpi__value" id="kpiClosed">—</div><div class="kpi__label">Procedures closes</div></div>
+<div class="card kpi"><div class="kpi__icon kpi__icon--red"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div><div class="kpi__value" id="kpiRisky">—</div><div class="kpi__label">Contaminations bacteriennes</div></div>
+<div class="card kpi"><div class="kpi__icon kpi__icon--green"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div><div class="kpi__value" id="kpiClosed">—</div><div class="kpi__label">Rappels obligatoires</div></div>
 <div class="card kpi"><div class="kpi__icon kpi__icon--blue"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div><div class="kpi__value" id="kpiBrands">—</div><div class="kpi__label">Marques distinctes</div></div>
-<div class="card kpi"><div class="kpi__icon kpi__icon--orange"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg></div><div class="kpi__value" id="kpiRate">—</div><div class="kpi__label">Taux fermeture</div></div>
-<div class="card kpi"><div class="kpi__icon kpi__icon--yellow"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L22 7v10c0 5-10 8-10 8s-10-3-10-8V7l10-5z"/><path d="M9 12l3 3 5-5"/></svg></div><div class="kpi__value" id="kpiSeverity">—</div><div class="kpi__label">% Grave/Mortel</div></div>
+<div class="card kpi"><div class="kpi__icon kpi__icon--orange"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg></div><div class="kpi__value" id="kpiRate">—</div><div class="kpi__label">% Obligatoires</div></div>
+<div class="card kpi"><div class="kpi__icon kpi__icon--yellow"><svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L22 7v10c0 5-10 8-10 8s-10-3-10-8V7l10-5z"/><path d="M9 12l3 3 5-5"/></svg></div><div class="kpi__value" id="kpiSeverity">—</div><div class="kpi__label">% Bacteriens</div></div>
 </section>
 
 <section style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-6);margin-top:var(--space-6)">
@@ -223,8 +223,8 @@ let d=STATE.records;const q=$('searchInput').value.trim().toLowerCase();
 const cat=$('filterCat').value;const risk=$('filterRisk').value;const legal=$('filterLegal').value;
 STATE.query=q;
 if(STATE.days>0){const ref=STATE.dataDate?new Date(STATE.dataDate):new Date();ref.setDate(ref.getDate()-STATE.days);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=ref)}
-if(STATE.chips.has('grave')&&!risk)d=d.filter(r=>/grave|mortel|hospitalisation/i.test(r.risques_encourus||''));
-if(STATE.chips.has('bacterien')&&!risk)d=d.filter(r=>/bacterien|microbio|salmonelle|listeria|e.coli|coli/i.test(r.risques_encourus||''));
+if(STATE.chips.has('grave')&&!risk)d=d.filter(r=>/listeria|salmonella|e.coli|stec|botulisme|brucellome/i.test(r.risques_encourus||''));
+if(STATE.chips.has('bacterien')&&!legal)d=d.filter(r=>r.nature_juridique_rappel==='imposé par arrêté préfectoral');
 if(STATE.chips.has('recent')&&STATE.days===0){const ref=STATE.dataDate?new Date(STATE.dataDate):new Date();ref.setDate(ref.getDate()-30);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=ref)}
 if(cat)d=d.filter(r=>r.sous_categorie_produit===cat);
 if(risk)d=d.filter(r=>r.risques_encourus===risk);
@@ -253,11 +253,11 @@ function updateDashboard(){
 const d=getFilteredRecords();if(!d.length)return;const r=d.length;
 $('kpiTotal').textContent=r.toLocaleString('fr-FR');
 $('dashTotalBadge').textContent=r.toLocaleString('fr-FR')+' fiches';
-const serious=d.filter(x=>/grave|mortel|hospitalisation/i.test(x.risques_encourus||'')).length;$('kpiRisky').textContent=serious.toLocaleString('fr-FR');
-const closed=d.filter(x=>{if(!x.date_de_fin_de_la_procedure_de_rappel)return false;const dt=new Date(x.date_de_fin_de_la_procedure_de_rappel);return!isNaN(dt)}).length;$('kpiClosed').textContent=closed.toLocaleString('fr-FR');
+const bacterial=d.filter(x=>/listeria|salmonella|e.coli|stec|botulisme|brucellome/i.test(x.risques_encourus||'')).length;$('kpiRisky').textContent=bacterial.toLocaleString('fr-FR');
+const mandatory=d.filter(x=>x.nature_juridique_rappel==='imposé par arrêté préfectoral').length;$('kpiClosed').textContent=mandatory.toLocaleString('fr-FR');
 const brands=new Set(d.map(x=>x.marque_produit).filter(Boolean));$('kpiBrands').textContent=brands.size.toLocaleString('fr-FR');
-const closedRate=r>0?((closed/r)*100).toFixed(0):'0';$('kpiRate').textContent=closedRate+'%';
-const sevPct=r>0?((serious/r)*100).toFixed(0):'0';$('kpiSeverity').textContent=sevPct+'%';
+const mandatoryRate=r>0?((mandatory/r)*100).toFixed(0):'0';$('kpiRate').textContent=mandatoryRate+'%';
+const bacterialPct=r>0?((bacterial/r)*100).toFixed(0):'0';$('kpiSeverity').textContent=bacterialPct+'%';
 renderCharts(d)}
 
 function renderCharts(data){
@@ -268,8 +268,8 @@ const catColors=catSorted.map((_,i)=>PALETTE[i%PALETTE.length]);
 makeBar($('chartCat'),catSorted.map(x=>x[0].length>22?x[0].slice(0,22)+'...':x[0]),catSorted.map(x=>x[1]),catColors);
 
 const riskCnt={};data.forEach(d=>{const k=d.risques_encourus||'Non specifie';riskCnt[k]=(riskCnt[k]||0)+1});
-const riskSorted=Object.entries(riskCnt).sort((a,b)=>b[1]-a[1]).slice(0,8);
-const riskColors=riskSorted.map(([k])=>/grave|mortel|hospitalisation/i.test(k)?'#FF4757':/bacterien|microbio|salmonelle|listeria|e.coli|coli/i.test(k)?'#FFA502':'#3B82F6');
+const riskSorted=Object.entries(riskCnt).sort((a,b)=>b[1]-a[1]).slice(0,12);
+const riskColors=riskSorted.map((_,i)=>PALETTE[i%PALETTE.length]);
 makeDoughnut($('chartRisk'),riskSorted.map(x=>x[0].length>25?x[0].slice(0,25)+'...':x[0]),riskSorted.map(x=>x[1]),riskColors);
 
 const legalCnt={};data.forEach(d=>{const k=d.nature_juridique_rappel||'Autre';legalCnt[k]=(legalCnt[k]||0)+1});
@@ -290,17 +290,17 @@ $('topBrandsContainer').innerHTML=topBrandsHtml;
 
 const topBrands=Object.entries(brandCnt).sort((a,b)=>b[1]-a[1]).slice(0,8);const brandColors=topBrands.map((_,i)=>PALETTE[i%PALETTE.length]);makeBar($('chartBrandCount'),topBrands.map(x=>x[0].slice(0,12)+'...'),topBrands.map(x=>x[1]),brandColors);
 
-const graveCnt=data.filter(x=>/grave|mortel|hospitalisation/i.test(x.risques_encourus||'')).length;
-const criticalCats={};data.forEach(d=>{if(!/grave|mortel|hospitalisation/i.test(d.risques_encourus||''))return;const k=d.sous_categorie_produit||'Autre';criticalCats[k]=(criticalCats[k]||0)+1});
+const bacterialCnt=data.filter(x=>/listeria|salmonella|e.coli|stec|botulisme/i.test(x.risques_encourus||'')).length;
+const criticalCats={};data.forEach(d=>{if(!/listeria|salmonella|e.coli|stec|botulisme/i.test(d.risques_encourus||''))return;const k=d.sous_categorie_produit||'Autre';criticalCats[k]=(criticalCats[k]||0)+1});
 const criticalSorted=Object.entries(criticalCats).sort((a,b)=>b[1]-a[1]).slice(0,6);
-const criticalHtml=criticalSorted.map(([cat,cnt])=>{const pct=(cnt/graveCnt*100).toFixed(1);return '<div style="border-left:3px solid #FF4757;padding-left:12px"><div style="font-weight:600;color:var(--text)">'+esc(cat.slice(0,30))+'</div><div style="font-size:12px;color:var(--text2)">'+cnt+' cas graves ('+pct+'%)</div></div>'}).join('');
+const criticalHtml=criticalSorted.map(([cat,cnt])=>{const pct=(cnt/bacterialCnt*100).toFixed(1);return '<div style="border-left:3px solid #FF4757;padding-left:12px"><div style="font-weight:600;color:var(--text)">'+esc(cat.slice(0,30))+'</div><div style="font-size:12px;color:var(--text2)">'+cnt+' contaminations bacteriennes ('+pct+'%)</div></div>'}).join('');
 $('criticalCatsContainer').innerHTML=criticalHtml;
 
-const closed=data.filter(x=>{if(!x.date_de_fin_de_la_procedure_de_rappel)return false;const dt=new Date(x.date_de_fin_de_la_procedure_de_rappel);return!isNaN(dt)}).length;
-const closedRate=((closed/data.length)*100).toFixed(1);
+const mandatory=data.filter(x=>x.nature_juridique_rappel==='imposé par arrêté préfectoral').length;
+const mandatoryRate=((mandatory/data.length)*100).toFixed(1);
 const insightsHtml=`
-<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Taux de fermeture</div><div style="font-size:20px;font-weight:700;color:var(--success);margin-top:4px">${closedRate}%</div><div style="font-size:12px;color:var(--text2);margin-top:4px">${closed}/${data.length} procedures closes</div></div>
-<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Risques graves</div><div style="font-size:20px;font-weight:700;color:var(--danger);margin-top:4px">${graveCnt}</div><div style="font-size:12px;color:var(--text2);margin-top:4px">${(graveCnt/data.length*100).toFixed(1)}% des rappels</div></div>
+<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Rappels obligatoires</div><div style="font-size:20px;font-weight:700;color:var(--success);margin-top:4px">${mandatoryRate}%</div><div style="font-size:12px;color:var(--text2);margin-top:4px">${mandatory}/${data.length} arretes prefectoraux</div></div>
+<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Risques bacteriens</div><div style="font-size:20px;font-weight:700;color:var(--danger);margin-top:4px">${bacterialCnt}</div><div style="font-size:12px;color:var(--text2);margin-top:4px">${(bacterialCnt/data.length*100).toFixed(1)}% des rappels</div></div>
 <div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Categorie dominante</div><div style="font-size:14px;font-weight:700;color:var(--brand);margin-top:4px">${esc(catSorted[0][0].slice(0,20))}</div><div style="font-size:12px;color:var(--text2);margin-top:4px">${catSorted[0][1]} rappels (${(catSorted[0][1]/data.length*100).toFixed(1)}%)</div></div>
 `;
 $('insightsContainer').innerHTML=insightsHtml;
@@ -332,7 +332,7 @@ $('searchEmpty').style.display='none';
 results.forEach(r=>{
 const tr=document.createElement('tr');tr.style.cursor='pointer';
 const cat=r.sous_categorie_produit||'';const risk=r.risques_encourus||'';
-const riskClass=/grave|mortel|hospitalisation/i.test(risk)?'badge--red':/bacterien|microbio|salmonelle|listeria|e.coli|coli/i.test(risk)?'badge--yellow':'badge--blue';
+const riskClass=/listeria|salmonella|e.coli|stec|botulisme|brucellome/i.test(risk)?'badge--red':/inertes|metal|verre|plastique|papier/i.test(risk)?'badge--yellow':'badge--blue';
 tr.innerHTML='<td><span class="badge badge--orange">'+esc(cat.slice(0,20))+'</span></td><td>'+esc(r.marque_produit||'')+'</td><td>'+esc(r.libelle||r.modeles_ou_references||'')+'</td><td><span class="badge '+riskClass+'">'+esc(risk.slice(0,28))+'</span></td><td style="white-space:nowrap">'+fmtDate(r.date_publication)+'</td><td>'+esc((r.motif_rappel||'').slice(0,40))+'</td><td><button class="btn btn--ghost btn--sm" data-id="'+r.id+'" aria-label="Voir details">Detail</button></td>';tbody.appendChild(tr)})}
 
 function renderPagination(total){
