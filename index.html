@@ -261,9 +261,11 @@ const sevPct=r>0?((serious/r)*100).toFixed(0):'0';$('kpiSeverity').textContent=s
 renderCharts(d)}
 
 function renderCharts(data){
+const PALETTE=['#F37021','#3B82F6','#2ED573','#FFA502','#FF4757','#9b59b6','#1E40AF','#7C3AED','#EC4899','#06B6D4','#EAB308','#E11D48','#0891B2','#6B21A8','#15803D'];
 const catCnt={};data.forEach(d=>{const k=d.sous_categorie_produit||'Autre';catCnt[k]=(catCnt[k]||0)+1});
 const catSorted=Object.entries(catCnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
-makeBar($('chartCat'),catSorted.map(x=>x[0].length>22?x[0].slice(0,22)+'...':x[0]),catSorted.map(x=>x[1]));
+const catColors=catSorted.map((_,i)=>PALETTE[i%PALETTE.length]);
+makeBar($('chartCat'),catSorted.map(x=>x[0].length>22?x[0].slice(0,22)+'...':x[0]),catSorted.map(x=>x[1]),catColors);
 
 const riskCnt={};data.forEach(d=>{const k=d.risques_encourus||'Non specifie';riskCnt[k]=(riskCnt[k]||0)+1});
 const riskSorted=Object.entries(riskCnt).sort((a,b)=>b[1]-a[1]).slice(0,8);
@@ -272,18 +274,21 @@ makeDoughnut($('chartRisk'),riskSorted.map(x=>x[0].length>25?x[0].slice(0,25)+'.
 
 const legalCnt={};data.forEach(d=>{const k=d.nature_juridique_rappel||'Autre';legalCnt[k]=(legalCnt[k]||0)+1});
 const legalSorted=Object.entries(legalCnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
-makeDoughnut($('chartLegal'),legalSorted.map(x=>x[0].length>20?x[0].slice(0,20)+'...':x[0]),legalSorted.map(x=>x[1]),['#F37021','#3B82F6','#2ED573','#FFA502','#FF4757','#9b59b6']);
+const legalColors=[PALETTE[0],PALETTE[1],PALETTE[2],PALETTE[3],PALETTE[4],PALETTE[5]];
+makeDoughnut($('chartLegal'),legalSorted.map(x=>x[0].length>20?x[0].slice(0,20)+'...':x[0]),legalSorted.map(x=>x[1]),legalColors);
 
+const MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const timeCnt={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);timeCnt[m]=(timeCnt[m]||0)+1});
 const timeSorted=Object.entries(timeCnt).sort((a,b)=>a[0].localeCompare(b[0]));
-makeLine($('chartTime'),timeSorted.map(x=>x[0].slice(5)),timeSorted.map(x=>x[1]));
+const timeLabels=timeSorted.map(x=>{const[y,m]=x[0].split('-');return MONTH_NAMES[parseInt(m)-1]+' '+y});
+makeLine($('chartTime'),timeLabels,timeSorted.map(x=>x[1]));
 
 const brandCnt={};data.forEach(d=>{const k=d.marque_produit;if(!k)return;brandCnt[k]=(brandCnt[k]||0)+1});
 const brandSorted=Object.entries(brandCnt).sort((a,b)=>b[1]-a[1]).slice(0,5);
 const topBrandsHtml=brandSorted.map(([b,c],i)=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--surface);border-radius:var(--radius)"><span style="font-weight:600;color:var(--text);flex:1">'+esc(b.slice(0,25))+'</span><span style="font-family:\'JetBrains Mono\';font-size:13px;color:var(--brand)">'+c+'</span></div>').join('');
 $('topBrandsContainer').innerHTML=topBrandsHtml;
 
-const brandCountMap=brandCnt;const brandCountVal=Object.values(brandCountMap);makeBar($('chartBrandCount'),Object.keys(brandCountMap).map(x=>x.slice(0,12)+'...').slice(0,8),Object.values(brandCountMap).slice(0,8));
+const topBrands=Object.entries(brandCnt).sort((a,b)=>b[1]-a[1]).slice(0,8);const brandColors=topBrands.map((_,i)=>PALETTE[i%PALETTE.length]);makeBar($('chartBrandCount'),topBrands.map(x=>x[0].slice(0,12)+'...'),topBrands.map(x=>x[1]),brandColors);
 
 const graveCnt=data.filter(x=>/grave|mortel|hospitalisation/i.test(x.risques_encourus||'')).length;
 const criticalCats={};data.forEach(d=>{if(!/grave|mortel|hospitalisation/i.test(d.risques_encourus||''))return;const k=d.sous_categorie_produit||'Autre';criticalCats[k]=(criticalCats[k]||0)+1});
@@ -302,8 +307,9 @@ $('insightsContainer').innerHTML=insightsHtml;
 
 if(STATE.currentPage!=='analyses')renderStats(data)}
 
-function makeBar(c,labels,data){const h=labels.length>10;if(window.cm&&window.cm[c.id])window.cm[c.id].destroy();if(!window.cm)window.cm={};const id=document.documentElement.getAttribute('data-theme')==='dark';
-window.cm[c.id]=new Chart(c,{type:'bar',data:{labels,datasets:[{data,backgroundColor:labels.map((_,i)=>`hsla(${(i*25+15)%360},70%,50%,0.55)`),borderColor:labels.map((_,i)=>`hsla(${(i*25+15)%360},70%,45%,1)`),borderWidth:1}]},options:{indexAxis:h?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
+function makeBar(c,labels,data,colors=null){const h=labels.length>10;if(window.cm&&window.cm[c.id])window.cm[c.id].destroy();if(!window.cm)window.cm={};const id=document.documentElement.getAttribute('data-theme')==='dark';
+const bgColors=colors||labels.map((_,i)=>`hsla(${(i*25+15)%360},70%,50%,0.55)`);const borderColors=colors?colors.map(c=>c.replace('0.','0.8')):labels.map((_,i)=>`hsla(${(i*25+15)%360},70%,45%,1)`);
+window.cm[c.id]=new Chart(c,{type:'bar',data:{labels,datasets:[{data,backgroundColor:bgColors,borderColor:borderColors,borderWidth:1}]},options:{indexAxis:h?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:id?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:id?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
 function makeDoughnut(c,labels,data,colors){if(window.cm&&window.cm[c.id])window.cm[c.id].destroy();if(!window.cm)window.cm={};const id=document.documentElement.getAttribute('data-theme')==='dark';
 window.cm[c.id]=new Chart(c,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{padding:6,boxWidth:10,font:{size:9},color:id?'#9CA3B5':'#6B7280'}}},cutout:'65%'}})}
 function makeLine(c,labels,data){if(window.cm&&window.cm[c.id])window.cm[c.id].destroy();if(!window.cm)window.cm={};const id=document.documentElement.getAttribute('data-theme')==='dark';const ctx=c.getContext('2d');
