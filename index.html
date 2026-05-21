@@ -781,51 +781,25 @@ window.cm=window.cm||{};
 window.cm.queryChartTime=new Chart($('queryChartTime'),{type:'bar',data:{labels,datasets:[{label:'Rappels',data:vals,backgroundColor:'rgba(243,112,33,0.6)',borderColor:'var(--brand)',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}}},scales:{y:{beginAtZero:true,grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'}}}}})}
 }
 
-async function mergeApiData(staticData){
-try{
-const apiData=await apiFetch('/records?limit=100&refine=categorie_produit:alimentation');
-if(!apiData.results)return staticData;
-const apiRecords=apiData.results;
-const staticIds=new Set(staticData.map(r=>(r.gtin||'')+'|'+(r.marque_produit||'')));
-const newRecords=apiRecords.filter(r=>!staticIds.has((r.gtin||'')+'|'+(r.marque_produit||'')));
-if(newRecords.length>0){
-const merged=[...newRecords,...staticData];
-merged.sort((a,b)=>new Date(b.date_publication||0)-new Date(a.date_publication||0));
-console.log('API: '+newRecords.length+' nouveaux rappels ajoutés');
-return merged.slice(0,13500);
-}
-return staticData;
-}catch(e){
-console.log('API merge skipped',e);
-return staticData;
-}}
 async function init(){
 $('dashTotalBadge').textContent='Chargement data.json...';
 try{
 const resp=await fetch(DATA_URL);
 if(!resp.ok)throw new Error('HTTP '+resp.status);
 const data=await resp.json();
-$('progressLabel').textContent='Chargement API...';
-const mergedData=await mergeApiData(data);
-STATE.records=mergedData;
-if(mergedData.length){STATE.dataDate=mergedData[0].date_publication||'';}
+STATE.records=data;
+if(data.length){STATE.dataDate=data[0].date_publication||'';}
 const now=new Date();STATE.lastLoadTime=now.toLocaleString('fr-FR');
-const lastDataDate=mergedData.length && mergedData[0].date_publication?new Date(mergedData[0].date_publication).toLocaleDateString('fr-FR'):'—';
-$('cacheBadge').innerHTML=mergedData.length+' fiches<br><small style="font-size:10px;opacity:0.7">Maj: '+lastDataDate+'</small>';
+const lastDataDate=data.length && data[0].date_publication?new Date(data[0].date_publication).toLocaleDateString('fr-FR'):'—';
+$('cacheBadge').innerHTML=data.length+' fiches<br><small style="font-size:10px;opacity:0.7">Maj: '+lastDataDate+'</small>';
 $('cacheBadge').style.cursor='pointer';$('cacheBadge').title='Cliquez pour voir le statut détaillé';
 $('cacheBadge').addEventListener('click',showUpdateStatus);
-$('dashTotalBadge').textContent=mergedData.length.toLocaleString('fr-FR')+' fiches';
-$('menuBadgeDash').textContent=mergedData.length>999?Math.round(mergedData.length/1000)+'k':mergedData.length;
-$('aboutCache').textContent=mergedData.length+' fiches (cache + API)';
-$('progressFill').style.width='100%';$('progressLabel').textContent=mergedData.length+' fiches';
+$('dashTotalBadge').textContent=data.length.toLocaleString('fr-FR')+' fiches';
+$('menuBadgeDash').textContent=data.length>999?Math.round(data.length/1000)+'k':data.length;
+$('aboutCache').textContent=data.length+' / 12945 (fichier statique)';
+$('progressFill').style.width='100%';$('progressLabel').textContent=data.length+' fiches';
 updateDashboard();doSearch(true);loadFacets();
 if(STATE.records.length)renderStats(STATE.records);
-try{
-const status=await checkAPIUpdates();
-if(status&&status.hasUpdates){
-$('cacheBadge').innerHTML=mergedData.length+' fiches<br><small style="font-size:10px;color:var(--success)">✅ à jour</small>';
-}}
-catch(e){console.log('Update check skipped',e)}
 }catch(e){
 $('dashTotalBadge').textContent='Erreur chargement data.json';
 $('cacheBadge').textContent='Erreur: verifier DATA_URL ou CORS';
