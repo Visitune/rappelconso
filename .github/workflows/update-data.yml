@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
       - uses: actions/setup-python@v5
         with: { python-version: '3.x' }
       - run: pip install requests
@@ -21,5 +21,6 @@ jobs:
           commit_message: "chore: update data.json"
           file_pattern: "data.json"
           commit_options: "--no-verify"
-          commit_user_name: "github-actions[bot]"
-          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_user_name: "mounir-automation"
+          commit_user_email: "${{ github.actor }}@users.noreply.github.com"
+          repository: ${{ github.repository }}
