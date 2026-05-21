@@ -17,7 +17,7 @@ def fetch(path):
 def main():
     meta = fetch("/records?limit=1&refine=categorie_produit:alimentation")
     total = meta["total_count"]
-    pages = math.ceil(min(total, 3000) / 100)
+    pages = math.ceil(total / 100)
 
     urls = [
         f"/records?limit=100&offset={i*100}&refine=categorie_produit:alimentation&order_by=date_publication+desc"
