@@ -473,16 +473,16 @@ const dataStr=JSON.stringify(STATE.records,null,2);
 const blob=new Blob([dataStr],{type:'application/json'});
 const url=URL.createObjectURL(blob);
 const a=document.createElement('a');
-a.href=url;
-a.download='data.json';
-a.click();
-URL.revokeObjectURL(url);
+a.href=url;a.download='data.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
 const extra=STATE.records.length-12945;
-if(extra>0)alert('✅ data.json exporté (12945 origine + '+extra+' nouveaux)\nPush sur GitHub pour mettre à jour');}
+if(extra>0)alert('✅ Export OK\n'+STATE.records.length+' fiches ('+extra+' nouveaux)\nPush sur GitHub');
+}
 if(localStorage.getItem('rc-theme'))setTheme(localStorage.getItem('rc-theme'));
+setTimeout(()=>{
 $('themeBtn').addEventListener('click',toggleTheme);
 $('refreshDataBtn').addEventListener('click',refreshData);
-$('exportDataBtn').addEventListener('click',exportData);
+if($('exportDataBtn'))$('exportDataBtn').addEventListener('click',exportData);
+},100);
 $('statusModalClose').addEventListener('click',()=>{$('statusModal').classList.remove('open');document.body.style.overflow='auto'});
 $('statusModal').addEventListener('click',(e)=>{if(e.target===$('statusModal')){$('statusModal').classList.remove('open');document.body.style.overflow='auto'}});
 
