@@ -393,6 +393,11 @@ Si le test montre Chi²=542 (LIÉ), cela signifie: <strong>"Les produits laitier
 <div id="modalLeft"><div class="skeleton" style="height:300px"></div></div>
 <div id="modalRight"><div class="skeleton" style="height:300px"></div></div>
 </div></div>
+<div id="statusModal" class="modal" role="dialog" aria-modal="true" aria-label="Statut des donnees">
+<div class="modal-inner" style="grid-template-columns:1fr;max-width:500px">
+<button class="modal-x" id="statusModalClose" aria-label="Fermer">&times;</button>
+<div id="statusModalContent" style="padding:20px;display:flex;flex-direction:column;gap:16px"></div>
+</div></div>
 <script>
 const DATA_URL = './data.json';
 const API='https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/rappelconso-v2-gtin-espaces';
@@ -434,28 +439,38 @@ async function checkAPIUpdates(){
   }catch(e){console.error('API check error:',e);return null}
 }
 async function showUpdateStatus(){
-  const html=`<div style="text-align:left;line-height:1.8">
-    <h3>📊 Statut des Données</h3>
-    <p><strong>Fiches chargées:</strong> ${STATE.records.length.toLocaleString('fr-FR')}</p>
-    <p><strong>Donnée la plus récente:</strong> ${STATE.dataDate?new Date(STATE.dataDate).toLocaleDateString('fr-FR'):'—'}</p>
-    <p><strong>Dernier refresh:</strong> ${STATE.lastLoadTime||'—'}</p>
-    <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
-    <p><em>Vérification de l'API en cours...</em></p>
-  </div>`;
-  alert(html);
+  const modal=$('statusModal');
+  const content=$('statusModalContent');
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+
+  content.innerHTML=`
+    <div><h3 style="margin:0;color:var(--brand)">📊 Statut des Données</h3></div>
+    <div style="background:var(--surface);padding:12px;border-radius:var(--radius);line-height:1.8">
+      <p style="margin:0"><strong>Fiches chargées:</strong> <span style="color:var(--brand)">${STATE.records.length.toLocaleString('fr-FR')}</span></p>
+      <p style="margin:6px 0 0 0"><strong>Donnée la plus récente:</strong> ${STATE.dataDate?new Date(STATE.dataDate).toLocaleDateString('fr-FR'):'—'}</p>
+      <p style="margin:6px 0 0 0"><strong>Dernier refresh:</strong> ${STATE.lastLoadTime||'—'}</p>
+    </div>
+    <div><em>Vérification de l'API en cours...</em></div>
+  `;
+
   const status=await checkAPIUpdates();
   if(status){
-    const msg=status.hasUpdates
-      ?'✓ API a DONNÉES PLUS RÉCENTES!\n'+status.apiDate+'\nvs\n'+status.dataDate
-      :'✓ data.json est À JOUR\n'+status.dataDate;
-    alert('📡 Vérification API:\n\n'+msg);
+    const isOutdated=status.hasUpdates;
+    const statusText=isOutdated
+      ?`⚠️ <strong style="color:var(--warning)">API A DONNÉES PLUS RÉCENTES</strong><br>API: ${new Date(status.apiDate).toLocaleDateString('fr-FR')}<br>Cache: ${new Date(status.dataDate).toLocaleDateString('fr-FR')}`
+      :`✅ <strong style="color:var(--success)">data.json EST À JOUR</strong><br>Date: ${new Date(status.dataDate).toLocaleDateString('fr-FR')}`;
+
+    content.innerHTML+=`<div style="background:var(--surface);padding:12px;border-radius:var(--radius);border-left:3px solid ${isOutdated?'var(--warning)':'var(--success)'}">${statusText}</div>`;
   }else{
-    alert('⚠️ Impossible de vérifier l\'API.\nVérifiez votre connexion.');
+    content.innerHTML+=`<div style="background:var(--surface);padding:12px;border-radius:var(--radius);border-left:3px solid var(--danger)">⚠️ <strong>Impossible de vérifier l'API</strong><br>Vérifiez votre connexion Internet</div>`;
   }
 }
 if(localStorage.getItem('rc-theme'))setTheme(localStorage.getItem('rc-theme'));
 $('themeBtn').addEventListener('click',toggleTheme);
 $('refreshDataBtn').addEventListener('click',refreshData);
+$('statusModalClose').addEventListener('click',()=>{$('statusModal').classList.remove('open');document.body.style.overflow='auto'});
+$('statusModal').addEventListener('click',(e)=>{if(e.target===$('statusModal')){$('statusModal').classList.remove('open');document.body.style.overflow='auto'}});
 
 async function apiFetch(path,retries=2){for(let i=0;i<=retries;i++){try{const r=await fetch(API+path);if(!r.ok&&r.status<500)throw new Error('API '+r.status);if(!r.ok)continue;return await r.json()}catch(e){if(i===retries)throw e;await new Promise(r=>setTimeout(r,1e3*(i+1)))}}throw new Error('API unreachable')}
 
