@@ -83,6 +83,8 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 </nav>
 <div class="side-footer">
 <div class="side-progress" id="progressWrap"><div class="bar"><div class="fill" id="progressFill" style="width:0%"></div></div><div class="label" id="progressLabel">Chargement...</div></div>
+<button id="refreshDataBtn" class="btn btn--ghost btn--xs" aria-label="Actualiser les donnees" title="Recharger data.json">
+<svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
 <button id="themeBtn" class="btn btn--ghost btn--xs" aria-label="Basculer theme">
 <svg class="icon icon-sm theme-icon" data-theme-icon="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg class="icon icon-sm theme-icon" data-theme-icon="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
@@ -403,8 +405,26 @@ function fmtDate(d){if(!d)return'—';const dt=new Date(d);return isNaN(dt)?'—
 function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
 function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('rc-theme',t)}
 function toggleTheme(){const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';setTheme(t);if(window.cm){Object.values(window.cm).forEach(c=>{try{c.destroy()}catch(_){}});window.cm={}}if(STATE.records.length){updateDashboard();renderStats(getFilteredRecords())}}
+async function refreshData(){
+  const btn=$('refreshDataBtn');btn.disabled=true;const old=btn.textContent;
+  try{
+    btn.innerHTML='<svg class="icon icon-sm" style="animation:spin 0.8s linear infinite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>';
+    const resp=await fetch(DATA_URL+'?t='+Date.now());
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const data=await resp.json();
+    STATE.records=data;
+    btn.innerHTML='✓';btn.style.color='var(--success)';
+    setTimeout(()=>{btn.innerHTML=old;btn.style.color='';btn.disabled=false},2000);
+    updateDashboard();onFilterChange();
+  }catch(e){
+    btn.innerHTML='✕';btn.style.color='var(--danger)';
+    setTimeout(()=>{btn.innerHTML=old;btn.style.color='';btn.disabled=false},2000);
+    console.error('Refresh error:',e);
+  }
+}
 if(localStorage.getItem('rc-theme'))setTheme(localStorage.getItem('rc-theme'));
 $('themeBtn').addEventListener('click',toggleTheme);
+$('refreshDataBtn').addEventListener('click',refreshData);
 
 async function apiFetch(path,retries=2){for(let i=0;i<=retries;i++){try{const r=await fetch(API+path);if(!r.ok&&r.status<500)throw new Error('API '+r.status);if(!r.ok)continue;return await r.json()}catch(e){if(i===retries)throw e;await new Promise(r=>setTimeout(r,1e3*(i+1)))}}throw new Error('API unreachable')}
 
