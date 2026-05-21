@@ -85,6 +85,8 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <div class="side-progress" id="progressWrap"><div class="bar"><div class="fill" id="progressFill" style="width:0%"></div></div><div class="label" id="progressLabel">Chargement...</div></div>
 <button id="refreshDataBtn" class="btn btn--ghost btn--xs" aria-label="Actualiser les donnees" title="Recharger data.json">
 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
+<button id="exportDataBtn" class="btn btn--ghost btn--xs" aria-label="Exporter data.json" title="Telecharger data.json pour mise à jour GitHub">
+<svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
 <button id="themeBtn" class="btn btn--ghost btn--xs" aria-label="Basculer theme">
 <svg class="icon icon-sm theme-icon" data-theme-icon="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg class="icon icon-sm theme-icon" data-theme-icon="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
@@ -466,9 +468,21 @@ async function showUpdateStatus(){
     content.innerHTML+=`<div style="background:var(--surface);padding:12px;border-radius:var(--radius);border-left:3px solid var(--danger)">⚠️ <strong>Impossible de vérifier l'API</strong><br>Vérifiez votre connexion Internet</div>`;
   }
 }
+function exportData(){
+const dataStr=JSON.stringify(STATE.records,null,2);
+const blob=new Blob([dataStr],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;
+a.download='data.json';
+a.click();
+URL.revokeObjectURL(url);
+const extra=STATE.records.length-12945;
+if(extra>0)alert('✅ data.json exporté (12945 origine + '+extra+' nouveaux)\nPush sur GitHub pour mettre à jour');}
 if(localStorage.getItem('rc-theme'))setTheme(localStorage.getItem('rc-theme'));
 $('themeBtn').addEventListener('click',toggleTheme);
 $('refreshDataBtn').addEventListener('click',refreshData);
+$('exportDataBtn').addEventListener('click',exportData);
 $('statusModalClose').addEventListener('click',()=>{$('statusModal').classList.remove('open');document.body.style.overflow='auto'});
 $('statusModal').addEventListener('click',(e)=>{if(e.target===$('statusModal')){$('statusModal').classList.remove('open');document.body.style.overflow='auto'}});
 
