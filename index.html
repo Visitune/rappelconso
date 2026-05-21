@@ -482,8 +482,6 @@ setTimeout(()=>{
 $('themeBtn').addEventListener('click',toggleTheme);
 $('refreshDataBtn').addEventListener('click',refreshData);
 if($('exportDataBtn'))$('exportDataBtn').addEventListener('click',exportData);
-if($('statusModalClose'))$('statusModalClose').addEventListener('click',()=>{$('statusModal').classList.remove('open');document.body.style.overflow='auto'});
-if($('statusModal'))$('statusModal').addEventListener('click',(e)=>{if(e.target===$('statusModal')){$('statusModal').classList.remove('open');document.body.style.overflow='auto'}});
 },100);
 
 async function apiFetch(path,retries=2){for(let i=0;i<=retries;i++){try{const r=await fetch(API+path);if(!r.ok&&r.status<500)throw new Error('API '+r.status);if(!r.ok)continue;return await r.json()}catch(e){if(i===retries)throw e;await new Promise(r=>setTimeout(r,1e3*(i+1)))}}throw new Error('API unreachable')}
