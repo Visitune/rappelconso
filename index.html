@@ -783,14 +783,18 @@ window.cm.queryChartTime=new Chart($('queryChartTime'),{type:'bar',data:{labels,
 
 async function mergeApiData(staticData){
 try{
-const apiData=await apiFetch('/records?limit=300&refine=categorie_produit:alimentation&order_by=date_publication+desc');
+const apiData=await apiFetch('/records?limit=100&refine=categorie_produit:alimentation');
 if(!apiData.results)return staticData;
 const apiRecords=apiData.results;
 const staticIds=new Set(staticData.map(r=>(r.gtin||'')+'|'+(r.marque_produit||'')));
 const newRecords=apiRecords.filter(r=>!staticIds.has((r.gtin||'')+'|'+(r.marque_produit||'')));
+if(newRecords.length>0){
 const merged=[...newRecords,...staticData];
 merged.sort((a,b)=>new Date(b.date_publication||0)-new Date(a.date_publication||0));
+console.log('API: '+newRecords.length+' nouveaux rappels ajoutés');
 return merged.slice(0,13500);
+}
+return staticData;
 }catch(e){
 console.log('API merge skipped',e);
 return staticData;
