@@ -413,6 +413,7 @@ async function refreshData(){
     if(!resp.ok)throw new Error('HTTP '+resp.status);
     const data=await resp.json();
     STATE.records=data;
+    STATE.lastLoadTime=new Date().toLocaleString('fr-FR');
     btn.innerHTML='✓';btn.style.color='var(--success)';
     setTimeout(()=>{btn.innerHTML=old;btn.style.color='';btn.disabled=false},2000);
     updateDashboard();onFilterChange();
@@ -420,6 +421,36 @@ async function refreshData(){
     btn.innerHTML='✕';btn.style.color='var(--danger)';
     setTimeout(()=>{btn.innerHTML=old;btn.style.color='';btn.disabled=false},2000);
     console.error('Refresh error:',e);
+  }
+}
+async function checkAPIUpdates(){
+  try{
+    const latest=await apiFetch('/records?limit=1&refine=categorie_produit:alimentation&order_by=date_publication+desc');
+    if(latest.results&&latest.results.length){
+      const apiDate=latest.results[0].date_publication;
+      const dataDate=STATE.dataDate||'';
+      return {apiDate,dataDate,hasUpdates:apiDate>dataDate,apiInfo:latest.results[0]};
+    }
+  }catch(e){console.error('API check error:',e);return null}
+}
+async function showUpdateStatus(){
+  const html=`<div style="text-align:left;line-height:1.8">
+    <h3>📊 Statut des Données</h3>
+    <p><strong>Fiches chargées:</strong> ${STATE.records.length.toLocaleString('fr-FR')}</p>
+    <p><strong>Donnée la plus récente:</strong> ${STATE.dataDate?new Date(STATE.dataDate).toLocaleDateString('fr-FR'):'—'}</p>
+    <p><strong>Dernier refresh:</strong> ${STATE.lastLoadTime||'—'}</p>
+    <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
+    <p><em>Vérification de l'API en cours...</em></p>
+  </div>`;
+  alert(html);
+  const status=await checkAPIUpdates();
+  if(status){
+    const msg=status.hasUpdates
+      ?'✓ API a DONNÉES PLUS RÉCENTES!\n'+status.apiDate+'\nvs\n'+status.dataDate
+      :'✓ data.json est À JOUR\n'+status.dataDate;
+    alert('📡 Vérification API:\n\n'+msg);
+  }else{
+    alert('⚠️ Impossible de vérifier l\'API.\nVérifiez votre connexion.');
   }
 }
 if(localStorage.getItem('rc-theme'))setTheme(localStorage.getItem('rc-theme'));
@@ -743,7 +774,11 @@ if(!resp.ok)throw new Error('HTTP '+resp.status);
 const data=await resp.json();
 STATE.records=data;
 if(data.length){STATE.dataDate=data[0].date_publication||'';}
-$('cacheBadge').textContent=data.length+' fiches chargees';
+const now=new Date();STATE.lastLoadTime=now.toLocaleString('fr-FR');
+const lastDataDate=data.length && data[0].date_publication?new Date(data[0].date_publication).toLocaleDateString('fr-FR'):'—';
+$('cacheBadge').innerHTML=data.length+' fiches<br><small style="font-size:10px;opacity:0.7">Maj: '+lastDataDate+'</small>';
+$('cacheBadge').style.cursor='pointer';$('cacheBadge').title='Cliquez pour voir le statut détaillé';
+$('cacheBadge').addEventListener('click',showUpdateStatus);
 $('dashTotalBadge').textContent=data.length.toLocaleString('fr-FR')+' fiches';
 $('menuBadgeDash').textContent=data.length>999?Math.round(data.length/1000)+'k':data.length;
 $('aboutCache').textContent=data.length+' / 12945 (fichier statique)';
@@ -751,12 +786,10 @@ $('progressFill').style.width='100%';$('progressLabel').textContent=data.length+
 updateDashboard();doSearch(true);loadFacets();
 if(STATE.records.length)renderStats(STATE.records);
 try{
-const latest=await apiFetch('/records?limit=1&refine=categorie_produit:alimentation&order_by=date_publication+desc');
-if(latest.results&&latest.results.length){
-const apiDate=latest.results[0].date_publication;
-if(apiDate>STATE.dataDate){
-$('cacheBadge').textContent=data.length+' fiches + mise a jour disponible';
-}}}
+const status=await checkAPIUpdates();
+if(status&&status.hasUpdates){
+$('cacheBadge').innerHTML=data.length+' fiches<br><small style="font-size:10px;color:var(--warning)">⚠️ Mise à jour disponible</small>';
+}}
 catch(e){console.log('Update check skipped',e)}
 }catch(e){
 $('dashTotalBadge').textContent='Erreur chargement data.json';
