@@ -783,8 +783,10 @@ window.cm.queryChartTime=new Chart($('queryChartTime'),{type:'bar',data:{labels,
 
 async function fetchApiRecords(){
 try{
-const apiData=await apiFetch('/records?limit=200&refine=categorie_produit:alimentation');
-return apiData.results||[];
+const apiData=await apiFetch('/records?limit=100');
+const filtered=(apiData.results||[]).filter(r=>r.categorie_produit==='alimentation');
+console.log('API: fetched 100, filtered to '+filtered.length+' alimentation records');
+return filtered;
 }catch(e){
 console.log('API fetch skipped',e);
 return [];
