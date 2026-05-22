@@ -795,8 +795,8 @@ window.cm.queryChartTime=new Chart($('queryChartTime'),{type:'bar',data:{labels,
 
 async function fetchApiAlimentation(){
 try{
-const apiData=await apiFetch("/records?limit=300&where=categorie_produit='alimentation'&order_by=date_publication%20desc");
-console.log('API: fetched '+apiData.results.length+' recent alimentation records');
+const apiData=await apiFetch("/records?limit=100&where=categorie_produit='alimentation'");
+console.log('API: fetched '+apiData.results.length+' alimentation records');
 return apiData.results||[];
 }catch(e){
 console.log('API alimentation fetch skipped',e);
