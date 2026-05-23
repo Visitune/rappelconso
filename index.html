@@ -46,7 +46,7 @@ th{padding:12px 14px;text-align:left;font-weight:600;color:var(--text2);font-siz
 td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}tr:hover td{background:var(--elevated)}
 .table-empty{text-align:center;padding:40px;color:var(--text3)}
 .pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;flex-wrap:wrap}.pag-btn{min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;transition:all var(--tf)}.pag-btn:hover{background:var(--elevated);color:var(--text)}.pag-btn.active{background:var(--brand);border-color:var(--brand);color:#fff}.pag-btn:disabled{opacity:0.3;cursor:not-allowed}.pag-info{font-size:11px;color:var(--text3);margin-left:8px}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.stats-card{padding:20px;max-height:350px;overflow:hidden}.stats-card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text2);display:flex;align-items:center;gap:8px}.stats-card canvas{display:block;max-width:100%;max-height:290px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.stats-card{padding:20px;overflow-y:auto;max-height:none}.stats-card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text2);display:flex;align-items:center;gap:8px}.stats-card canvas{display:block;max-width:100%;max-height:290px}
 .stats-insight{padding:14px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--brand);margin-top:10px}.stats-insight p{font-size:13px;color:var(--text2)}
 .pareto-chart{display:flex;flex-direction:column;gap:6px;padding:6px 0}.pareto-bar{display:flex;align-items:center;gap:10px}.pareto-bar__label{min-width:80px;font-size:11px;color:var(--text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pareto-bar__track{flex:1;height:16px;background:var(--surface);border-radius:var(--radius-full);overflow:hidden}.pareto-bar__fill{height:100%;border-radius:var(--radius-full);transition:width 1s ease}.pareto-bar__val{font-size:11px;color:var(--text3);min-width:32px;text-align:right;font-family:'JetBrains Mono',monospace}
 .corr-grid{display:grid;gap:2px;font-size:12px}.corr-cell{padding:8px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-family:'JetBrains Mono',monospace;min-height:40px;transition:all var(--tf);border:1px solid rgba(255,255,255,0.02)}.corr-cell:hover{transform:scale(1.05);box-shadow:0 0 8px rgba(243,112,33,0.2)}.corr-cell--header{color:var(--text2);font-weight:700;font-size:11px;background:var(--elevated)}.corr-cell:hover{transform:scale(1.1)}
@@ -168,36 +168,46 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <div class="page-header"><h1 class="page-title">Analyses Statistiques Détaillées</h1><div class="page-meta"><span class="badge badge--white" id="statsBadge" aria-live="polite" aria-atomic="true">Donnees filtrees</span></div></div>
 
 <section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
-<div class="card stats-card" id="seasonality-card" aria-busy="false"><div class="card__header">📅 Saisonnalité Mensuelle</div><canvas id="chartSeason" class="card__body"></canvas><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="skeleton" hidden id="skelSeason"></div><div class="stats-insight" style="margin-top:12px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--info)"><div style="font-weight:600;color:var(--text);margin-bottom:6px">📅 Qu'est-ce que c'est?</div><p style="margin:0;color:var(--text2);font-size:12px">Montre comment les rappels se distribuent par mois (Jan-Déc). Révèle les <strong>pics saisonniers</strong> de contamination.</p><div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--text2)"><strong>À chercher:</strong> Les mois avec barres hautes = périodes à surveiller. Ex: hiver = plus de Listeria (froid ralentit la distribution)?</div></div></div>
+<div class="card stats-card" id="seasonality-card" aria-busy="false"><div class="card__header">📅 Saisonnalité Mensuelle</div><canvas id="chartSeason" class="card__body"></canvas><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="skeleton" hidden id="skelSeason"></div><div class="stats-insight" style="margin-top:12px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--info)"><div style="font-weight:600;color:var(--text);margin-bottom:6px">❓ Qu'est-ce que c'est?</div><p style="margin:0;color:var(--text2);font-size:12px">Montre comment les rappels varient par mois (Jan-Déc). Révèle les <strong>périodes à risque</strong>.</p><div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--text2)"><strong>À chercher:</strong> Barres hautes = mois problématiques. Ex: décembre-janvier = plus de Listeria (froid)?<br/><strong>Action:</strong> Renforcer les contrôles en période pic</div></div></div>
 
-<div class="card stats-card" id="pareto-card" aria-busy="false"><div class="card__header">📊 Loi de Pareto (80/20)</div><div id="paretoContainer" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--warning)"><div style="font-weight:600;color:var(--text);margin-bottom:6px">📊 Le Principe 80/20</div><p style="margin:0;color:var(--text2);font-size:12px">80% des problèmes viennent de 20% des causes. Ici: <strong>80% des rappels</strong> sont concentrés dans <strong>~20% des catégories de produits</strong>.</p><div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--text2)"><strong>Utilité:</strong> Prioriser les contrôles. Si lait+viande = 80% des rappels → concentre les ressources là!</div><div style="margin-top:6px;font-size:11px;color:var(--text3)">Barre orange = avant 80% | Barre grise = après 80%</div></div></div>
+<div class="card stats-card" id="pareto-card" aria-busy="false"><div class="card__header">📊 Loi de Pareto (80/20) — Priorisation</div><div id="paretoContainer" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--warning)"><div style="font-weight:600;color:var(--text);margin-bottom:6px">❓ Qu'est-ce que c'est?</div><p style="margin:0;color:var(--text2);font-size:12px"><strong>Principe 80/20:</strong> 80% des problèmes = 20% des causes. Ici: <strong>80% des rappels proviennent de ~20% des catégories</strong>.</p><div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--text2)"><strong>Utilité:</strong> Allouer les ressources intelligemment. Si lait+viande = 80% → concentrer les inspections là.<br/><strong>Légende:</strong> 🟠 Orange = avant 80% | ⬜ Gris = après 80%</div></div></div>
 </section>
 
 <div class="card stats-card" style="margin-bottom:var(--space-6)" id="correlation-card" aria-busy="false">
-<div class="card__header" style="margin-bottom:16px">🔗 Matrice de Corrélation — Catégories × Risques</div>
+<div class="card__header" style="margin-bottom:16px">🔗 Tableau Croisé — Catégories × Risques</div>
 <div id="corrContainer" class="card__body" style="overflow-x:auto;padding:0"><div class="skeleton" hidden></div></div>
 <div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
 <div class="stats-insight" style="margin-top:16px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--info)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px">🔗 Qu'est-ce que c'est?</div>
-<p style="margin:0;color:var(--text2);font-size:12px"><strong>Tableau croisé:</strong> Chaque ligne = catégorie de produit. Chaque colonne = type de risque. Chaque cellule = nombre de rappels pour cette paire.</p>
+<div style="font-weight:600;color:var(--text);margin-bottom:6px">❓ Qu'est-ce que c'est?</div>
+<p style="margin:0;color:var(--text2);font-size:12px"><strong>Tableau croisé:</strong> Visualise TOUS les liens produit-risque. Chaque ligne = catégorie | Chaque colonne = type de risque | Cellule = nombre de rappels.</p>
 
 <div style="margin-top:10px;padding:10px;background:var(--surface);border-radius:var(--radius)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:11px">📖 Comment Lire?</div>
-<div style="font-size:11px;color:var(--text2);line-height:1.6">
-<div style="margin:4px 0"><span style="color:var(--brand);font-weight:600">🟠 Orange intensif:</span> Beaucoup de rappels (lien fort)</div>
-<div style="margin:4px 0"><span style="color:var(--text3);font-weight:600">⬜ Gris clair:</span> Peu ou 0 rappels (lien faible)</div>
-<div style="margin:4px 0"><span style="color:var(--text3);font-weight:600">📊 Nombre:</span> Exact de rappels pour cette combinaison</div>
+<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:12px">🎨 Comment Lire les Couleurs?</div>
+<div style="font-size:11px;color:var(--text2);line-height:1.8">
+<div style="margin:6px 0;padding:6px;background:rgba(243,112,33,0.2);border-radius:4px"><span style="color:var(--brand);font-weight:600">🟠 Orange INTENSIF:</span> Beaucoup de rappels = lien très fort</div>
+<div style="margin:6px 0;padding:6px;background:rgba(243,112,33,0.05);border-radius:4px"><span style="color:var(--text2);font-weight:600">🟠 Orange PÂLE:</span> Quelques rappels = lien modéré</div>
+<div style="margin:6px 0;padding:6px;background:rgba(0,0,0,0.1);border-radius:4px"><span style="color:var(--text3);font-weight:600">⬜ Gris/Blanc:</span> 0 rappels = aucun lien</div>
 </div>
 </div>
 
-<div style="margin-top:10px;padding:10px;background:rgba(46,213,115,0.1);border-radius:var(--radius);border-left:3px solid var(--success)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:11px">💡 Exemple Réel:</div>
+<div style="margin-top:10px;padding:10px;background:rgba(243,112,33,0.1);border-radius:var(--radius);border-left:3px solid var(--brand)">
+<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:12px">📊 Exemple Concret:</div>
 <div style="font-size:11px;color:var(--text2);line-height:1.6">
-Ligne "Lait" × Colonne "Listeria" = 1512 rappels → <strong>Lait + Listeria = fort lien!</strong> Justifie des contrôles de chaîne du froid stricte pour les produits laitiers.
+Croisement "Lait" × "Listeria" affiche <strong>1512</strong> (cellule orange intense)<br/>
+→ Signifie: <strong>1512 rappels de lait concernent Listeria</strong><br/>
+→ Conclusion: <strong>Lait = très à risque pour Listeria!</strong><br/>
+→ Action: Inspections strictes chaîne du froid produits laitiers
 </div>
 </div>
 
-<div style="margin-top:8px;font-size:10px;color:var(--text3)">💪 Action: Identifiez les cellules orange intenses = paires produit-risque critiques à monitorer en priorité</div>
+<div style="margin-top:10px;padding:10px;background:rgba(59,130,246,0.1);border-radius:var(--radius);border-left:3px solid var(--info)">
+<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:12px">💡 Comment Utiliser?</div>
+<div style="font-size:11px;color:var(--text2);line-height:1.6">
+1. <strong>Cherchez les cellules orange intenses</strong> = problèmes critiques<br/>
+2. <strong>Passez la souris dessus</strong> pour voir le nombre exact<br/>
+3. <strong>Identifiez les patterns</strong> (ex: Viande → Salmonella partout)
+</div>
+</div>
 </div>
 </div>
 
@@ -215,42 +225,73 @@ Ligne "Lait" × Colonne "Listeria" = 1512 rappels → <strong>Lait + Listeria = 
 </div>
 
 <div class="card stats-card" id="chi2-card" aria-busy="false">
-<div class="card__header">📐 Test d'Indépendance Chi² (χ²)</div>
+<div class="card__header">📐 Chi² — Test de Relation Produit-Risque</div>
 <div id="chi2Container" class="card__body" style="display:flex;flex-direction:column;gap:12px"><div class="skeleton" hidden></div></div>
 <div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
-<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:var(--elevated);border-radius:var(--radius);border-left:4px solid var(--info)">
-<div style="font-weight:600;color:var(--text);margin-bottom:8px">🎯 C'est quoi le Chi²?</div>
-<p style="margin:0;color:var(--text2);line-height:1.5">Un test statistique qui vérifie si deux variables sont <strong>liées</strong> ou <strong>indépendantes</strong>. Ici: <strong>"Les types de produits affectent-ils les types de risques?"</strong></p>
 
-<div style="font-weight:600;color:var(--text);margin-top:10px;margin-bottom:6px">📊 Les 3 Métriques Expliquées:</div>
-<div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px">
-<div style="padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--brand)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">Chi² (χ²)</div>
-  <div style="font-size:13px;color:var(--text);margin-top:2px">Valeur brute du test</div>
-  <div style="font-size:11px;color:var(--text2);margin-top:4px">Plus élevé = lien plus fort (> 3.84 = significatif)</div>
+<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(59,130,246,0.1);border-radius:var(--radius);border-left:4px solid var(--info)">
+<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:13px">❓ Problème à Résoudre</div>
+<p style="margin:0;color:var(--text2);line-height:1.5"><strong>"Les certains types de produits ont-ils PLUS de certains risques?"</strong> Exemple: le lait a-t-il plus de Listeria que la viande?</p>
 </div>
-<div style="padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--warning)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">V de Cramer</div>
-  <div style="font-size:13px;color:var(--text);margin-top:2px">Force du lien (0.0 à 1.0)</div>
-  <div style="font-size:11px;color:var(--text2);margin-top:4px">0.1=faible | 0.3=modéré | 0.5+=fort</div>
+
+<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(46,213,115,0.1);border-radius:var(--radius);border-left:4px solid var(--success)">
+<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">✅ La Réponse: LIÉ ou INDÉPENDANT?</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+<div style="padding:10px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--success)">
+<div style="font-size:11px;font-weight:600;color:var(--success);text-transform:uppercase">✓ LIÉ</div>
+<div style="font-size:12px;color:var(--text2);margin-top:6px">Certains produits ont des risques spécifiques (ex: Lait → Listeria très fréquent)</div>
 </div>
-<div style="padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--success)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">Résultat (LIÉ / INDÉPENDANT)</div>
-  <div style="font-size:13px;color:var(--text);margin-top:2px">Conclusion du test (p &lt; 0.05)</div>
-  <div style="font-size:11px;color:var(--text2);margin-top:4px">LIÉ = certains produits ont des risques spécifiques</div>
+<div style="padding:10px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--text3)">
+<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase">× INDÉPENDANT</div>
+<div style="font-size:12px;color:var(--text2);margin-top:6px">Les risques sont aléatoires, pas liés à la catégorie</div>
+</div>
 </div>
 </div>
 
-<div style="font-weight:600;color:var(--text);margin-top:10px;margin-bottom:6px">💡 Comment Interpréter?</div>
-<ul style="margin:6px 0;padding-left:20px;color:var(--text2);font-size:12px">
-<li style="margin:4px 0"><strong>LIÉ (Chi² > 3.84):</strong> Les risques <u>ne sont pas au hasard</u> — certains produits ont des profils de risque spécifiques (ex: viande → Listeria)</li>
-<li style="margin:4px 0"><strong>INDÉPENDANT:</strong> Les risques <u>sont aléatoires</u> — pas de relation entre type de produit et type de risque</li>
-<li style="margin:4px 0"><strong>V de Cramer > 0.3:</strong> Lien assez fort pour justifier des contrôles ciblés par catégorie</li>
+<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(255,165,2,0.1);border-radius:var(--radius);border-left:4px solid var(--warning)">
+<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">📊 Les 3 Valeurs à Lire:</div>
+<div style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px">
+<div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
+  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">1. Chi² (χ²)</div>
+  <div style="font-size:13px;color:var(--text);margin-top:4px;font-weight:600">Seuil magique: <strong>3.84</strong></div>
+  <div style="font-size:11px;color:var(--text2);margin-top:4px">Si votre valeur > 3.84 = <strong>LIÉ</strong> ✓ | Si < 3.84 = <strong>INDÉPENDANT</strong> ×</div>
+</div>
+<div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
+  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">2. V de Cramer (Force)</div>
+  <div style="font-size:13px;color:var(--text);margin-top:4px;font-weight:600">Échelle: <strong>0.0 (faible) → 1.0 (fort)</strong></div>
+  <div style="font-size:11px;color:var(--text2);margin-top:4px">• 0.0–0.1 = très faible | • 0.1–0.3 = faible | • 0.3–0.5 = modéré | • 0.5+ = fort</div>
+</div>
+<div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
+  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">3. Résultat (Conclusion)</div>
+  <div style="font-size:13px;color:var(--text);margin-top:4px;font-weight:600">LIÉ ou INDÉPENDANT</div>
+  <div style="font-size:11px;color:var(--text2);margin-top:4px">La conclusion finale basée sur la valeur Chi²</div>
+</div>
+</div>
+</div>
+
+<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(243,112,33,0.1);border-radius:var(--radius);border-left:4px solid var(--brand)">
+<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">🎓 Exemple Concret avec Chiffres:</div>
+<div style="padding:10px;background:var(--surface);border-radius:var(--radius);margin-top:8px">
+<div style="font-size:11px;font-weight:600;color:var(--brand);margin-bottom:6px">Scénario: Lait vs Listeria</div>
+<div style="font-size:11px;color:var(--text2);line-height:1.6">
+• Dataset: 1000 rappels (800 lait, 200 autre)<br/>
+• Listeria: 500 cas lait, 50 cas autre<br/>
+• Chi² calculé = <strong>542</strong> (très > 3.84)<br/>
+• V de Cramer = <strong>0.6</strong> (lien TRÈS fort)<br/>
+• <strong>Conclusion:</strong> LIÉ ✓ — Le lait a VRAIMENT plus de Listeria<br/>
+<strong style="color:var(--brand)">👉 Action:</strong> Renforcer les contrôles de chaîne du froid pour produits laitiers
+</div>
+</div>
+</div>
+
+<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(255,71,87,0.1);border-radius:var(--radius);border-left:4px solid var(--danger)">
+<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">⚠️ Cas où Chi² ne Marche Pas:</div>
+<ul style="margin:6px 0;padding-left:18px;color:var(--text2);font-size:11px">
+<li>Filtre = 1 seule catégorie (ex: juste "Lait") → impossible de comparer</li>
+<li>Filtre = 1 seul risque (ex: juste "Listeria") → impossible de comparer</li>
+<li>Données insuffisantes (&lt; 30 rappels) → résultat non fiable</li>
 </ul>
-
-<div style="font-weight:600;color:var(--text);margin-top:10px;margin-bottom:4px">🎓 Exemple Réel:</div>
-<div style="padding:8px;background:rgba(46,213,115,0.1);border-radius:var(--radius);border-left:3px solid var(--success);font-size:11px;color:var(--text2)">
-Si le test montre Chi²=542 (LIÉ), cela signifie: <strong>"Les produits laitiers rencontrent BEAUCOUP plus Listeria que les autres catégories"</strong> — pas une coïncidence, mais une réalité identifiable.
+<div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--info);font-weight:600">💡 Conseil: Utilisez la page "Requêtes" pour analyser une seule catégorie/risque</div>
 </div>
 </div>
 </div>
