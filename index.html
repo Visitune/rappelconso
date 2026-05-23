@@ -51,6 +51,8 @@ td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle
 .pareto-chart{display:flex;flex-direction:column;gap:6px;padding:6px 0}.pareto-bar{display:flex;align-items:center;gap:10px}.pareto-bar__label{min-width:80px;font-size:11px;color:var(--text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pareto-bar__track{flex:1;height:16px;background:var(--surface);border-radius:var(--radius-full);overflow:hidden}.pareto-bar__fill{height:100%;border-radius:var(--radius-full);transition:width 1s ease}.pareto-bar__val{font-size:11px;color:var(--text3);min-width:32px;text-align:right;font-family:'JetBrains Mono',monospace}
 .corr-grid{display:grid;gap:2px;font-size:12px}.corr-cell{padding:8px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-family:'JetBrains Mono',monospace;min-height:40px;transition:all var(--tf);border:1px solid rgba(255,255,255,0.02)}.corr-cell:hover{transform:scale(1.05);box-shadow:0 0 8px rgba(243,112,33,0.2)}.corr-cell--header{color:var(--text2);font-weight:700;font-size:11px;background:var(--elevated)}.corr-cell:hover{transform:scale(1.1)}
 .chi2-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:0}.chi2-card{padding:20px;text-align:center;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}.chi2-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--brand);margin-bottom:8px}.chi2-label{font-size:12px;color:var(--text2);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.toggle-btn{background:var(--elevated);border:1px solid var(--border);color:var(--text2);padding:8px 12px;border-radius:var(--radius);font-size:11px;font-weight:600;cursor:pointer;transition:all var(--tf);display:inline-flex;align-items:center;gap:6px;margin-top:10px}
+.toggle-btn:hover{background:var(--surface);color:var(--text)}.toggle-content{max-height:0;overflow:hidden;transition:max-height 0.3s ease}.toggle-content.open{max-height:2000px}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:16px;color:var(--text3)}.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin 0.8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 .blob-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.04}.blob-1{width:600px;height:600px;background:var(--brand);top:-10%;right:-5%;animation:float 12s ease-in-out infinite}.blob-2{width:400px;height:400px;background:#3B82F6;bottom:-5%;left:-5%;animation:float 10s ease-in-out infinite 2s}.blob-3{width:300px;height:300px;background:#2ED573;bottom:30%;right:10%;animation:float 14s ease-in-out infinite 4s}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
 .sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;z-index:100;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}.side-brand{padding:24px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}.side-logo{width:36px;height:36px;border-radius:var(--radius);background:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0}.side-title{font-weight:700;font-size:15px}.side-sub{font-size:10px;color:var(--text3);margin-top:2px}
@@ -230,69 +232,67 @@ Croisement "Lait" × "Listeria" affiche <strong>1512</strong> (cellule orange in
 <div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
 
 <div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(59,130,246,0.1);border-radius:var(--radius);border-left:4px solid var(--info)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:13px">❓ Problème à Résoudre</div>
-<p style="margin:0;color:var(--text2);line-height:1.5"><strong>"Les certains types de produits ont-ils PLUS de certains risques?"</strong> Exemple: le lait a-t-il plus de Listeria que la viande?</p>
+<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:13px">❓ La Question</div>
+<p style="margin:0;color:var(--text2);line-height:1.5"><strong>"Certains types de produits ont-ils PLUS de certains risques?"</strong> Exemple: le lait a-t-il plus de Listeria que la viande?</p>
 </div>
 
 <div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(46,213,115,0.1);border-radius:var(--radius);border-left:4px solid var(--success)">
 <div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">✅ La Réponse: LIÉ ou INDÉPENDANT?</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
 <div style="padding:10px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--success)">
-<div style="font-size:11px;font-weight:600;color:var(--success);text-transform:uppercase">✓ LIÉ</div>
-<div style="font-size:12px;color:var(--text2);margin-top:6px">Certains produits ont des risques spécifiques (ex: Lait → Listeria très fréquent)</div>
+<div style="font-size:11px;font-weight:600;color:var(--success);text-transform:uppercase">✓ LIÉ = OUI</div>
+<div style="font-size:12px;color:var(--text2);margin-top:6px">Certains produits ont des risques spécifiques</div>
 </div>
 <div style="padding:10px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--text3)">
-<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase">× INDÉPENDANT</div>
-<div style="font-size:12px;color:var(--text2);margin-top:6px">Les risques sont aléatoires, pas liés à la catégorie</div>
+<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase">× INDÉPENDANT = NON</div>
+<div style="font-size:12px;color:var(--text2);margin-top:6px">Les risques sont aléatoires</div>
 </div>
 </div>
 </div>
 
-<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(255,165,2,0.1);border-radius:var(--radius);border-left:4px solid var(--warning)">
+<button class="toggle-btn" onclick="this.nextElementSibling.classList.toggle('open');this.innerHTML=this.nextElementSibling.classList.contains('open')?'📖 Masquer les détails ▴':'📖 Lire les détails ▾'">📖 Lire les détails ▾</button>
+
+<div class="toggle-content" style="margin-top:10px">
+
+<div class="stats-insight" style="font-size:12px;padding:14px;background:rgba(255,165,2,0.1);border-radius:var(--radius);border-left:4px solid var(--warning)">
 <div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">📊 Les 3 Valeurs à Lire:</div>
 <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px">
 <div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">1. Chi² (χ²)</div>
-  <div style="font-size:13px;color:var(--text);margin-top:4px;font-weight:600">Seuil magique: <strong>3.84</strong></div>
-  <div style="font-size:11px;color:var(--text2);margin-top:4px">Si votre valeur > 3.84 = <strong>LIÉ</strong> ✓ | Si < 3.84 = <strong>INDÉPENDANT</strong> ×</div>
+  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">1. Chi² (χ²) — Seuil: 3.84</div>
+  <div style="font-size:11px;color:var(--text2);margin-top:6px">Si > 3.84 = <strong style="color:var(--success)">LIÉ ✓</strong> | Si ≤ 3.84 = <strong style="color:var(--text3)">INDÉPENDANT ×</strong></div>
 </div>
 <div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">2. V de Cramer (Force)</div>
-  <div style="font-size:13px;color:var(--text);margin-top:4px;font-weight:600">Échelle: <strong>0.0 (faible) → 1.0 (fort)</strong></div>
-  <div style="font-size:11px;color:var(--text2);margin-top:4px">• 0.0–0.1 = très faible | • 0.1–0.3 = faible | • 0.3–0.5 = modéré | • 0.5+ = fort</div>
+  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">2. V de Cramer (Force): 0.0 → 1.0</div>
+  <div style="font-size:11px;color:var(--text2);margin-top:6px">0.0–0.1 = très faible | 0.3–0.5 = modéré | 0.5+ = fort</div>
 </div>
 <div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">3. Résultat (Conclusion)</div>
-  <div style="font-size:13px;color:var(--text);margin-top:4px;font-weight:600">LIÉ ou INDÉPENDANT</div>
-  <div style="font-size:11px;color:var(--text2);margin-top:4px">La conclusion finale basée sur la valeur Chi²</div>
+  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">3. Résultat</div>
+  <div style="font-size:11px;color:var(--text2);margin-top:6px">Conclusion finale: LIÉ ou INDÉPENDANT</div>
 </div>
 </div>
 </div>
 
 <div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(243,112,33,0.1);border-radius:var(--radius);border-left:4px solid var(--brand)">
-<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">🎓 Exemple Concret avec Chiffres:</div>
-<div style="padding:10px;background:var(--surface);border-radius:var(--radius);margin-top:8px">
-<div style="font-size:11px;font-weight:600;color:var(--brand);margin-bottom:6px">Scénario: Lait vs Listeria</div>
+<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">🎓 Exemple: Chi² = 542 (Lait + Listeria)</div>
 <div style="font-size:11px;color:var(--text2);line-height:1.6">
-• Dataset: 1000 rappels (800 lait, 200 autre)<br/>
-• Listeria: 500 cas lait, 50 cas autre<br/>
-• Chi² calculé = <strong>542</strong> (très > 3.84)<br/>
-• V de Cramer = <strong>0.6</strong> (lien TRÈS fort)<br/>
-• <strong>Conclusion:</strong> LIÉ ✓ — Le lait a VRAIMENT plus de Listeria<br/>
-<strong style="color:var(--brand)">👉 Action:</strong> Renforcer les contrôles de chaîne du froid pour produits laitiers
-</div>
+• 1000 rappels: 800 lait | 200 autre<br/>
+• Listeria: 500 cas lait | 50 cas autre<br/>
+• Chi²=542 (> 3.84) → <strong style="color:var(--success)">LIÉ ✓</strong><br/>
+• V=0.6 → lien TRÈS fort<br/>
+👉 <strong>Conclusion:</strong> Le lait a vraiment plus de Listeria!
 </div>
 </div>
 
 <div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(255,71,87,0.1);border-radius:var(--radius);border-left:4px solid var(--danger)">
-<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">⚠️ Cas où Chi² ne Marche Pas:</div>
+<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">⚠️ Quand Chi² ne Marche Pas?</div>
 <ul style="margin:6px 0;padding-left:18px;color:var(--text2);font-size:11px">
-<li>Filtre = 1 seule catégorie (ex: juste "Lait") → impossible de comparer</li>
-<li>Filtre = 1 seul risque (ex: juste "Listeria") → impossible de comparer</li>
-<li>Données insuffisantes (&lt; 30 rappels) → résultat non fiable</li>
+<li><strong>1 seule catégorie</strong> → Impossible de comparer</li>
+<li><strong>1 seul risque</strong> → Impossible de comparer</li>
+<li><strong>&lt; 30 rappels</strong> → Résultat non fiable</li>
 </ul>
-<div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--info);font-weight:600">💡 Conseil: Utilisez la page "Requêtes" pour analyser une seule catégorie/risque</div>
+<div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--info);font-weight:600">💡 Solution: Allez à "Requêtes" pour une seule catégorie/risque</div>
 </div>
+
 </div>
 </div>
 </section>
@@ -756,7 +756,7 @@ sh+='</div>';
 sh+='<div style="padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--danger)"><div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text)">Top 3 Risques</div>';
 topRisks.forEach(([risk,cnt])=>{sh+='<div style="font-size:11px;color:var(--text2);padding:4px 0">• '+esc(risk.slice(0,50))+': <strong>'+cnt+' rappels</strong> ('+((cnt/n)*100).toFixed(1)+'%)</div>'});
 sh+='</div>';$('summaryContainer').innerHTML=sh;
-const c2=catsAll.map(x=>x[0]),r2=risksAll.map(x=>x[0]);if(n<2||c2.length<2||r2.length<2){$('chi2Container').innerHTML='<div style="padding:12px;text-align:center;color:var(--text3)"><p style="font-size:13px">Pas assez de catégories/risques distincts pour calculer le test.</p></div>'}else{
+const c2=catsAll.map(x=>x[0]),r2=risksAll.map(x=>x[0]);if(n<2||c2.length<2||r2.length<2){const msg='<div style="padding:16px;background:rgba(255,71,87,0.15);border-radius:var(--radius);border-left:4px solid var(--danger)"><div style="font-weight:600;color:var(--danger);margin-bottom:10px;font-size:13px">❌ Chi² IMPOSSIBLE — Données Insuffisantes</div><div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px"><div style="margin:6px 0"><strong>Catégories:</strong> '+c2.length+' trouvée(s) <strong style="color:var(--text3)">(besoin: ≥2)</strong></div><div style="margin:6px 0"><strong>Risques:</strong> '+r2.length+' trouvé(s) <strong style="color:var(--text3)">(besoin: ≥2)</strong></div></div><div style="padding:10px;background:var(--surface);border-radius:6px;border-left:3px solid var(--info);margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:var(--info);margin-bottom:4px">💡 Pourquoi?</div><div style="font-size:11px;color:var(--text2)">Chi² compare les relations entre catégories et risques. Avec seulement '+c2.length+' catégorie(s) et '+r2.length+' risque(s), il n\'y a rien à comparer!</div></div><div style="padding:10px;background:rgba(46,213,115,0.1);border-radius:6px;border-left:3px solid var(--success)"><div style="font-size:12px;font-weight:600;color:var(--success);margin-bottom:4px">✓ Solution</div><div style="font-size:11px;color:var(--text2)">Allez à <strong>Requêtes</strong> pour analyser une catégorie/risque spécifique</div></div></div>';$('chi2Container').innerHTML=msg;}else{
 let chi=0;c2.forEach(c=>{r2.forEach(r=>{const e=(cc[c]*rc[r])/n,o=j[c]?.[r]||0;if(e>0)chi+=((o-e)**2)/e})});
 const df=(c2.length-1)*(r2.length-1),pValue=chi>3.841?0.001:0.5,cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));
 let chi2Html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
