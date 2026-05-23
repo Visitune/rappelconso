@@ -795,12 +795,19 @@ window.cm.queryChartTime=new Chart($('queryChartTime'),{type:'bar',data:{labels,
 
 async function fetchApiAlimentation(){
 try{
-const apiData=await apiFetch("/records?limit=100&where=categorie_produit='alimentation'");
-console.log('API: fetched '+apiData.results.length+' alimentation records');
+const cutoffDate=new Date();cutoffDate.setDate(cutoffDate.getDate()-7);const cutoff=cutoffDate.toISOString().split('T')[0];
+const apiData=await apiFetch("/records?limit=100&where=categorie_produit='alimentation' AND date_publication>='" + cutoff + "'");
+console.log('API: fetched '+apiData.results.length+' recent (last 7 days) alimentation records');
 return apiData.results||[];
 }catch(e){
-console.log('API alimentation fetch skipped',e);
+try{
+const apiData=await apiFetch("/records?limit=200&refine=categorie_produit:alimentation");
+console.log('API fallback: fetched '+apiData.results.length+' records via refine');
+return apiData.results||[];
+}catch(e2){
+console.log('API alimentation fetch failed completely',e);
 return [];
+}
 }}
 async function init(){
 $('dashTotalBadge').textContent='Chargement data.json...';
@@ -810,8 +817,8 @@ if(!resp.ok)throw new Error('HTTP '+resp.status);
 const data=await resp.json();
 $('progressLabel').textContent='Fusion API...';
 const apiRecords=await fetchApiAlimentation();
-const dataIds=new Set(data.map(r=>(r.gtin||'')+'|'+(r.marque_produit||'')));
-const newRecords=apiRecords.filter(r=>!dataIds.has((r.gtin||'')+'|'+(r.marque_produit||'')));
+const dataIds=new Set(data.map(r=>r.id));
+const newRecords=apiRecords.filter(r=>!dataIds.has(r.id));
 const merged=[...data,...newRecords];
 merged.sort((a,b)=>new Date(b.date_publication||0)-new Date(a.date_publication||0));
 STATE.records=merged;
