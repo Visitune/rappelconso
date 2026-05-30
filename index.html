@@ -66,6 +66,21 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 .modal-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:20px;display:flex;align-items:center;justify-content:center;z-index:10}.modal-x:hover{background:var(--elevated);color:var(--text)}
 .modal-img{width:100%;aspect-ratio:3/4;object-fit:contain;border-radius:var(--radius-lg);background:var(--bg);border:1px solid var(--border)}.modal-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.modal-thumb{width:56px;height:56px;border-radius:var(--radius);border:2px solid transparent;cursor:pointer;overflow:hidden;transition:border-color var(--tf)}.modal-thumb:hover,.modal-thumb.active{border-color:var(--brand)}.modal-thumb img{width:100%;height:100%;object-fit:cover}
 .modal-title{font-size:20px;font-weight:700}.modal-sub{font-size:13px;color:var(--text2);margin-top:4px}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;margin-top:16px}.modal-field{display:flex;flex-direction:column;gap:2px}.modal-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}.modal-val{color:var(--text);line-height:1.5}.modal-full{grid-column:1/-1}.modal-section{border-top:1px solid var(--border);padding-top:14px;margin-top:6px}.modal-section h3{font-size:14px;font-weight:600;margin-bottom:8px}.modal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;border-top:1px solid var(--border);padding-top:16px}@media(max-width:768px){.modal-inner{grid-template-columns:1fr}}
+.section-sep{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin:0 0 16px 0;display:flex;align-items:center;gap:12px}.section-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+.info-btn{margin-left:auto;width:18px;height:18px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text3);font-size:10px;cursor:default;position:relative;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-style:italic;font-family:Georgia,serif;line-height:1}
+.info-btn::before{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);right:0;background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:11px;color:var(--text2);white-space:pre-line;max-width:280px;min-width:180px;box-shadow:var(--shadow);z-index:300;display:none;font-weight:400;line-height:1.5;font-style:normal;font-family:'Inter',sans-serif;text-align:left}
+.info-btn:hover::before,.info-btn:focus-visible::before{display:block}
+.year-btns{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 0 12px}
+.year-btn{padding:3px 9px;border-radius:var(--radius-full);font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all var(--tf)}.year-btn:hover,.year-btn.active{background:rgba(243,112,33,0.12);border-color:var(--brand);color:var(--brand)}
+.query-unified{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+.q-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:170px}
+.q-field label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.q-field input,.q-field select{padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;transition:border-color var(--tf);font-family:inherit}
+.q-field input:focus,.q-field select:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px var(--brand-glow)}
+.quick-chips{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 2px}
+.quick-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--radius-full);font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all var(--tf)}
+.quick-chip:hover,.quick-chip.active{background:rgba(243,112,33,0.12);border-color:var(--brand);color:var(--brand)}
+.quick-chip svg{width:11px;height:11px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -174,252 +189,83 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <div class="pagination" id="searchPagination" role="navigation" aria-label="Pagination"></div></div>
 </div>
 <div class="page" data-page="analyses" hidden>
-<div class="page-header"><h1 class="page-title">Analyses Statistiques Détaillées</h1><div class="page-meta"><span class="badge badge--white" id="statsBadge" aria-live="polite" aria-atomic="true">Donnees filtrees</span></div></div>
+<div class="page-header"><h1 class="page-title">Analyses Statistiques</h1><div class="page-meta"><span class="badge badge--white" id="statsBadge" aria-live="polite" aria-atomic="true">Données filtrées</span></div></div>
 
-<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
-<div class="card stats-card" id="seasonality-card" aria-busy="false"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>Saisonnalité Mensuelle</div><canvas id="chartSeason" class="card__body"></canvas><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="skeleton" hidden id="skelSeason"></div><div class="stats-insight" style="margin-top:12px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--info)"><div style="font-weight:600;color:var(--text);margin-bottom:6px">❓ Qu'est-ce que c'est?</div><p style="margin:0;color:var(--text2);font-size:12px">Montre comment les rappels varient par mois (Jan-Déc). Révèle les <strong>périodes à risque</strong>.</p><div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--text2)"><strong>À chercher:</strong> Barres hautes = mois problématiques. Ex: décembre-janvier = plus de Listeria (froid)?<br/><strong>Action:</strong> Renforcer les contrôles en période pic</div></div></div>
-
-<div class="card stats-card" id="pareto-card" aria-busy="false"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Loi de Pareto (80/20) — Priorisation</div><div id="paretoContainer" class="card__body"><div class="skeleton" hidden></div></div><div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div><div class="stats-insight" style="margin-top:12px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--warning)"><div style="font-weight:600;color:var(--text);margin-bottom:6px">❓ Qu'est-ce que c'est?</div><p style="margin:0;color:var(--text2);font-size:12px"><strong>Principe 80/20:</strong> 80% des problèmes = 20% des causes. Ici: <strong>80% des rappels proviennent de ~20% des catégories</strong>.</p><div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--text2)"><strong>Utilité:</strong> Allouer les ressources intelligemment. Si lait+viande = 80% → concentrer les inspections là.<br/><strong>Légende:</strong> 🟠 Orange = avant 80% | ⬜ Gris = après 80%</div></div></div>
+<p class="section-sep">Vue d'ensemble — Où sont les problèmes ?</p>
+<section style="display:grid;grid-template-columns:1fr 1.6fr;gap:var(--space-6);margin-bottom:var(--space-6)">
+<div class="card stats-card" id="pareto-card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Pareto 80/20<button class="info-btn" data-tip="80% des rappels viennent de ~20% des catégories.
+Barres orange = catégories prioritaires (avant le seuil 80%).
+Barres grises = catégories secondaires.
+→ Concentrer les contrôles sur les barres orange.">i</button></div><div id="paretoContainer" class="card__body"></div></div>
+<div class="card stats-card" id="correlation-card"><div class="card__header" style="margin-bottom:16px"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>Tableau Croisé — Catégories × Risques<button class="info-btn" data-tip="Chaque cellule = nombre de rappels pour une paire catégorie × risque.
+Orange intense = lien fort. Orange pâle = lien modéré. Gris = aucun lien.
+Survolez une cellule pour voir le nombre exact.">i</button></div><div id="corrContainer" class="card__body" style="overflow-x:auto;padding:0"></div></div>
 </section>
 
-<div class="card stats-card" style="margin-bottom:var(--space-6)" id="correlation-card" aria-busy="false">
-<div class="card__header" style="margin-bottom:16px"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>Tableau Croisé — Catégories × Risques</div>
-<div id="corrContainer" class="card__body" style="overflow-x:auto;padding:0"><div class="skeleton" hidden></div></div>
-<div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
-<div class="stats-insight" style="margin-top:16px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--info)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px">❓ Qu'est-ce que c'est?</div>
-<p style="margin:0;color:var(--text2);font-size:12px"><strong>Tableau croisé:</strong> Visualise TOUS les liens produit-risque. Chaque ligne = catégorie | Chaque colonne = type de risque | Cellule = nombre de rappels.</p>
-
-<div style="margin-top:10px;padding:10px;background:var(--surface);border-radius:var(--radius)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:12px">🎨 Comment Lire les Couleurs?</div>
-<div style="font-size:11px;color:var(--text2);line-height:1.8">
-<div style="margin:6px 0;padding:6px;background:rgba(243,112,33,0.2);border-radius:4px"><span style="color:var(--brand);font-weight:600">🟠 Orange INTENSIF:</span> Beaucoup de rappels = lien très fort</div>
-<div style="margin:6px 0;padding:6px;background:rgba(243,112,33,0.05);border-radius:4px"><span style="color:var(--text2);font-weight:600">🟠 Orange PÂLE:</span> Quelques rappels = lien modéré</div>
-<div style="margin:6px 0;padding:6px;background:rgba(0,0,0,0.1);border-radius:4px"><span style="color:var(--text3);font-weight:600">⬜ Gris/Blanc:</span> 0 rappels = aucun lien</div>
-</div>
-</div>
-
-<div style="margin-top:10px;padding:10px;background:rgba(243,112,33,0.1);border-radius:var(--radius);border-left:3px solid var(--brand)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:12px">📊 Exemple Concret:</div>
-<div style="font-size:11px;color:var(--text2);line-height:1.6">
-Croisement "Lait" × "Listeria" affiche <strong>1512</strong> (cellule orange intense)<br/>
-→ Signifie: <strong>1512 rappels de lait concernent Listeria</strong><br/>
-→ Conclusion: <strong>Lait = très à risque pour Listeria!</strong><br/>
-→ Action: Inspections strictes chaîne du froid produits laitiers
-</div>
-</div>
-
-<div style="margin-top:10px;padding:10px;background:rgba(59,130,246,0.1);border-radius:var(--radius);border-left:3px solid var(--info)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:12px">💡 Comment Utiliser?</div>
-<div style="font-size:11px;color:var(--text2);line-height:1.6">
-1. <strong>Cherchez les cellules orange intenses</strong> = problèmes critiques<br/>
-2. <strong>Passez la souris dessus</strong> pour voir le nombre exact<br/>
-3. <strong>Identifiez les patterns</strong> (ex: Viande → Salmonella partout)
-</div>
-</div>
-</div>
-</div>
-
+<p class="section-sep">Tendances — Évolution dans le temps</p>
+<div class="card stats-card" style="margin-bottom:var(--space-6)" id="trend-card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Tendance Temporelle (Régression Linéaire)<button class="info-btn" data-tip="Ligne bleue = rappels réels par mois.
+Ligne orange pointillée = tendance mathématique (régression linéaire).
+Pente qui monte → augmentation globale des rappels.
+Pic soudain = possible contamination détectée ou campagne d'inspection.">i</button></div><canvas id="chartTrend" class="card__body" style="max-height:260px"></canvas><div class="skeleton" hidden id="skelTrend"></div></div>
 <section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
-<div class="card stats-card" id="summary-card" aria-busy="false">
-<div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>Résumé des Données Filtrées</div>
-<div id="summaryContainer" class="card__body" style="display:flex;flex-direction:column;gap:12px"><div class="skeleton" hidden></div></div>
-<div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
-<div class="stats-insight" style="margin-top:12px;font-size:13px">
-<p><strong>Clés:</strong></p>
-<p style="margin-top:6px">• <strong>Concentration</strong> = % des données dans le top 3</p>
-<p>• <strong>Diversité</strong> = nombre de catégories/risques distincts</p>
-<p style="margin-top:6px;color:var(--text3)">Plus concentré = moins de variété, risques plus prévisibles</p>
-</div>
-</div>
-
-<div class="card stats-card" id="chi2-card" aria-busy="false">
-<div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Chi² — Test de Relation Produit-Risque</div>
-<div id="chi2Container" class="card__body" style="display:flex;flex-direction:column;gap:12px"><div class="skeleton" hidden></div></div>
-<div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
-
-<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(59,130,246,0.1);border-radius:var(--radius);border-left:4px solid var(--info)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:13px">❓ La Question</div>
-<p style="margin:0;color:var(--text2);line-height:1.5"><strong>"Certains types de produits ont-ils PLUS de certains risques?"</strong> Exemple: le lait a-t-il plus de Listeria que la viande?</p>
-</div>
-
-<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(46,213,115,0.1);border-radius:var(--radius);border-left:4px solid var(--success)">
-<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">✅ La Réponse: LIÉ ou INDÉPENDANT?</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
-<div style="padding:10px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--success)">
-<div style="font-size:11px;font-weight:600;color:var(--success);text-transform:uppercase">✓ LIÉ = OUI</div>
-<div style="font-size:12px;color:var(--text2);margin-top:6px">Certains produits ont des risques spécifiques</div>
-</div>
-<div style="padding:10px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--text3)">
-<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase">× INDÉPENDANT = NON</div>
-<div style="font-size:12px;color:var(--text2);margin-top:6px">Les risques sont aléatoires</div>
-</div>
-</div>
-</div>
-
-<button class="toggle-btn" onclick="this.nextElementSibling.classList.toggle('open');this.innerHTML=this.nextElementSibling.classList.contains('open')?'📖 Masquer les détails ▴':'📖 Lire les détails ▾'">📖 Lire les détails ▾</button>
-
-<div class="toggle-content" style="margin-top:10px">
-
-<div class="stats-insight" style="font-size:12px;padding:14px;background:rgba(255,165,2,0.1);border-radius:var(--radius);border-left:4px solid var(--warning)">
-<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">📊 Les 3 Valeurs à Lire:</div>
-<div style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px">
-<div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">1. Chi² (χ²) — Seuil: 3.84</div>
-  <div style="font-size:11px;color:var(--text2);margin-top:6px">Si > 3.84 = <strong style="color:var(--success)">LIÉ ✓</strong> | Si ≤ 3.84 = <strong style="color:var(--text3)">INDÉPENDANT ×</strong></div>
-</div>
-<div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">2. V de Cramer (Force): 0.0 → 1.0</div>
-  <div style="font-size:11px;color:var(--text2);margin-top:6px">0.0–0.1 = très faible | 0.3–0.5 = modéré | 0.5+ = fort</div>
-</div>
-<div style="padding:10px;background:var(--surface);border-radius:var(--radius)">
-  <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase">3. Résultat</div>
-  <div style="font-size:11px;color:var(--text2);margin-top:6px">Conclusion finale: LIÉ ou INDÉPENDANT</div>
-</div>
-</div>
-</div>
-
-<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(243,112,33,0.1);border-radius:var(--radius);border-left:4px solid var(--brand)">
-<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">🎓 Exemple: Chi² = 542 (Lait + Listeria)</div>
-<div style="font-size:11px;color:var(--text2);line-height:1.6">
-• 1000 rappels: 800 lait | 200 autre<br/>
-• Listeria: 500 cas lait | 50 cas autre<br/>
-• Chi²=542 (> 3.84) → <strong style="color:var(--success)">LIÉ ✓</strong><br/>
-• V=0.6 → lien TRÈS fort<br/>
-👉 <strong>Conclusion:</strong> Le lait a vraiment plus de Listeria!
-</div>
-</div>
-
-<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:14px;background:rgba(255,71,87,0.1);border-radius:var(--radius);border-left:4px solid var(--danger)">
-<div style="font-weight:600;color:var(--text);margin-bottom:8px;font-size:13px">⚠️ Quand Chi² ne Marche Pas?</div>
-<ul style="margin:6px 0;padding-left:18px;color:var(--text2);font-size:11px">
-<li><strong>1 seule catégorie</strong> → Impossible de comparer</li>
-<li><strong>1 seul risque</strong> → Impossible de comparer</li>
-<li><strong>&lt; 30 rappels</strong> → Résultat non fiable</li>
-</ul>
-<div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:var(--radius);font-size:11px;color:var(--info);font-weight:600">💡 Solution: Allez à "Requêtes" pour une seule catégorie/risque</div>
-</div>
-
-</div>
-</div>
+<div class="card stats-card" id="trend-indicator"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Croissance sur 3 mois<button class="info-btn" data-tip="Compare la moyenne des 3 derniers mois vs les 3 mois précédents.
+Rouge = davantage de rappels qu'avant.
+Vert = diminution des rappels.
+Un écart > 20% mérite attention.">i</button></div><div id="trendIndicatorContainer" class="card__body" style="align-items:center;padding:20px"></div></div>
+<div class="card stats-card" id="compliance-card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Conformité Volontaire<button class="info-btn" data-tip="% des rappels initiés volontairement par les entreprises (sans arrêté préfectoral).
+Élevé = l'industrie agit avant d'y être contrainte légalement.
+→ Bon indicateur d'autorégulation du secteur alimentaire.">i</button></div><div id="complianceContainer" class="card__body" style="align-items:center;padding:20px"></div></div>
 </section>
 
-<div class="card stats-card" style="margin-bottom:var(--space-6)" id="trend-card" aria-busy="false">
-<div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Tendance Temporelle (Régression Linéaire)</div>
-<canvas id="chartTrend" class="card__body" style="max-height:280px"></canvas>
-<div class="card__loader" style="display:none;"><div class="spinner"></div>Chargement...</div>
-<div class="skeleton" hidden id="skelTrend"></div>
-<div class="stats-insight" style="margin-top:12px;font-size:12px;padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--info)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px">📈 Qu'est-ce que c'est?</div>
-<p style="margin:0;color:var(--text2);font-size:12px">Visualise l'évolution des rappels dans le temps avec une <strong>tendance mathématique</strong> (droite de régression).</p>
+<p class="section-sep">Saisonnalité — Patterns par période</p>
+<div class="card stats-card" style="margin-bottom:var(--space-6)" id="seasonality-card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>Rappels par Mois<div id="yearBtns" class="year-btns"></div><button class="info-btn" data-tip="Barres hautes = mois avec plus de rappels historiquement.
+Sélectionnez une année pour voir sa saisonnalité spécifique.
+'Tout' = distribution cumulée sur toutes les années.">i</button></div><canvas id="chartSeason" class="card__body"></canvas><div class="skeleton" hidden id="skelSeason"></div></div>
 
-<div style="margin-top:10px;padding:10px;background:var(--surface);border-radius:var(--radius)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:11px">🎯 Comment Lire?</div>
-<div style="font-size:11px;color:var(--text2);line-height:1.6">
-<div style="margin:4px 0"><span style="color:#3B82F6;font-weight:600">🔵 Ligne bleue:</span> Données réelles observées</div>
-<div style="margin:4px 0"><span style="color:var(--brand);font-weight:600">🟠 Ligne pointillée orange:</span> Tendance calculée (lissage)</div>
-<div style="margin:4px 0"><strong>Pente:</strong> Si remonte = augmentation | Si descend = diminution</div>
-</div>
-</div>
-
-<div style="margin-top:10px;padding:10px;background:rgba(255,71,87,0.1);border-radius:var(--radius);border-left:3px solid var(--danger)">
-<div style="font-weight:600;color:var(--text);margin-bottom:6px;font-size:11px">⚠️ À Regarder:</div>
-<div style="font-size:11px;color:var(--text2)">Hausse soudaine? Pic important? = Alerte possible (nouvelle contamination détectée)</div>
-</div>
-</div>
-</div>
-
-<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
-<div class="card stats-card" id="trend-indicator" aria-busy="false">
-<div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Indicateur de Croissance (3 mois)</div>
-<div id="trendIndicatorContainer" class="card__body" style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px"><div class="skeleton" hidden></div></div>
-<div class="stats-insight" style="margin-top:12px;font-size:13px">
-<p><strong>Signification:</strong> Mesure l'accélération des rappels. Positif = volume en hausse, négatif = baisse.</p>
-<p style="margin-top:6px;color:var(--text3)">Une hausse soudaine indique potentiellement un problème systémique identifié.</p>
-</div>
-</div>
-
-<div class="card stats-card" id="compliance-card" aria-busy="false">
-<div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Indice de Conformité Volontaire</div>
-<div id="complianceContainer" class="card__body" style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px"><div class="skeleton" hidden></div></div>
-<div class="stats-insight" style="margin-top:12px;font-size:13px">
-<p><strong>Signification:</strong> % des rappels volontaires = autoréglementation de l'industrie.</p>
-<p style="margin-top:6px;color:var(--text3)">Plus élevé = meilleure autorégulation, moins d'interventions gouvernementales.</p>
-</div>
-</div>
-</section>
-
-<section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)">
-<div class="card stats-card" id="risk-severity" aria-busy="false">
-<div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Matrice Sévérité × Fréquence</div>
-<div id="riskSeverityContainer" class="card__body"><div class="skeleton" hidden></div></div>
-<div class="stats-insight" style="margin-top:12px;font-size:13px">
-<p><strong>Lecture:</strong> Classe les risques par sévérité (CRITIQUE vs MODÉRÉ) et fréquence.</p>
-<p style="margin-top:6px">CRITIQUE EN HAUT À GAUCHE = Priorité absolue.</p>
-</div>
-</div>
-
-<div class="card stats-card" id="category-risk" aria-busy="false">
-<div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Risque Dominant par Catégorie</div>
-<div id="categoryRiskContainer" class="card__body"><div class="skeleton" hidden></div></div>
-<div class="stats-insight" style="margin-top:12px;font-size:13px">
-<p><strong>Lecture:</strong> Montre quel risque domine dans chaque catégorie de produit.</p>
-<p style="margin-top:6px">Permet d'identifier les contrôles nécessaires par secteur.</p>
-</div>
-</div>
+<p class="section-sep">Relations — Produits & Risques</p>
+<section style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-6)">
+<div class="card stats-card" id="chi2-card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Chi² — Lien Produit-Risque<button class="info-btn" data-tip="Chi² > 3.84 → lien statistique confirmé entre catégories et risques.
+V de Cramer = force du lien (0=nul, 0.3=modéré, 0.5+=fort).
+Sélectionnez des catégories et risques dans les filtres pour affiner.">i</button></div><div id="chi2Container" class="card__body" style="gap:12px"></div></div>
+<div class="card stats-card" id="risk-severity"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Fréquence des Risques<button class="info-btn" data-tip="Risques classés par fréquence dans la sélection active.
+CRITIQUE = bactéries pathogènes (Listeria, Salmonella, E.coli, STEC, Botulisme).
+MODÉRÉ = autres types de contamination ou défaut.">i</button></div><div id="riskSeverityContainer" class="card__body"></div></div>
+<div class="card stats-card" id="category-risk"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Risque Dominant par Catégorie<button class="info-btn" data-tip="Pour chaque catégorie de produit, quel est le risque le plus fréquent ?
+Identifie rapidement les contrôles prioritaires par secteur.
+Ex: Lait → Listeria, Viande → Salmonella.">i</button></div><div id="categoryRiskContainer" class="card__body"></div></div>
 </section>
 </div>
 <div class="page" data-page="query" hidden>
-<div class="page-header"><h1 class="page-title">Requêtes Avancées — Exploration par Produit/Risque</h1><div class="page-meta"><span class="badge badge--white" id="queryResultsBadge" aria-live="polite" aria-atomic="true">0 resultats</span></div></div>
-
+<div class="page-header"><h1 class="page-title">Requêtes</h1><div class="page-meta"><span class="badge badge--white" id="queryResultsBadge" aria-live="polite" aria-atomic="true">0 résultats</span></div></div>
+<div class="card" style="margin-bottom:var(--space-6)">
+<div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Filtrer les rappels</div>
+<div class="query-unified">
+<div class="q-field" style="flex:2"><label for="queryProduct">Produit / Marque / Catégorie</label><input type="text" id="queryProduct" list="queryProductList" placeholder="Ex: lait, viande, fromagerie..." autocomplete="off"><datalist id="queryProductList"></datalist></div>
+<div class="q-field" style="flex:2"><label for="queryRisk">Type de risque</label><input type="text" id="queryRisk" list="queryRiskList" placeholder="Ex: listeria, salmonella, corps étranger..." autocomplete="off"><datalist id="queryRiskList"></datalist></div>
+<div class="q-field" style="flex:0 0 auto;min-width:120px"><label for="queryPeriod">Période</label><select id="queryPeriod"><option value="0">Tout</option><option value="30">30 jours</option><option value="90">3 mois</option><option value="180">6 mois</option><option value="365">1 an</option></select></div>
+<button class="btn btn--primary" id="queryRunBtn" style="align-self:flex-end"><svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Rechercher</button>
+<button class="btn btn--ghost" id="queryClearBtn" style="align-self:flex-end" title="Effacer"><svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+</div>
+<div class="quick-chips" id="quickChips">
+<button class="quick-chip" data-prod="" data-risk="listeria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Listeria</button>
+<button class="quick-chip" data-prod="" data-risk="salmonella"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Salmonella</button>
+<button class="quick-chip" data-prod="" data-risk="e\.coli|stec">E.coli / STEC</button>
+<button class="quick-chip" data-prod="" data-risk="corps.tranger|corps étranger">Corps étrangers</button>
+<button class="quick-chip" data-prod="" data-risk="allergen|allergène">Allergènes</button>
+<button class="quick-chip" data-prod="" data-risk="pesticide">Pesticides</button>
+<button class="quick-chip" data-prod="lait|fromage|crème|yaourt|beurre" data-risk="">Produits laitiers</button>
+<button class="quick-chip" data-prod="viande|charcuterie|volaille|boeuf|porc|agneau" data-risk="">Viandes</button>
+<button class="quick-chip" data-prod="poisson|crustacé|coquillage|saumon|thon|crevette" data-risk="">Poissons & mer</button>
+<button class="quick-chip" data-prod="traiteur|plat préparé|pizza|surgelé|conserve" data-risk="">Plats préparés</button>
+</div>
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
-<div class="card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Filtrer par Type de Produit</div>
-<div style="display:flex;flex-direction:column;gap:12px">
-<div><label for="queryProduct" style="font-size:12px;color:var(--text3);text-transform:uppercase;font-weight:600">Produit (regex)</label><input type="text" id="queryProduct" list="queryProductList" placeholder="Ex: viande, lait, cereal..." style="width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px" aria-label="Filtrer produits par regex"><datalist id="queryProductList"></datalist></div>
-<button class="btn btn--primary btn--sm" id="queryProductBtn">Interroger Produits</button>
-<div id="productResultsInfo" style="font-size:12px;color:var(--text3);padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--brand);display:none"></div>
+<div class="card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Marques concernées</div><div id="recurrenceByBrandContainer" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;margin-top:4px"></div></div>
+<div class="card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Évolution temporelle</div><canvas id="queryChartTime" style="max-height:280px"></canvas></div>
 </div>
-</div>
-
-<div class="card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Filtrer par Type de Risque</div>
-<div style="display:flex;flex-direction:column;gap:12px">
-<div><label for="queryRisk" style="font-size:12px;color:var(--text3);text-transform:uppercase;font-weight:600">Risque (regex)</label><input type="text" id="queryRisk" list="queryRiskList" placeholder="Ex: listeria, salmonella, pesticide..." style="width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px" aria-label="Filtrer risques par regex"><datalist id="queryRiskList"></datalist></div>
-<button class="btn btn--primary btn--sm" id="queryRiskBtn">Interroger Risques</button>
-<div id="riskResultsInfo" style="font-size:12px;color:var(--text3);padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--danger);display:none"></div>
-</div>
-</div>
-</div>
-
-<div class="card" style="margin-bottom:var(--space-6)"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>Corrélation: Produit × Risque</div>
-<div style="display:flex;flex-direction:column;gap:12px">
-<div><label for="queryCorrProd" style="font-size:12px;color:var(--text3);text-transform:uppercase;font-weight:600">Produit 1 (regex)</label><input type="text" id="queryCorrProd" placeholder="Ex: viande" style="width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px" aria-label="Produit pour corrélation"></div>
-<div><label for="queryCorrRisk" style="font-size:12px;color:var(--text3);text-transform:uppercase;font-weight:600">Risque (regex)</label><input type="text" id="queryCorrRisk" placeholder="Ex: listeria" style="width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px" aria-label="Risque pour corrélation"></div>
-<button class="btn btn--primary btn--sm" id="queryCorrBtn">Analyser Corrélation</button>
-<div id="corrResultsInfo" style="font-size:12px;color:var(--text3);padding:12px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--info);display:none"></div>
-</div>
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
-<div class="card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Récurrence par Marque</div>
-<div id="recurrenceByBrandContainer" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto"></div>
-<div class="stats-insight" style="margin-top:12px;font-size:12px;color:var(--text3)"><p>Nombre de rappels par marque dans la sélection.</p></div>
-</div>
-
-<div class="card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Fréquence Temporelle</div>
-<canvas id="queryChartTime"></canvas>
-<div class="stats-insight" style="margin-top:12px;font-size:12px;color:var(--text3)"><p>Évolution mensuelle des rappels pour la requête actuelle.</p></div>
-</div>
-</div>
-
-<div class="card" style="margin-bottom:var(--space-6)"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 0-2-2V9m0 0h18"/></svg>Résultats Détaillés<button id="exportQueryCsvBtn" class="btn btn--ghost btn--xs" style="margin-left:auto" title="Exporter la sélection en CSV"><svg style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> CSV</button></div>
-<div class="table-wrap" style="margin-top:12px"><table role="grid"><thead><tr>
-<th>Catégorie</th>
-<th>Marque</th>
-<th>Produit</th>
-<th>Risque</th>
-<th>Date</th>
-</tr></thead><tbody id="queryTableBody"></tbody></table></div>
-<div id="queryEmpty" class="table-empty" style="display:none;padding:40px">Aucun résultat. Ajuste ta requête.</div>
+<div class="card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 0-2-2V9m0 0h18"/></svg>Résultats<span id="queryCountLabel" style="font-size:11px;color:var(--text3);font-weight:400;margin-left:6px"></span><button id="exportQueryCsvBtn" class="btn btn--ghost btn--xs" style="margin-left:auto" title="Exporter en CSV"><svg style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> CSV</button></div>
+<div class="table-wrap" style="margin-top:12px"><table role="grid"><thead><tr><th>Catégorie</th><th>Marque</th><th>Produit</th><th>Risque</th><th>Date</th><th></th></tr></thead><tbody id="queryTableBody"></tbody></table></div>
+<div id="queryEmpty" class="table-empty" style="padding:40px">Lance une recherche ou clique sur un raccourci ci-dessus.</div>
 </div>
 </div>
 
@@ -751,17 +597,7 @@ risks.forEach(r=>{const v=cr[c]?.[r]||0;const max=Math.max(1,...Object.values(cr
 ch+='</div></div>';$('corrContainer').innerHTML=ch;
 const cc={},rc={},j={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1;if(!j[c])j[c]={};j[c][r]=(j[c][r]||0)+1});
 const catsAll=Object.entries(cc).sort((a,b)=>b[1]-a[1]);const risksAll=Object.entries(rc).sort((a,b)=>b[1]-a[1]);const n=data.length;
-const topCats=catsAll.slice(0,3);const topRisks=risksAll.slice(0,3);const catConc=topCats.reduce((s,x)=>s+x[1],0)/n*100;const riskConc=topRisks.reduce((s,x)=>s+x[1],0)/n*100;
-let sh='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
-sh+='<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Categories distinctes</div><div style="font-size:22px;font-weight:700;color:var(--brand);margin-top:6px">'+catsAll.length+'</div><div style="font-size:11px;color:var(--text2);margin-top:4px">Top 3 = '+catConc.toFixed(1)+'% des rappels</div></div>';
-sh+='<div style="padding:12px;background:var(--surface);border-radius:var(--radius)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Types de risques</div><div style="font-size:22px;font-weight:700;color:var(--danger);margin-top:6px">'+risksAll.length+'</div><div style="font-size:11px;color:var(--text2);margin-top:4px">Top 3 = '+riskConc.toFixed(1)+'% des rappels</div></div>';
-sh+='</div>';
-sh+='<div style="padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--brand)"><div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text)">Top 3 Catégories</div>';
-topCats.forEach(([cat,cnt])=>{sh+='<div style="font-size:11px;color:var(--text2);padding:4px 0">• '+esc(cat.slice(0,40))+': <strong>'+cnt+' rappels</strong> ('+((cnt/n)*100).toFixed(1)+'%)</div>'});
-sh+='</div>';
-sh+='<div style="padding:12px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--danger)"><div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text)">Top 3 Risques</div>';
-topRisks.forEach(([risk,cnt])=>{sh+='<div style="font-size:11px;color:var(--text2);padding:4px 0">• '+esc(risk.slice(0,50))+': <strong>'+cnt+' rappels</strong> ('+((cnt/n)*100).toFixed(1)+'%)</div>'});
-sh+='</div>';$('summaryContainer').innerHTML=sh;
+buildYearSelector(data);
 const c2=catsAll.map(x=>x[0]),r2=risksAll.map(x=>x[0]);if(n<2||c2.length<2||r2.length<2){const msg='<div style="padding:16px;background:rgba(255,71,87,0.15);border-radius:var(--radius);border-left:4px solid var(--danger)"><div style="font-weight:600;color:var(--danger);margin-bottom:10px;font-size:13px">❌ Chi² IMPOSSIBLE — Données Insuffisantes</div><div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px"><div style="margin:6px 0"><strong>Catégories:</strong> '+c2.length+' trouvée(s) <strong style="color:var(--text3)">(besoin: ≥2)</strong></div><div style="margin:6px 0"><strong>Risques:</strong> '+r2.length+' trouvé(s) <strong style="color:var(--text3)">(besoin: ≥2)</strong></div></div><div style="padding:10px;background:var(--surface);border-radius:6px;border-left:3px solid var(--info);margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:var(--info);margin-bottom:4px">💡 Pourquoi?</div><div style="font-size:11px;color:var(--text2)">Chi² compare les relations entre catégories et risques. Avec seulement '+c2.length+' catégorie(s) et '+r2.length+' risque(s), il n\'y a rien à comparer!</div></div><div style="padding:10px;background:rgba(46,213,115,0.1);border-radius:6px;border-left:3px solid var(--success)"><div style="font-size:12px;font-weight:600;color:var(--success);margin-bottom:4px">✓ Solution</div><div style="font-size:11px;color:var(--text2)">Allez à <strong>Requêtes</strong> pour analyser une catégorie/risque spécifique</div></div></div>';$('chi2Container').innerHTML=msg;}else{
 let chi=0;c2.forEach(c=>{r2.forEach(r=>{const e=(cc[c]*rc[r])/n,o=j[c]?.[r]||0;if(e>0)chi+=((o-e)**2)/e})});
 const df=(c2.length-1)*(r2.length-1),pValue=chi>3.841?0.001:0.5,cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));
@@ -785,7 +621,7 @@ const voluntary=data.filter(r=>r.nature_juridique_rappel==='volontaire (sans arr
 let complianceHtml='<div style="text-align:center;padding:20px"><div style="font-size:36px;font-weight:700;color:var(--success)">'+voluntary_pct+'%</div><div style="font-size:14px;color:var(--text2);margin-top:12px">Volontaires</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+voluntary+'/'+data.length+' rappels<br/>= Bonne autorégulation</div></div>';
 $('complianceContainer').innerHTML=complianceHtml;
 const riskByCat={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Unknown';if(!riskByCat[c])riskByCat[c]={};riskByCat[c][r]=(riskByCat[c][r]||0)+1});
-const criticalRisks=/listeria|salmonella|e.coli|stec|botulisme/i;const risksByFrequency=Object.entries(Object.fromEntries(data.map(d=>[d.risques_encourus,1]))).map(x=>x[0]);let rsh='<div style="display:flex;flex-direction:column;gap:8px">';
+const criticalRisks=/listeria|salmonella|e.coli|stec|botulisme/i;const riskFreqMap={};data.forEach(d=>{const r=d.risques_encourus||'';if(r)riskFreqMap[r]=(riskFreqMap[r]||0)+1});const risksByFrequency=Object.entries(riskFreqMap).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);let rsh='<div style="display:flex;flex-direction:column;gap:8px">';
 risksByFrequency.slice(0,6).forEach(risk=>{const isCritical=criticalRisks.test(risk);const cnt=data.filter(d=>d.risques_encourus===risk).length;const pct=(cnt/data.length*100).toFixed(1);const badge=isCritical?'<span style="color:var(--danger);font-weight:700;font-size:10px;letter-spacing:.5px">● CRITIQUE</span>':'<span style="color:var(--warning);font-weight:700;font-size:10px;letter-spacing:.5px">● MODÉRÉ</span>';rsh+='<div style="padding:10px;background:var(--surface);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-size:11px;font-weight:600">'+badge+'</div><div style="font-size:11px;color:var(--text2);margin-top:2px">'+risk.substring(0,35)+'</div></div><div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--brand)">'+pct+'%</div><div style="font-size:10px;color:var(--text3)">'+cnt+'</div></div></div>'});
 rsh+='</div>';$('riskSeverityContainer').innerHTML=rsh;
 const topCats3=Object.entries(riskByCat).sort((a,b)=>Object.values(b[1]).reduce((s,x)=>s+x,0)-Object.values(a[1]).reduce((s,x)=>s+x,0)).slice(0,5);let crsh='<div style="display:flex;flex-direction:column;gap:8px">';
@@ -799,37 +635,38 @@ window.cm.chartTrend=new Chart($('chartTrend'),{type:'line',data:{labels,dataset
 
 function normalizeRisks(riskStr){if(!riskStr)return[];return riskStr.split('|').map(r=>r.trim()).filter(r=>r.length>0)}
 
-function queryByProduct(regex_pattern){
-try{const re=new RegExp(regex_pattern,'i');const results=STATE.records.filter(d=>{const p=d.sous_categorie_produit||'';const b=d.marque_produit||'';return re.test(p)||re.test(b)});
-const brands={};results.forEach(d=>{const b=d.marque_produit||'Sans marque';brands[b]=(brands[b]||0)+1});
-const topBrands=Object.entries(brands).sort((a,b)=>b[1]-a[1]).slice(0,10);
-let html='<div style="font-size:12px;color:var(--text3);padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--brand)"><strong>'+results.length+' rappels</strong> correspondent à "<strong>'+esc(regex_pattern)+'</strong>"<br/>Distinct marques: <strong>'+Object.keys(brands).length+'</strong></div>';
-$('productResultsInfo').innerHTML=html;$('productResultsInfo').style.display='block';
-renderQueryResults(results)}catch(e){alert('Regex invalide: '+e.message)}}
+function buildYearSelector(data){
+const yrs=[...new Set(data.map(d=>d.date_publication?.slice(0,4)).filter(Boolean))].sort().reverse();
+const c=$('yearBtns');if(!c)return;
+let h='<button class="year-btn active" data-year="all">Tout</button>';
+yrs.slice(0,6).forEach(y=>{h+='<button class="year-btn" data-year="'+y+'">'+y+'</button>'});
+c.innerHTML=h;
+c.addEventListener('click',function(e){const btn=e.target.closest('.year-btn');if(!btn)return;
+c.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+const yr=btn.dataset.year;
+const fd=yr==='all'?data:data.filter(d=>d.date_publication?.startsWith(yr));
+const m=Array(12).fill(0);fd.forEach(d=>{if(!d.date_publication)return;const dt=new Date(d.date_publication);if(!isNaN(dt))m[dt.getMonth()]++});
+makeBar($('chartSeason'),MONTHS,m)})}
 
-function queryByRisk(regex_pattern){
-try{const re=new RegExp(regex_pattern,'i');const results=[];STATE.records.forEach(d=>{const risks=normalizeRisks(d.risques_encourus||'');if(risks.some(r=>re.test(r))){results.push(d)}});
-const risks={};results.forEach(d=>{const rk=normalizeRisks(d.risques_encourus||'');rk.forEach(r=>{if(re.test(r))risks[r]=(risks[r]||0)+1})});
-const topRisks=Object.entries(risks).sort((a,b)=>b[1]-a[1]).slice(0,5);
-let html='<div style="font-size:12px;color:var(--text3);padding:8px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--danger)"><strong>'+results.length+' rappels</strong> pour "<strong>'+esc(regex_pattern)+'</strong>"<br/>Top risques: '+topRisks.map(r=>r[0].substring(0,30)+'('+r[1]+')').join(', ')+'</div>';
-$('riskResultsInfo').innerHTML=html;$('riskResultsInfo').style.display='block';
-renderQueryResults(results)}catch(e){alert('Regex invalide: '+e.message)}}
-
-function queryCorrélation(prodPattern,riskPattern){
-try{const prodRe=new RegExp(prodPattern,'i'),riskRe=new RegExp(riskPattern,'i');
-const results=STATE.records.filter(d=>{const p=d.sous_categorie_produit||'';const b=d.marque_produit||'';const risks=normalizeRisks(d.risques_encourus||'');return(prodRe.test(p)||prodRe.test(b))&&risks.some(r=>riskRe.test(r))});
-const freq=results.length,pct=STATE.records.length>0?((freq/STATE.records.length)*100).toFixed(2):0;
-const cats={};results.forEach(d=>{const c=d.sous_categorie_produit||'Autre';cats[c]=(cats[c]||0)+1});
-const topCats=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,3);
-let html='<div style="font-size:12px;color:var(--text3);padding:12px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--info)"><div><strong>Corrélation:</strong> "'+esc(prodPattern)+'" × "'+esc(riskPattern)+'"</div><div style="margin-top:8px"><strong>Fréquence:</strong> <strong style="color:var(--brand)">'+freq+'</strong> rappels ('+pct+'% de la base)</div><div style="margin-top:4px"><strong>Catégories:</strong> '+topCats.map(c=>c[0].substring(0,25)+'('+c[1]+')').join(', ')+'</div><div style="margin-top:4px;font-size:11px;color:var(--text3)">✓ Plus haute fréquence = lien plus fort</div></div>';
-$('corrResultsInfo').innerHTML=html;$('corrResultsInfo').style.display='block';
-renderQueryResults(results)}catch(e){alert('Regex invalide: '+e.message)}}
+function runUnifiedQuery(){
+const pv=($('queryProduct').value||'').trim();
+const rv=($('queryRisk').value||'').trim();
+const days=parseInt($('queryPeriod').value)||0;
+$('quickChips').querySelectorAll('.quick-chip').forEach(c=>{
+const cp=(c.dataset.prod||'');const cr=(c.dataset.risk||'');
+c.classList.toggle('active',(cp&&cp===pv)||(cr&&cr===rv))});
+let res=STATE.records;
+if(days>0){const cut=new Date();cut.setDate(cut.getDate()-days);res=res.filter(r=>r.date_publication&&new Date(r.date_publication)>=cut)}
+if(pv){try{const re=new RegExp(pv,'i');res=res.filter(d=>re.test(d.sous_categorie_produit||'')||re.test(d.marque_produit||'')||re.test(d.libelle||''))}catch(e){}}
+if(rv){try{const re=new RegExp(rv,'i');res=res.filter(d=>re.test(d.risques_encourus||''))}catch(e){}}
+renderQueryResults(res)}
 
 function renderQueryResults(results){
-$('queryResultsBadge').textContent=results.length+' resultats';
-if(results.length===0){$('queryTableBody').innerHTML='';$('queryEmpty').style.display='block';return}
+const nb=results.length;$('queryResultsBadge').textContent=nb+' résultat'+(nb!==1?'s':'');
+const lbl=$('queryCountLabel');if(lbl)lbl.textContent=nb>200?'(200 affichés sur '+nb+')':'';
+if(nb===0){$('queryTableBody').innerHTML='';$('queryEmpty').style.display='block';return}
 $('queryEmpty').style.display='none';
-let rows='';results.slice(0,50).forEach(d=>{rows+='<tr><td style="font-size:12px">'+esc(d.sous_categorie_produit||'—')+'</td><td style="font-size:12px">'+esc(d.marque_produit||'—')+'</td><td style="font-size:12px">'+esc(d.libelle?.substring(0,40)||'—')+'</td><td style="font-size:12px">'+esc((d.risques_encourus||'—').substring(0,40))+'</td><td style="font-size:11px;color:var(--text3)">'+fmtDate(d.date_publication)+'</td></tr>'});
+let rows='';results.slice(0,200).forEach(d=>{rows+='<tr><td style="font-size:12px">'+esc(d.sous_categorie_produit||'—')+'</td><td style="font-size:12px;font-weight:500">'+esc(d.marque_produit||'—')+'</td><td style="font-size:12px">'+esc(d.libelle?.substring(0,45)||'—')+'</td><td style="font-size:11px;color:var(--text3)">'+esc((d.risques_encourus||'—').substring(0,40))+'</td><td style="font-size:11px;color:var(--text3);white-space:nowrap">'+fmtDate(d.date_publication)+'</td><td><button class="btn btn--ghost btn--xs" data-id="'+esc(String(d.id))+'" title="Voir la fiche" style="padding:4px 8px">→</button></td></tr>'});
 $('queryTableBody').innerHTML=rows;
 const brands={};results.forEach(d=>{const b=d.marque_produit||'Sans marque';brands[b]=(brands[b]||0)+1});
 const topBrands=Object.entries(brands).sort((a,b)=>b[1]-a[1]).slice(0,8);
@@ -932,11 +769,11 @@ rows.forEach(tr=>{const cells=Array.from(tr.querySelectorAll('td')).slice(0,5);l
 const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
 const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rappels_requete_'+new Date().toISOString().slice(0,10)+'.csv';a.click()}
 
-$('queryProductBtn').addEventListener('click',()=>{const val=$('queryProduct').value.trim();if(!val){alert('Entrez un motif de recherche (regex)');return}queryByProduct(val)});
-$('queryProduct').addEventListener('keypress',(e)=>{if(e.key==='Enter')$('queryProductBtn').click()});
-$('queryRiskBtn').addEventListener('click',()=>{const val=$('queryRisk').value.trim();if(!val){alert('Entrez un motif de risque (regex)');return}queryByRisk(val)});
-$('queryRisk').addEventListener('keypress',(e)=>{if(e.key==='Enter')$('queryRiskBtn').click()});
-$('queryCorrBtn').addEventListener('click',()=>{const prod=$('queryCorrProd').value.trim(),risk=$('queryCorrRisk').value.trim();if(!prod||!risk){alert('Entrez un produit ET un risque');return}queryCorrélation(prod,risk)});
+if($('queryRunBtn'))$('queryRunBtn').addEventListener('click',runUnifiedQuery);
+if($('queryClearBtn'))$('queryClearBtn').addEventListener('click',()=>{$('queryProduct').value='';$('queryRisk').value='';$('queryPeriod').value='0';$('quickChips').querySelectorAll('.quick-chip').forEach(c=>c.classList.remove('active'));$('queryTableBody').innerHTML='';$('queryEmpty').style.display='block';$('queryResultsBadge').textContent='0 résultats';$('recurrenceByBrandContainer').innerHTML='';});
+$('queryProduct').addEventListener('keypress',(e)=>{if(e.key==='Enter')runUnifiedQuery()});
+$('queryRisk').addEventListener('keypress',(e)=>{if(e.key==='Enter')runUnifiedQuery()});
+if($('quickChips'))$('quickChips').addEventListener('click',function(e){const chip=e.target.closest('.quick-chip');if(!chip)return;const wasActive=chip.classList.contains('active');$('quickChips').querySelectorAll('.quick-chip').forEach(c=>c.classList.remove('active'));if(!wasActive){chip.classList.add('active');$('queryProduct').value=chip.dataset.prod||'';$('queryRisk').value=chip.dataset.risk||'';$('queryPeriod').value='0';runUnifiedQuery()}else{$('queryProduct').value='';$('queryRisk').value='';$('queryTableBody').innerHTML='';$('queryEmpty').style.display='block';$('queryResultsBadge').textContent='0 résultats'}});
 if($('exportQueryCsvBtn'))$('exportQueryCsvBtn').addEventListener('click',exportQueryCSV);
 
 init();
