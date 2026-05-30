@@ -846,15 +846,29 @@ window.cm.queryChartTime=new Chart($('queryChartTime'),{type:'bar',data:{labels,
 
 async function fetchApiAlimentation(){
 try{
-const cutoffDate=new Date();cutoffDate.setDate(cutoffDate.getDate()-7);const cutoff=cutoffDate.toISOString().split('T')[0];
-const apiData=await apiFetch("/records?limit=100&where=categorie_produit='alimentation' AND date_publication>='" + cutoff + "'");
-console.log('API: fetched '+apiData.results.length+' recent (last 7 days) alimentation records');
-return apiData.results||[];
+const cutoffDate=new Date();cutoffDate.setDate(cutoffDate.getDate()-14);const cutoff=cutoffDate.toISOString().split('T')[0];
+const first=await apiFetch("/records?limit=100&where=categorie_produit='alimentation' AND date_publication>='"+cutoff+"'&order_by=date_publication+desc");
+const total=first.total_count||0;
+let results=first.results||[];
+if(total>100){
+const pages=Math.ceil(total/100);
+const rest=await Promise.all(Array.from({length:pages-1},(_,i)=>apiFetch("/records?limit=100&offset="+((i+1)*100)+"&where=categorie_produit='alimentation' AND date_publication>='"+cutoff+"'&order_by=date_publication+desc")));
+results=results.concat(rest.flatMap(d=>d.results||[]));
+}
+console.log('API: fetched '+results.length+'/'+total+' recent (last 14 days) alimentation records');
+return results;
 }catch(e){
 try{
-const apiData=await apiFetch("/records?limit=200&refine=categorie_produit:alimentation");
-console.log('API fallback: fetched '+apiData.results.length+' records via refine');
-return apiData.results||[];
+const first=await apiFetch("/records?limit=100&refine=categorie_produit:alimentation&order_by=date_publication+desc");
+const total=first.total_count||0;
+let results=first.results||[];
+if(total>100){
+const pages=Math.ceil(Math.min(total,500)/100);
+const rest=await Promise.all(Array.from({length:pages-1},(_,i)=>apiFetch("/records?limit=100&offset="+((i+1)*100)+"&refine=categorie_produit:alimentation&order_by=date_publication+desc")));
+results=results.concat(rest.flatMap(d=>d.results||[]));
+}
+console.log('API fallback: fetched '+results.length+' records via refine');
+return results;
 }catch(e2){
 console.log('API alimentation fetch failed completely',e);
 return [];
