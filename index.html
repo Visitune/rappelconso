@@ -160,15 +160,18 @@ tbody tr{animation:row-in 0.15s ease both}
 </nav>
 <div class="side-footer">
 <div class="side-progress" id="progressWrap"><div class="bar"><div class="fill" id="progressFill" style="width:0%"></div></div><div class="label" id="progressLabel">Chargement...</div></div>
+<div style="display:flex;gap:6px;align-items:center">
 <button id="refreshDataBtn" class="btn btn--ghost btn--xs" aria-label="Actualiser les donnees" title="Recharger data.json">
 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>
-<button id="exportDataBtn" class="btn btn--ghost btn--xs" aria-label="Exporter data.json" title="Telecharger data.json pour mise à jour GitHub">
-<svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
 <button id="themeBtn" class="btn btn--ghost btn--xs" aria-label="Basculer theme">
 <svg class="icon icon-sm theme-icon" data-theme-icon="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg class="icon icon-sm theme-icon" data-theme-icon="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+<button class="btn btn--ghost btn--xs" onclick="switchPage('about')" title="À propos" aria-label="À propos">
+<svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
+</div>
 <div class="side-visipilot">
-<p class="side-disclaimer">Application à usage <strong>pédagogique et informatif</strong>.<br>En cas de doute sur un rappel, consultez toujours le site officiel&nbsp;:<br><a href="https://rappelconso.fr" target="_blank" rel="noopener">rappelconso.fr</a></p>
+<a href="https://visipilot.com" target="_blank" rel="noopener" style="display:inline-flex;text-decoration:none;opacity:0.7;transition:opacity 0.15s;margin-bottom:6px" title="VisiPilot.com"><img src="https://visipilot.com/logovisipilot-300x81-1.png" alt="VisiPilot" style="height:18px;width:auto;display:block" loading="lazy"></a>
+<p class="side-disclaimer">Usage <strong>pédagogique</strong> uniquement.<br>En cas de doute&nbsp;: <a href="https://rappelconso.fr" target="_blank" rel="noopener">rappelconso.fr</a></p>
 </div>
 </div>
 </aside>
@@ -420,6 +423,22 @@ Cette analyse sert à repérer des foyers territoriaux et la part nationale.">?<
 </div>
 </div>
 
+<!-- Export données -->
+<div class="about-card">
+<div class="about-section-title">
+<svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+Export & Mise à jour des données
+</div>
+<p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 14px">Le fichier <code>data.json</code> est le cache local des rappels. Vous pouvez le télécharger ici pour le mettre à jour manuellement dans le dépôt GitHub, ou laisser GitHub Actions le régénérer automatiquement chaque nuit.</p>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+<button id="exportDataBtn" class="btn btn--primary btn--sm">
+<svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+Télécharger data.json
+</button>
+<span id="aboutExportInfo" style="font-size:11px;color:var(--text3)"></span>
+</div>
+</div>
+
 <!-- Source des données -->
 <div class="about-card">
 <div class="about-section-title">
@@ -571,8 +590,8 @@ const blob=new Blob([dataStr],{type:'application/json'});
 const url=URL.createObjectURL(blob);
 const a=document.createElement('a');
 a.href=url;a.download='data.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-const extra=STATE.records.length-12945;
-if(extra>0)alert('✅ Export OK\n'+STATE.records.length+' fiches ('+extra+' nouveaux)\nPush sur GitHub');
+const info=$('aboutExportInfo');
+if(info)info.textContent=STATE.records.length.toLocaleString('fr-FR')+' fiches exportées — '+new Date().toLocaleString('fr-FR');
 }
 if(localStorage.getItem('rc-theme'))setTheme(localStorage.getItem('rc-theme'));
 setTimeout(()=>{
