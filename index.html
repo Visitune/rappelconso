@@ -149,6 +149,26 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <button class="btn btn--ghost btn--sm" data-days="365">1 an</button>
 </div>
 <button id="clearFiltersBtn" class="btn btn--ghost btn--sm" style="color:var(--danger)" aria-label="Effacer tous les filtres">Effacer</button>
+<button class="info-btn" style="margin-left:4px" data-tip="Comment fonctionnent les filtres ?
+
+Barre de recherche — filtre marque, produit, motif (texte libre).
+
+Sous-catégories / Risques — sélection multiple via les menus déroulants.
+
+Nature juridique — distingue rappels volontaires et imposés par arrêté.
+
+Chips rapides:
+• Contamination bactérienne = Listeria, Salmonella, E.coli, STEC, Botulisme
+• Rappels obligatoires = imposés par arrêté préfectoral
+• 30 derniers jours = rappels récents uniquement
+
+Période (30j / 3 mois…) — fenêtre glissante depuis la date du dernier rappel en cache.
+
+Graphiques cliquables — cliquer une barre ou un segment applique ce filtre. Recliquer le désactive.
+
+Effacer — remet tous les filtres à zéro.
+
+Les filtres se combinent (ET logique). Le résumé sous la barre affiche ce qui est actif.">?</button>
 </div>
 </div>
 <div class="filter-summary" id="filterSummary" aria-live="polite"></div>
@@ -594,7 +614,7 @@ h+='<button class="pag-btn" data-page="'+(p+1)+'" '+(p>=pages?'disabled':'')+'>&
 qsa('.chip').forEach(c=>c.addEventListener('click',function(){
 const v=this.dataset.chip;
 if(v==='all'){qsa('.chip').forEach(x=>x.classList.remove('active'));this.classList.add('active');STATE.chips=new Set(['all']);STATE.filterCats.clear();STATE.filterRisks.clear();$('filterLegal').value='';STATE.days=0;qsa('[id*="Menu"] input[type="checkbox"]').forEach(x=>x.checked=false);qsa('.filter-toggle').forEach(b=>updateFilterBtn(b.id));qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').classList.add('active')}
-else{STATE.chips.delete('all');qsa('.chip[data-chip="all"]').classList.remove('active');
+else{STATE.chips.delete('all');qsa('.chip[data-chip="all"]').forEach(x=>x.classList.remove('active'));
 if(STATE.chips.has(v)){STATE.chips.delete(v);this.classList.remove('active')}else{STATE.chips.add(v);this.classList.add('active')}}
 if(STATE.chips.size===0){STATE.chips=new Set(['all']);qsa('.chip[data-chip="all"]').forEach(x=>x.classList.add('active'))}
 STATE.page=1;onFilterChange()}));
@@ -603,7 +623,7 @@ const updateFilterVisuals=()=>{
 };
 $('clearFiltersBtn').addEventListener('click',function(){
 $('searchInput').value='';STATE.filterCats.clear();STATE.filterRisks.clear();$('filterLegal').value='';
-STATE.query='';STATE.days=0;STATE.chips=new Set(['all']);qsa('.chip').forEach(x=>x.classList.remove('active'));qsa('.chip[data-chip="all"]').classList.add('active');
+STATE.query='';STATE.days=0;STATE.chips=new Set(['all']);qsa('.chip').forEach(x=>x.classList.remove('active'));qsa('.chip[data-chip="all"]').forEach(x=>x.classList.add('active'));
 qsa('[id*="Menu"] input[type="checkbox"]').forEach(x=>x.checked=false);qsa('.filter-toggle').forEach(b=>updateFilterBtn(b.id));
 qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').classList.add('active');
 STATE.page=1;onFilterChange()});
