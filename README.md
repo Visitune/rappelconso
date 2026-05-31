@@ -1,6 +1,6 @@
 # RappelConso — Guide Rapide
 
-Dashboard interactif: 12,945+ rappels alimentaires (2013-2024) avec filtres, analyses statistiques et recherche avancée.
+Dashboard interactif: 12,945+ rappels alimentaires (2021-2026 dans le cache local actuel) avec filtres, analyses statistiques et recherche avancée.
 **Données mises à jour automatiquement** — voir section "Mise à Jour des Données" ci-dessous.
 
 ## 5 Pages
@@ -9,7 +9,7 @@ Dashboard interactif: 12,945+ rappels alimentaires (2013-2024) avec filtres, ana
 |------|------|
 | **Dashboard** | KPIs: +29% tendance, 85% volontaires, top catégories/risques |
 | **Recherche** | Recherche simple par marque/produit, tableau sortable |
-| **Analyses** | Chi² (test indépendance), Pareto 80/20, Corrélation, Tendance |
+| **Analyses** | Chi² réel, p-value, V de Cramer, résidus standardisés, Pareto, anomalies temporelles, saisonnalité, criticité, marques, géographie |
 | **Requêtes** | Regex avancées: `viandes`, `listeria`, `viandes\|salmonella` |
 | **À propos** | Infos source |
 
@@ -28,15 +28,57 @@ Dashboard interactif: 12,945+ rappels alimentaires (2013-2024) avec filtres, ana
 
 ---
 
-## Chi² — Les 3 Points Essentiels
+## Méthodes Statistiques Ajoutées
 
-1. **Question:** "Certains produits ont-ils des risques spécifiques?"
-2. **Résultat:**
-   - `χ² > 3.84` = **LIÉ** (oui, lien statistique)
-   - `χ² ≤ 3.84` = **INDÉPENDANT** (non, c'est aléatoire)
-3. **Condition:** Besoin ≥2 catégories ET ≥2 risques
+### Chi² — Indépendance Catégorie × Risque
 
-**Erreur "Pas assez de catégories"?** = Vous avez filtré à 1 catégorie. Passez à **Requêtes**.
+- **Question:** les catégories de produits ont-elles des profils de risques différents ?
+- **Calcul:** `χ² = somme((observé - attendu)^2 / attendu)`.
+- **Degrés de liberté:** `(nb_categories - 1) * (nb_risques - 1)`.
+- **Décision:** lien statistique si `p-value < 0.05`, pas avec un seuil fixe unique.
+- **Force:** `V de Cramer = sqrt(χ² / (n * min(lignes-1, colonnes-1)))`.
+- **Qualité:** la page signale la part des cellules avec effectif attendu `< 5`, car trop de petites cellules fragilisent le test.
+
+### Résidus Standardisés
+
+- **Formule:** `résidu = (observé - attendu) / sqrt(attendu)`.
+- **Lecture:** `résidu > 2` = couple catégorie-risque surreprésenté ; `résidu < -2` = sous-représenté.
+- **Utilité:** identifie les couples responsables du Chi², par exemple `Viandes × Salmonella`.
+
+### Anomalies Temporelles
+
+- **Formule:** `z = (volume_mois - moyenne_mensuelle) / écart_type`.
+- **Lecture:** `z > 2` indique un mois atypiquement élevé.
+- **Complément:** comparaison au même mois N-1 quand disponible pour limiter les faux signaux saisonniers.
+
+### Saisonnalité Normalisée
+
+- **Indice:** `moyenne du mois / moyenne mensuelle globale`.
+- **Lecture:** `1.25` = mois 25% au-dessus de la normale ; `0.80` = mois 20% sous la normale.
+
+### Score de Criticité
+
+Score opérationnel sur 100, non officiel, combinant:
+
+- gravité du risque ;
+- rappel imposé ou volontaire ;
+- couverture géographique ;
+- durée de commercialisation ;
+- conservation au froid ;
+- récurrence de la marque.
+
+### Récurrence Marques
+
+- **Score:** `rappels * log(1 + mois_distincts) * risques_distincts`.
+- **Utilité:** repère les marques qui reviennent souvent, dans le temps, avec plusieurs types de problèmes.
+
+### Géographie
+
+- Détecte `France entière`.
+- Extrait les départements via les codes entre parenthèses, par exemple `(59)`.
+- Conserve aussi le nombre de zones brutes, car le champ source mélange départements, régions, villes et texte libre.
+
+Tous les blocs disposent de boutons `?` ou `i` dans l'interface pour expliquer la méthode aux utilisateurs.
 
 ---
 
@@ -54,9 +96,9 @@ viande|salmonella   → Viande OU Salmonella
 
 ## Données (Vue Globale)
 
-- **Total:** 12,945+ rappels (2013-2024)
+- **Total:** 12,945+ rappels (cache local: 2021-03-26 à 2026-05-19)
 - **Catégories:** 24 (Lait 24%, Viande 23%, Poisson 8%)
-- **Risques:** 182 types (Listeria 25%, Chimique 15%, Pesticides 11%)
+- **Risques:** 57 libellés normalisés par séparation `|`
 - **Tendance:** +29% sur 3 mois
 - **Volontaires:** 85%, Obligatoires: 15%
 
@@ -70,7 +112,7 @@ viande|salmonella   → Viande OU Salmonella
 
 1. **Cache statique** (`data.json` — 14.6 MB)
    - Mis à jour **quotidiennement à 6h UTC** par GitHub Actions
-   - Contient tous les rappels historiques (2013-2024)
+   - Contient les rappels alimentaires disponibles dans le cache local
    - Récupérés via API publique: `data.economie.gouv.fr`
 
 2. **Fusion API temps réel** (au chargement de l'app)
