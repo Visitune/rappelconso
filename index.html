@@ -40,7 +40,7 @@ a{color:var(--brand)}button{cursor:pointer;font-family:inherit}input,select{font
 .filter-select{padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;cursor:pointer;min-width:140px;transition:all var(--tf);display:inline-flex;align-items:center;gap:6px}.filter-select:focus{border-color:var(--brand);outline:none}.filter-select.active{border-color:var(--brand);background:rgba(243,112,33,0.08);font-weight:500}
 .filter-dropdown{flex:1;min-width:140px}.filter-toggle{width:100%;text-align:left}.filter-toggle:hover{background:var(--elevated)}.filter-menu{padding:8px;display:flex;flex-direction:column;gap:2px}.filter-menu label{display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;cursor:pointer;user-select:none;transition:all var(--tf);color:var(--text2);font-size:12px}.filter-menu label:hover{background:var(--elevated);color:var(--text)}.filter-menu input[type="checkbox"]{cursor:pointer;accent-color:var(--brand)}
 .filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.filter-chips{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0}.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius-full);font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all var(--tf)}.chip:hover,.chip.active{background:rgba(243,112,33,0.12);border-color:var(--brand);color:var(--brand)}.chip .x{margin-left:2px;opacity:0.5}.chip:hover .x{opacity:1}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0}.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--radius-full);font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all var(--tf)}.chip:hover,.chip.active{background:rgba(243,112,33,0.12);border-color:var(--brand);color:var(--brand)}.chip[aria-pressed="true"]{box-shadow:0 0 0 2px rgba(243,112,33,0.08)}.chip-count{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7}.chip .x{margin-left:2px;opacity:0.5}.chip:hover .x{opacity:1}.filter-summary{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--text3);padding:2px 0 6px}.filter-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--radius-full);background:rgba(243,112,33,0.10);color:var(--brand);border:1px solid rgba(243,112,33,0.20);font-weight:600}.chart-card canvas{cursor:pointer}
 .date-presets{display:flex;gap:4px;flex-wrap:wrap}.date-presets .btn{font-size:11px;padding:6px 10px;min-height:32px}.date-presets .btn.active{background:var(--elevated);color:var(--brand);border-color:var(--brand)}
 .table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border)}table{width:100%;border-collapse:collapse;font-size:13px}thead{background:var(--surface)}
 th{padding:12px 14px;text-align:left;font-weight:600;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--border);user-select:none}th:hover{color:var(--text)}th .sort-arrow{opacity:0.3;margin-left:4px;display:inline-block}th.sorted .sort-arrow{opacity:1;color:var(--brand)}
@@ -151,6 +151,7 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 <button id="clearFiltersBtn" class="btn btn--ghost btn--sm" style="color:var(--danger)" aria-label="Effacer tous les filtres">Effacer</button>
 </div>
 </div>
+<div class="filter-summary" id="filterSummary" aria-live="polite"></div>
 </div>
 <div id="content">
 <div class="page" data-page="dashboard">
@@ -425,8 +426,40 @@ function populateFilters(){
 STATE.filterCats=new Set();STATE.filterRisks=new Set();
 const popMulti=(btnId,menuId,arr)=>{const menu=$(menuId);menu.innerHTML='';const isRisk=btnId==='filterRiskBtn';const filterSet=isRisk?STATE.filterRisks:STATE.filterCats;const allValues=arr.map(a=>Object.values(a)[0]).filter(v=>v);const btnGroup=document.createElement('div');btnGroup.style.cssText='padding:8px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap';const selectAllBtn=document.createElement('button');selectAllBtn.textContent='Tous';selectAllBtn.style.cssText='flex:1;min-width:50px;padding:6px 12px;background:var(--brand);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600';selectAllBtn.addEventListener('click',()=>{allValues.forEach(v=>filterSet.add(v));document.querySelectorAll('#'+menuId+' input[type="checkbox"]').forEach(inp=>{inp.checked=true});updateFilterBtn(btnId);onFilterChange()});const clearBtn=document.createElement('button');clearBtn.textContent='Aucun';clearBtn.style.cssText='flex:1;min-width:50px;padding:6px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600';clearBtn.addEventListener('click',()=>{filterSet.clear();document.querySelectorAll('#'+menuId+' input[type="checkbox"]').forEach(inp=>{inp.checked=false});updateFilterBtn(btnId);onFilterChange()});btnGroup.appendChild(selectAllBtn);btnGroup.appendChild(clearBtn);menu.appendChild(btnGroup);arr.forEach(a=>{const v=Object.values(a)[0];const c=a['count(*)'];if(!v)return;const label=document.createElement('label');const inp=document.createElement('input');inp.type='checkbox';inp.value=v;inp.addEventListener('change',()=>{if(inp.checked)filterSet.add(v);else filterSet.delete(v);updateFilterBtn(btnId);onFilterChange()});label.appendChild(inp);label.appendChild(document.createTextNode(v+' ('+c+')'));menu.appendChild(label)});$(btnId).addEventListener('click',e=>{e.stopPropagation();const m=$(menuId);m.style.display=m.style.display==='none'?'block':'none'})};
 if($('filterCatBtn')){popMulti('filterCatBtn','filterCatMenu',STATE.facets.cats);popMulti('filterRiskBtn','filterRiskMenu',STATE.facets.risks)}
+const legalSel=$('filterLegal');if(legalSel){const current=legalSel.value;legalSel.innerHTML='<option value="">Nature juridique</option>';STATE.facets.legals.forEach(a=>{const v=a.nature_juridique_rappel||Object.values(a)[0],c=a['count(*)'];if(!v)return;const o=document.createElement('option');o.value=v;o.textContent=v+(c?' ('+c+')':'');legalSel.appendChild(o)});legalSel.value=current}
+updateFilterChipCounts();updateFilterSummary();
 document.addEventListener('click',()=>{$('filterCatMenu').style.display='none';$('filterRiskMenu').style.display='none'})}
 function updateFilterBtn(btnId){const count=btnId==='filterCatBtn'?STATE.filterCats.size:STATE.filterRisks.size;const isCat=btnId==='filterCatBtn';const svg=isCat?'<svg style="width:13px;height:13px;flex-shrink:0;pointer-events:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>':'<svg style="width:13px;height:13px;flex-shrink:0;pointer-events:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';$(btnId).innerHTML=svg+(isCat?'Sous-catégories':'Risques')+' ('+count+')'}
+
+function setSetFilter(kind,value){
+  const set=kind==='cat'?STATE.filterCats:STATE.filterRisks;
+  if(value)set.add(value);
+  document.querySelectorAll('#'+(kind==='cat'?'filterCatMenu':'filterRiskMenu')+' input[type="checkbox"]').forEach(inp=>{inp.checked=set.has(inp.value)});
+  updateFilterBtn(kind==='cat'?'filterCatBtn':'filterRiskBtn');
+  STATE.chips.delete('all');qsa('.chip[data-chip="all"]').forEach(x=>x.classList.remove('active'));
+  STATE.page=1;onFilterChange();
+}
+
+function updateFilterSummary(){
+  const el=$('filterSummary');if(!el)return;
+  if($('filterLegal'))$('filterLegal').classList.toggle('active',$('filterLegal').value!=='');
+  const parts=[];const q=$('searchInput')?.value.trim();
+  if(q)parts.push('Recherche: '+q);
+  if(STATE.filterCats.size)parts.push(STATE.filterCats.size+' sous-catégorie(s)');
+  if(STATE.filterRisks.size)parts.push(STATE.filterRisks.size+' risque(s)');
+  if($('filterLegal')?.value)parts.push($('filterLegal').value);
+  if(STATE.days>0)parts.push(STATE.days+' jours');
+  STATE.chips.forEach(c=>{if(c!=='all')parts.push(({grave:'contamination bactérienne',bacterien:'rappels obligatoires',recent:'30 derniers jours'}[c]||c))});
+  const count=getFilteredRecords().length;
+  el.innerHTML=(parts.length?parts.map(p=>'<span class="filter-pill">'+esc(p)+'</span>').join(''):'<span>Aucun filtre actif</span>')+'<span class="filter-pill">'+count.toLocaleString('fr-FR')+' fiche'+(count>1?'s':'')+'</span>';
+  qsa('.chip').forEach(ch=>ch.setAttribute('aria-pressed',ch.classList.contains('active')?'true':'false'));
+}
+
+function updateFilterChipCounts(){
+  const full=STATE.records;if(!full.length)return;
+  const defs={all:full.length,grave:full.filter(r=>/listeria|salmonella|e.coli|stec|botulisme|brucell/i.test(r.risques_encourus||'')).length,bacterien:full.filter(r=>r.nature_juridique_rappel==='imposé par arrêté préfectoral').length,recent:full.filter(r=>{const ref=STATE.dataDate?new Date(STATE.dataDate):new Date();ref.setDate(ref.getDate()-30);return r.date_publication&&new Date(r.date_publication)>=ref}).length};
+  qsa('.chip').forEach(ch=>{let b=ch.querySelector('.chip-count');if(!b){b=document.createElement('span');b.className='chip-count';ch.appendChild(b)}const n=defs[ch.dataset.chip]||0;b.textContent=n>999?Math.round(n/1000)+'k':n});
+}
 
 function getFilteredRecords(){
 let d=STATE.records;const q=$('searchInput').value.trim().toLowerCase();
@@ -446,7 +479,8 @@ function onFilterChange(){
 const page=STATE.currentPage;
 if(page==='search'){STATE.page=1;doSearch(false)}
 else if(page==='dashboard')updateDashboard()
-else if(page==='analyses'){const d=getFilteredRecords();$('statsBadge').textContent=d.length+' fiches filtrées';renderStats(d);renderCharts(d)}}
+else if(page==='analyses'){const d=getFilteredRecords();$('statsBadge').textContent=d.length+' fiches filtrées';renderStats(d);renderCharts(d)}
+updateFilterSummary()}
 
 function switchPage(name){
 qsa('.side-link').forEach(x=>{x.classList.toggle('active',x.dataset.page===name);x.setAttribute('aria-current',x.dataset.page===name?'page':'false')});
@@ -477,11 +511,13 @@ const catCnt={};data.forEach(d=>{const k=d.sous_categorie_produit||'Autre';catCn
 const catSorted=Object.entries(catCnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
 const catColors=catSorted.map((_,i)=>PALETTE[i%PALETTE.length]);
 makeBar($('chartCat'),catSorted.map(x=>x[0].length>22?x[0].slice(0,22)+'...':x[0]),catSorted.map(x=>x[1]),catColors);
+if(window.cm?.chartCat){window.cm.chartCat.options.onClick=(e,els)=>{if(!els.length)return;setSetFilter('cat',catSorted[els[0].index][0])};window.cm.chartCat.update()}
 
 const riskCnt={};data.forEach(d=>{const k=d.risques_encourus||'Non specifie';riskCnt[k]=(riskCnt[k]||0)+1});
 const riskSorted=Object.entries(riskCnt).sort((a,b)=>b[1]-a[1]).slice(0,12);
 const riskColors=riskSorted.map((_,i)=>PALETTE[i%PALETTE.length]);
 makeDoughnut($('chartRisk'),riskSorted.map(x=>x[0].length>25?x[0].slice(0,25)+'...':x[0]),riskSorted.map(x=>x[1]),riskColors);
+if(window.cm?.chartRisk){window.cm.chartRisk.options.onClick=(e,els)=>{if(!els.length)return;normalizeRisks(riskSorted[els[0].index][0]).forEach(r=>STATE.filterRisks.add(r));document.querySelectorAll('#filterRiskMenu input[type="checkbox"]').forEach(inp=>{inp.checked=STATE.filterRisks.has(inp.value)});updateFilterBtn('filterRiskBtn');STATE.chips.delete('all');qsa('.chip[data-chip="all"]').forEach(x=>x.classList.remove('active'));STATE.page=1;onFilterChange()};window.cm.chartRisk.update()}
 
 const legalCnt={};data.forEach(d=>{const k=d.nature_juridique_rappel||'Autre';legalCnt[k]=(legalCnt[k]||0)+1});
 const legalSorted=Object.entries(legalCnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
@@ -558,6 +594,7 @@ const v=this.dataset.chip;
 if(v==='all'){qsa('.chip').forEach(x=>x.classList.remove('active'));this.classList.add('active');STATE.chips=new Set(['all']);STATE.filterCats.clear();STATE.filterRisks.clear();$('filterLegal').value='';STATE.days=0;qsa('[id*="Menu"] input[type="checkbox"]').forEach(x=>x.checked=false);qsa('.filter-toggle').forEach(b=>updateFilterBtn(b.id));qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').classList.add('active')}
 else{STATE.chips.delete('all');qsa('.chip[data-chip="all"]').classList.remove('active');
 if(STATE.chips.has(v)){STATE.chips.delete(v);this.classList.remove('active')}else{STATE.chips.add(v);this.classList.add('active')}}
+if(STATE.chips.size===0){STATE.chips=new Set(['all']);qsa('.chip[data-chip="all"]').forEach(x=>x.classList.add('active'))}
 STATE.page=1;onFilterChange()}));
 const updateFilterVisuals=()=>{
   $('filterLegal').classList.toggle('active',$('filterLegal').value!=='');
@@ -842,7 +879,7 @@ $('menuBadgeDash').textContent=merged.length>999?Math.round(merged.length/1000)+
 $('aboutCache').textContent=merged.length+' fiches ('+data.length+' cache'+badge+')';
 $('progressFill').style.width='100%';$('progressLabel').textContent=merged.length+' fiches';
 updateDashboard();doSearch(true);loadFacets();
-if(STATE.records.length){renderStats(STATE.records);populateQueryAutocomplete();updateChipCounts()}
+if(STATE.records.length){renderStats(STATE.records);populateQueryAutocomplete();updateChipCounts();updateFilterChipCounts();updateFilterSummary()}
 }catch(e){
 $('dashTotalBadge').textContent='Erreur chargement data.json';
 $('cacheBadge').textContent='Erreur: verifier DATA_URL ou CORS';
@@ -853,7 +890,7 @@ try{
 const meta=await apiFetch('/records?limit=1&refine=categorie_produit:alimentation');
 const total=meta.total_count||0;const pages=Math.ceil(Math.min(total,3000)/100);
 const all=(await Promise.all(Array.from({length:pages},(_,i)=>apiFetch('/records?limit=100&offset='+(i*100)+'&refine=categorie_produit:alimentation&order_by=date_publication+desc')))).flatMap(d=>d.results||[])
-STATE.records=all;updateDashboard();doSearch(true);loadFacets();populateQueryAutocomplete();updateChipCounts();
+STATE.records=all;updateDashboard();doSearch(true);loadFacets();populateQueryAutocomplete();updateChipCounts();updateFilterChipCounts();updateFilterSummary();
 $('cacheBadge').textContent='Fallback: '+all.length+' fiches via API';
 }catch(e){$('dashTotalBadge').textContent='Erreur de chargement'}}
 
