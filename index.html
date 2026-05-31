@@ -295,9 +295,9 @@ La comparaison N-1 limite les faux signaux saisonniers.">?</button></div><div id
 </section>
 
 <p class="section-sep">Saisonnalité — Patterns par période</p>
-<div class="card stats-card" style="margin-bottom:var(--space-6)" id="seasonality-card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>Rappels par Mois<div id="yearBtns" class="year-btns"></div><button class="info-btn" data-tip="Barres hautes = mois avec plus de rappels historiquement.
-Sélectionnez une année pour voir sa saisonnalité spécifique.
-'Tout' = distribution cumulée sur toutes les années.">i</button></div><canvas id="chartSeason" class="card__body"></canvas><div class="skeleton" hidden id="skelSeason"></div></div>
+<div class="card stats-card" style="margin-bottom:var(--space-6)" id="seasonality-card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>Rappels par Mois<div id="yearBtns" class="year-btns"></div><button class="info-btn" data-tip="Tout = graphique groupé : pour chaque mois, une barre par année côte à côte (comparaison directe).
+Année X = saisonnalité de cette année seule.
+Utile pour repérer si un mois est systématiquement élevé ou si c'est ponctuel.">i</button></div><canvas id="chartSeason" class="card__body"></canvas><div class="skeleton" hidden id="skelSeason"></div></div>
 <div class="card stats-card" style="margin-bottom:var(--space-6)" id="seasonality-index-card"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>Indice de Saisonnalité<button class="info-btn" data-tip="Indice = moyenne du mois / moyenne mensuelle globale.
 1.25 signifie 25% au-dessus de la normale.
 0.80 signifie 20% sous la normale.
@@ -871,17 +871,37 @@ let national=0,dep={};data.forEach(d=>{if(isNationalZone(d.zone_geographique_de_
 }
 
 function buildYearSelector(data){
-const yrs=[...new Set(data.map(d=>d.date_publication?.slice(0,4)).filter(Boolean))].sort().reverse();
+const yrs=[...new Set(data.map(d=>d.date_publication?.slice(0,4)).filter(Boolean))].sort().reverse().slice(0,6);
 const c=$('yearBtns');if(!c)return;
 let h='<button class="year-btn active" data-year="all">Tout</button>';
-yrs.slice(0,6).forEach(y=>{h+='<button class="year-btn" data-year="'+y+'">'+y+'</button>'});
+yrs.forEach(y=>{h+='<button class="year-btn" data-year="'+y+'">'+y+'</button>'});
 c.innerHTML=h;
+const YR_COLORS=['rgba(243,112,33,0.75)','rgba(59,130,246,0.75)','rgba(46,213,115,0.75)','rgba(255,99,132,0.75)','rgba(167,139,250,0.75)','rgba(245,158,11,0.75)'];
+function drawSeason(yr){
+  const canvas=$('chartSeason');if(!canvas)return;
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const tick={color:isDark?'#9CA3B5':'#6B7280',font:{size:10}};
+  const grid={color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'};
+  if(window.cm?.chartSeason)window.cm.chartSeason.destroy();
+  if(!window.cm)window.cm={};
+  if(yr==='all'){
+    canvas.style.maxHeight='520px';canvas.style.height='520px';
+    const datasets=yrs.map((y,i)=>{
+      const m=Array(12).fill(0);
+      data.filter(d=>d.date_publication?.startsWith(y)).forEach(d=>{const dt=new Date(d.date_publication);if(!isNaN(dt))m[dt.getMonth()]++});
+      return{label:y,data:m,backgroundColor:YR_COLORS[i%YR_COLORS.length],borderRadius:2};
+    });
+    window.cm.chartSeason=new Chart(canvas,{type:'bar',data:{labels:MONTHS,datasets},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{color:tick.color,font:{size:10},padding:10,boxWidth:12}}},scales:{x:{grid,ticks:tick,beginAtZero:true},y:{grid:{display:false},ticks:tick}}}});
+  }else{
+    canvas.style.maxHeight='';canvas.style.height='';
+    const m=Array(12).fill(0);
+    data.filter(d=>d.date_publication?.startsWith(yr)).forEach(d=>{const dt=new Date(d.date_publication);if(!isNaN(dt))m[dt.getMonth()]++});
+    makeBar(canvas,MONTHS,m);
+  }
+}
+drawSeason('all');
 c.addEventListener('click',function(e){const btn=e.target.closest('.year-btn');if(!btn)return;
-c.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-const yr=btn.dataset.year;
-const fd=yr==='all'?data:data.filter(d=>d.date_publication?.startsWith(yr));
-const m=Array(12).fill(0);fd.forEach(d=>{if(!d.date_publication)return;const dt=new Date(d.date_publication);if(!isNaN(dt))m[dt.getMonth()]++});
-makeBar($('chartSeason'),MONTHS,m)})}
+c.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');drawSeason(btn.dataset.year)})}
 
 const ACTIVE_CHIPS={risk:null,prod:null};
 
