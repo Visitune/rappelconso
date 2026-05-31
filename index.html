@@ -87,6 +87,39 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 .quick-chip svg{width:11px;height:11px;flex-shrink:0}
 .chip-cnt{margin-left:3px;font-size:10px;opacity:0.55;font-weight:400}.quick-chip.active .chip-cnt{opacity:0.85}
 .chip-sep{width:1px;height:20px;background:var(--border);margin:0 4px;align-self:center;flex-shrink:0}
+/* ── Animations ── */
+@keyframes pill-in{from{opacity:0;transform:scale(0.82) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes kpi-pop{0%,100%{transform:scale(1)}40%{transform:scale(1.06)}}
+@keyframes slide-down{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes row-in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.filter-pill{animation:pill-in 0.18s ease both;cursor:pointer;user-select:none}
+.filter-pill:hover{background:rgba(243,112,33,0.18);border-color:var(--brand)}
+.filter-pill .pill-x{margin-left:4px;opacity:0.55;font-size:13px;line-height:1}
+.filter-pill:hover .pill-x{opacity:1;color:var(--danger)}
+.filter-pill--count{cursor:default;background:var(--surface);color:var(--text2);border-color:var(--border);margin-left:auto}
+.filter-pill--count:hover{background:var(--surface);border-color:var(--border)}
+.kpi__value.kpi-anim{animation:kpi-pop 0.35s ease}
+tbody tr{animation:row-in 0.15s ease both}
+/* ── Drilldown ── */
+.drill-panel{background:var(--card);border:1px solid var(--brand);border-radius:var(--radius-lg);padding:var(--space-5);margin-top:var(--space-6);animation:slide-down 0.22s ease}
+.drill-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.drill-breadcrumb{display:flex;align-items:center;gap:6px;flex:1;font-size:13px;flex-wrap:wrap}
+.drill-crumb{color:var(--brand);cursor:pointer;font-weight:600;text-decoration:none;border:none;background:none;padding:0;font-family:inherit;font-size:13px}
+.drill-crumb:hover{text-decoration:underline}
+.drill-sep{color:var(--text3);font-size:12px}
+.drill-current{color:var(--text);font-weight:500}
+.drill-count{font-size:11px;color:var(--text3);margin-left:8px}
+.drill-list{display:flex;flex-direction:column;gap:5px;max-height:380px;overflow-y:auto}
+.drill-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--surface);border-radius:var(--radius);cursor:pointer;border:1px solid transparent;transition:all var(--tf);gap:12px}
+.drill-item:hover{border-color:var(--brand);background:rgba(243,112,33,0.06);transform:translateX(3px)}
+.drill-item__info{flex:1;min-width:0}
+.drill-item__label{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drill-item__sub{font-size:11px;color:var(--text3);margin-top:2px}
+.drill-item__badge{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;flex-shrink:0}
+.drill-item__badge--danger{color:var(--danger)}
+.drill-item__badge--brand{color:var(--brand)}
+.drill-item__badge--arrow{color:var(--text3)}
+.drill-empty{padding:24px;text-align:center;color:var(--text3);font-size:13px}
 </style>
 </head>
 <body>
@@ -199,6 +232,19 @@ Les filtres se combinent (ET logique). Le résumé sous la barre affiche ce qui 
 
 <div class="card chart-card" style="grid-column:1/-1;padding:20px"><div class="card__header"><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Insights & Tendances</div><div id="insightsContainer" class="card__body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px"></div></div>
 </section>
+
+<div id="drillPanel" hidden>
+  <div class="drill-panel">
+    <div class="drill-header">
+      <div class="drill-breadcrumb" id="drillBreadcrumb"></div>
+      <button id="drillClose" class="btn btn--ghost btn--xs" title="Fermer">
+        <svg style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        Fermer
+      </button>
+    </div>
+    <div id="drillContent" class="drill-list"></div>
+  </div>
+</div>
 
 </div>
 <div class="page" data-page="search" id="search" hidden>
@@ -465,17 +511,56 @@ function setSetFilter(kind,value){
 function updateFilterSummary(){
   const el=$('filterSummary');if(!el)return;
   if($('filterLegal'))$('filterLegal').classList.toggle('active',$('filterLegal').value!=='');
-  const parts=[];const q=$('searchInput')?.value.trim();
-  if(q)parts.push('Recherche: '+q);
-  if(STATE.filterCats.size)parts.push(STATE.filterCats.size+' sous-catégorie(s)');
-  if(STATE.filterRisks.size)parts.push(STATE.filterRisks.size+' risque(s)');
-  if($('filterLegal')?.value)parts.push($('filterLegal').value);
-  if(STATE.days>0)parts.push(STATE.days+' jours');
-  STATE.chips.forEach(c=>{if(c!=='all')parts.push(({grave:'contamination bactérienne',bacterien:'rappels obligatoires',recent:'30 derniers jours'}[c]||c))});
+  const pills=[];
+  const q=$('searchInput')?.value.trim();
+  if(q)pills.push({label:'🔍 '+q.slice(0,30),rm:()=>{$('searchInput').value='';STATE.page=1;onFilterChange()}});
+  STATE.filterCats.forEach(v=>pills.push({label:v.slice(0,28)+(v.length>28?'…':''),rm:()=>setSetFilter('cat',v)}));
+  STATE.filterRisks.forEach(v=>pills.push({label:v.slice(0,28)+(v.length>28?'…':''),rm:()=>setSetFilter('risk',v)}));
+  const lv=$('filterLegal')?.value;
+  if(lv)pills.push({label:lv.slice(0,28),rm:()=>{$('filterLegal').value='';STATE.page=1;onFilterChange()}});
+  if(STATE.days>0)pills.push({label:STATE.days+'j',rm:()=>{STATE.days=0;qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').forEach(x=>x.classList.add('active'));STATE.page=1;onFilterChange()}});
+  STATE.chips.forEach(c=>{if(c!=='all'){const lbl={grave:'Bactéries',bacterien:'Obligatoires',recent:'30j'}[c]||c;pills.push({label:lbl,rm:()=>{STATE.chips.delete(c);qsa('.chip[data-chip="'+c+'"]').forEach(x=>x.classList.remove('active'));if(STATE.chips.size===0){STATE.chips=new Set(['all']);qsa('.chip[data-chip="all"]').forEach(x=>x.classList.add('active'))}STATE.page=1;onFilterChange()}})}});
   const count=getFilteredRecords().length;
-  el.innerHTML=(parts.length?parts.map(p=>'<span class="filter-pill">'+esc(p)+'</span>').join(''):'<span>Aucun filtre actif</span>')+'<span class="filter-pill">'+count.toLocaleString('fr-FR')+' fiche'+(count>1?'s':'')+'</span>';
+  let html=pills.length
+    ?pills.map((p,i)=>'<button class="filter-pill" data-pi="'+i+'">'+esc(p.label)+'<span class="pill-x" aria-hidden="true">×</span></button>').join('')
+    :'<span style="font-size:11px;color:var(--text3);padding:2px 4px">Aucun filtre actif</span>';
+  html+='<span class="filter-pill filter-pill--count">'+count.toLocaleString('fr-FR')+' fiche'+(count>1?'s':'')+'</span>';
+  el.innerHTML=html;
+  el.querySelectorAll('.filter-pill[data-pi]').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();pills[+btn.dataset.pi].rm()})});
   qsa('.chip').forEach(ch=>ch.setAttribute('aria-pressed',ch.classList.contains('active')?'true':'false'));
 }
+
+/* ── Animations KPI ── */
+function animKpi(el,val){
+  const prev=parseInt((el.textContent||'0').replace(/\D/g,''))||0;
+  const next=parseInt(String(val).replace(/\D/g,''))||0;
+  if(prev===next){el.textContent=typeof val==='string'?val:next.toLocaleString('fr-FR');return}
+  const t0=performance.now(),dur=420;
+  const step=now=>{const p=Math.min(1,(now-t0)/dur),e2=p<.5?2*p*p:-1+(4-2*p)*p,v=Math.round(prev+(next-prev)*e2);
+    el.textContent=typeof val==='string'?val:v.toLocaleString('fr-FR');if(p<1)requestAnimationFrame(step);else{el.textContent=typeof val==='string'?val:next.toLocaleString('fr-FR');el.classList.add('kpi-anim');setTimeout(()=>el.classList.remove('kpi-anim'),400)}};
+  requestAnimationFrame(step)}
+
+/* ── Drilldown catégorie → risque → fiches ── */
+const DRILL={cat:null,risk:null,data:[]};
+function drillBreadcrumb(parts){$('drillBreadcrumb').innerHTML=parts.map((p,i)=>i<parts.length-1?'<button class="drill-crumb" data-di="'+i+'">'+esc(p.label)+'</button><span class="drill-sep">›</span>':'<span class="drill-current">'+esc(p.label)+'</span>').join('')+'<span class="drill-count">'+DRILL.data.length+' rappels</span>';$('drillBreadcrumb').querySelectorAll('[data-di]').forEach(b=>{b.addEventListener('click',()=>{const i=+b.dataset.di;if(i===0)drillToCat(DRILL.cat);else drillClear()})})}
+function drillToCat(cat){
+  DRILL.cat=cat;DRILL.risk=null;
+  DRILL.data=getFilteredRecords().filter(d=>(d.sous_categorie_produit||'Autre')===cat);
+  drillBreadcrumb([{label:'Dashboard'},{label:cat}]);
+  const risks={};DRILL.data.forEach(d=>normalizeRisks(d.risques_encourus||'Non spécifié').forEach(r=>{risks[r]=(risks[r]||0)+1}));
+  const sorted=Object.entries(risks).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const crit=/listeria|salmonella|coli|stec|botul/i;
+  $('drillContent').innerHTML=sorted.length?sorted.map(([r,c])=>'<div class="drill-item" data-dr="'+esc(r)+'"><div class="drill-item__info"><div class="drill-item__label">'+esc(r)+'</div></div><span class="drill-item__badge '+(crit.test(r)?'drill-item__badge--danger':'drill-item__badge--brand')+'">'+c+'</span></div>').join(''):'<div class="drill-empty">Aucun risque trouvé</div>';
+  $('drillContent').querySelectorAll('[data-dr]').forEach(el=>{el.addEventListener('click',()=>drillToRisk(el.dataset.dr))});
+  $('drillPanel').hidden=false;$('drillPanel').scrollIntoView({behavior:'smooth',block:'nearest'})}
+function drillToRisk(risk){
+  DRILL.risk=risk;
+  DRILL.data=getFilteredRecords().filter(d=>{const cm=(d.sous_categorie_produit||'Autre')===DRILL.cat;const rm=normalizeRisks(d.risques_encourus||'').some(r=>r===risk);return cm&&rm});
+  drillBreadcrumb([{label:'Dashboard'},{label:DRILL.cat},{label:risk}]);
+  $('drillContent').innerHTML=DRILL.data.length?DRILL.data.slice(0,25).map(d=>'<div class="drill-item" data-did="'+esc(String(d.id))+'"><div class="drill-item__info"><div class="drill-item__label">'+esc(d.marque_produit||'Sans marque')+(d.libelle?' — '+esc(d.libelle.slice(0,45)):'')+'</div><div class="drill-item__sub">'+fmtDate(d.date_publication)+(d.nature_juridique_rappel?' · '+esc(d.nature_juridique_rappel.slice(0,35)):'')+' </div></div><span class="drill-item__badge drill-item__badge--arrow">›</span></div>').join('')+(DRILL.data.length>25?'<div class="drill-empty">+'+( DRILL.data.length-25)+' fiches — voir dans Recherche</div>':''):'<div class="drill-empty">Aucune fiche pour ce couple.</div>';
+  $('drillContent').querySelectorAll('[data-did]').forEach(el=>{el.addEventListener('click',()=>openModal(el.dataset.did))});
+}
+function drillClear(){DRILL.cat=null;DRILL.risk=null;DRILL.data=[];$('drillPanel').hidden=true}
 
 function updateFilterChipCounts(){
   const full=STATE.records;if(!full.length)return;
@@ -518,13 +603,14 @@ qsa('.side-link').forEach(a=>a.addEventListener('click',function(){switchPage(th
 
 function updateDashboard(){
 const d=getFilteredRecords();if(!d.length)return;const r=d.length;
-$('kpiTotal').textContent=r.toLocaleString('fr-FR');
+animKpi($('kpiTotal'),r);
 $('dashTotalBadge').textContent=r.toLocaleString('fr-FR')+' fiches';
-const bacterial=d.filter(x=>/listeria|salmonella|e.coli|stec|botulisme|brucellome/i.test(x.risques_encourus||'')).length;$('kpiRisky').textContent=bacterial.toLocaleString('fr-FR');
-const mandatory=d.filter(x=>x.nature_juridique_rappel==='imposé par arrêté préfectoral').length;$('kpiClosed').textContent=mandatory.toLocaleString('fr-FR');
-const brands=new Set(d.map(x=>x.marque_produit).filter(Boolean));$('kpiBrands').textContent=brands.size.toLocaleString('fr-FR');
+const bacterial=d.filter(x=>/listeria|salmonella|e.coli|stec|botulisme|brucellome/i.test(x.risques_encourus||'')).length;animKpi($('kpiRisky'),bacterial);
+const mandatory=d.filter(x=>x.nature_juridique_rappel==='imposé par arrêté préfectoral').length;animKpi($('kpiClosed'),mandatory);
+const brands=new Set(d.map(x=>x.marque_produit).filter(Boolean));animKpi($('kpiBrands'),brands.size);
 const mandatoryRate=r>0?((mandatory/r)*100).toFixed(0):'0';$('kpiRate').textContent=mandatoryRate+'%';
 const bacterialPct=r>0?((bacterial/r)*100).toFixed(0):'0';$('kpiSeverity').textContent=bacterialPct+'%';
+if(DRILL.cat)drillToCat(DRILL.cat);
 renderCharts(d)}
 
 function renderCharts(data){
@@ -533,7 +619,7 @@ const catCnt={};data.forEach(d=>{const k=d.sous_categorie_produit||'Autre';catCn
 const catSorted=Object.entries(catCnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
 const catColors=catSorted.map((_,i)=>PALETTE[i%PALETTE.length]);
 makeBar($('chartCat'),catSorted.map(x=>x[0].length>22?x[0].slice(0,22)+'...':x[0]),catSorted.map(x=>x[1]),catColors);
-if(window.cm?.chartCat){window.cm.chartCat.options.onClick=(e,els)=>{if(!els.length)return;setSetFilter('cat',catSorted[els[0].index][0])};window.cm.chartCat.update()}
+if(window.cm?.chartCat){window.cm.chartCat.options.onClick=(e,els)=>{if(!els.length)return;const cat=catSorted[els[0].index][0];setSetFilter('cat',cat);drillToCat(cat)};window.cm.chartCat.update()}
 
 const riskCnt={};data.forEach(d=>{const k=d.risques_encourus||'Non specifie';riskCnt[k]=(riskCnt[k]||0)+1});
 const riskSorted=Object.entries(riskCnt).sort((a,b)=>b[1]-a[1]).slice(0,12);
@@ -968,6 +1054,7 @@ $('queryProduct').value=(ACTIVE_CHIPS.prod?.dataset.prod)||'';
 $('queryRisk').value=(ACTIVE_CHIPS.risk?.dataset.risk)||'';
 if(ACTIVE_CHIPS.risk||ACTIVE_CHIPS.prod)runUnifiedQuery();else clearQuery()}});
 if($('exportQueryCsvBtn'))$('exportQueryCsvBtn').addEventListener('click',exportQueryCSV);
+if($('drillClose'))$('drillClose').addEventListener('click',drillClear);
 
 // ── Info-btn tooltip (click-based, viewport-aware) ────────────────────────
 (function(){
