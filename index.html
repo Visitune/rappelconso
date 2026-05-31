@@ -433,10 +433,12 @@ function updateFilterBtn(btnId){const count=btnId==='filterCatBtn'?STATE.filterC
 
 function setSetFilter(kind,value){
   const set=kind==='cat'?STATE.filterCats:STATE.filterRisks;
-  if(value)set.add(value);
+  if(value){if(set.has(value))set.delete(value);else set.add(value);}
   document.querySelectorAll('#'+(kind==='cat'?'filterCatMenu':'filterRiskMenu')+' input[type="checkbox"]').forEach(inp=>{inp.checked=set.has(inp.value)});
   updateFilterBtn(kind==='cat'?'filterCatBtn':'filterRiskBtn');
-  STATE.chips.delete('all');qsa('.chip[data-chip="all"]').forEach(x=>x.classList.remove('active'));
+  const allEmpty=STATE.filterCats.size===0&&STATE.filterRisks.size===0;
+  if(allEmpty){STATE.chips=new Set(['all']);qsa('.chip[data-chip="all"]').forEach(x=>x.classList.add('active'))}
+  else{STATE.chips.delete('all');qsa('.chip[data-chip="all"]').forEach(x=>x.classList.remove('active'));}
   STATE.page=1;onFilterChange();
 }
 
