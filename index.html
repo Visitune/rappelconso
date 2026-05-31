@@ -81,6 +81,8 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 .quick-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--radius-full);font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all var(--tf)}
 .quick-chip:hover,.quick-chip.active{background:rgba(243,112,33,0.12);border-color:var(--brand);color:var(--brand)}
 .quick-chip svg{width:11px;height:11px;flex-shrink:0}
+.chip-cnt{margin-left:3px;font-size:10px;opacity:0.55;font-weight:400}.quick-chip.active .chip-cnt{opacity:0.85}
+.chip-sep{width:1px;height:20px;background:var(--border);margin:0 4px;align-self:center;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -247,16 +249,19 @@ Ex: Lait → Listeria, Viande → Salmonella.">i</button></div><div id="category
 <button class="btn btn--ghost" id="queryClearBtn" style="align-self:flex-end" title="Effacer"><svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
 </div>
 <div class="quick-chips" id="quickChips">
-<button class="quick-chip" data-prod="" data-risk="listeria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Listeria</button>
-<button class="quick-chip" data-prod="" data-risk="salmonella"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Salmonella</button>
-<button class="quick-chip" data-prod="" data-risk="e\.coli|stec">E.coli / STEC</button>
-<button class="quick-chip" data-prod="" data-risk="corps.tranger|corps étranger">Corps étrangers</button>
-<button class="quick-chip" data-prod="" data-risk="allergen|allergène">Allergènes</button>
-<button class="quick-chip" data-prod="" data-risk="pesticide">Pesticides</button>
-<button class="quick-chip" data-prod="lait|fromage|crème|yaourt|beurre" data-risk="">Produits laitiers</button>
-<button class="quick-chip" data-prod="viande|charcuterie|volaille|boeuf|porc|agneau" data-risk="">Viandes</button>
-<button class="quick-chip" data-prod="poisson|crustacé|coquillage|saumon|thon|crevette" data-risk="">Poissons & mer</button>
-<button class="quick-chip" data-prod="traiteur|plat préparé|pizza|surgelé|conserve" data-risk="">Plats préparés</button>
+<button class="quick-chip" data-group="risk" data-prod="" data-risk="listeria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Listeria</button>
+<button class="quick-chip" data-group="risk" data-prod="" data-risk="salmonella"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Salmonella</button>
+<button class="quick-chip" data-group="risk" data-prod="" data-risk="e[. ]?coli|stec|escherichia">E.coli / STEC</button>
+<button class="quick-chip" data-group="risk" data-prod="" data-risk="botulisme|clostridium">Botulisme</button>
+<button class="quick-chip" data-group="risk" data-prod="" data-risk="corps.étranger|corps étrangers?|étranger">Corps étrangers</button>
+<button class="quick-chip" data-group="risk" data-prod="" data-risk="allergen|allergène">Allergènes</button>
+<button class="quick-chip" data-group="risk" data-prod="" data-risk="pesticide">Pesticides</button>
+<span class="chip-sep"></span>
+<button class="quick-chip" data-group="prod" data-prod="lait|fromage|cr[eè]me laitière|yaourt|beurre" data-risk="">Produits laitiers</button>
+<button class="quick-chip" data-group="prod" data-prod="viande|charcuterie|volaille|boeuf|porc|agneau|jambon" data-risk="">Viandes</button>
+<button class="quick-chip" data-group="prod" data-prod="poisson|crustac|coquillage|saumon|thon|crevette|seafood" data-risk="">Poissons & mer</button>
+<button class="quick-chip" data-group="prod" data-prod="traiteur|cuisiné|plat.préparé|pizza|surgelé|conserve" data-risk="">Plats préparés</button>
+<button class="quick-chip" data-group="prod" data-prod="boulangerie|viennoiserie|pâtisserie|biscuit|gâteau" data-risk="">Boulangerie</button>
 </div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6)">
@@ -648,18 +653,35 @@ const fd=yr==='all'?data:data.filter(d=>d.date_publication?.startsWith(yr));
 const m=Array(12).fill(0);fd.forEach(d=>{if(!d.date_publication)return;const dt=new Date(d.date_publication);if(!isNaN(dt))m[dt.getMonth()]++});
 makeBar($('chartSeason'),MONTHS,m)})}
 
+const ACTIVE_CHIPS={risk:null,prod:null};
+
 function runUnifiedQuery(){
 const pv=($('queryProduct').value||'').trim();
 const rv=($('queryRisk').value||'').trim();
 const days=parseInt($('queryPeriod').value)||0;
-$('quickChips').querySelectorAll('.quick-chip').forEach(c=>{
-const cp=(c.dataset.prod||'');const cr=(c.dataset.risk||'');
-c.classList.toggle('active',(cp&&cp===pv)||(cr&&cr===rv))});
 let res=STATE.records;
 if(days>0){const cut=new Date();cut.setDate(cut.getDate()-days);res=res.filter(r=>r.date_publication&&new Date(r.date_publication)>=cut)}
-if(pv){try{const re=new RegExp(pv,'i');res=res.filter(d=>re.test(d.sous_categorie_produit||'')||re.test(d.marque_produit||'')||re.test(d.libelle||''))}catch(e){}}
-if(rv){try{const re=new RegExp(rv,'i');res=res.filter(d=>re.test(d.risques_encourus||''))}catch(e){}}
+if(pv){try{const re=new RegExp(pv,'i');res=res.filter(d=>re.test(d.sous_categorie_produit||'')||re.test(d.marque_produit||'')||re.test(d.libelle||''))}catch(e){alert('Regex produit invalide: '+e.message);return}}
+if(rv){try{const re=new RegExp(rv,'i');res=res.filter(d=>re.test(d.risques_encourus||''))}catch(e){alert('Regex risque invalide: '+e.message);return}}
 renderQueryResults(res)}
+
+function clearQuery(){
+$('queryTableBody').innerHTML='';$('queryEmpty').style.display='block';
+$('queryResultsBadge').textContent='0 résultats';
+$('recurrenceByBrandContainer').innerHTML='';
+if(window.cm?.queryChartTime){window.cm.queryChartTime.destroy();window.cm.queryChartTime=null}
+const lbl=$('queryCountLabel');if(lbl)lbl.textContent=''}
+
+function updateChipCounts(){
+const chips=$('quickChips');if(!chips||!STATE.records.length)return;
+chips.querySelectorAll('.quick-chip').forEach(c=>{
+const pv=c.dataset.prod||'';const rv=c.dataset.risk||'';
+let res=STATE.records;
+try{if(pv){const re=new RegExp(pv,'i');res=res.filter(d=>re.test(d.sous_categorie_produit||'')||re.test(d.marque_produit||''))}}catch(e){}
+try{if(rv){const re=new RegExp(rv,'i');res=res.filter(d=>re.test(d.risques_encourus||''))}}catch(e){}
+let b=c.querySelector('.chip-cnt');
+if(!b){b=document.createElement('span');b.className='chip-cnt';c.appendChild(b)}
+b.textContent='·'+(res.length>999?Math.round(res.length/1000)+'k':res.length)})}
 
 function renderQueryResults(results){
 const nb=results.length;$('queryResultsBadge').textContent=nb+' résultat'+(nb!==1?'s':'');
@@ -736,7 +758,7 @@ $('menuBadgeDash').textContent=merged.length>999?Math.round(merged.length/1000)+
 $('aboutCache').textContent=merged.length+' fiches ('+data.length+' cache'+badge+')';
 $('progressFill').style.width='100%';$('progressLabel').textContent=merged.length+' fiches';
 updateDashboard();doSearch(true);loadFacets();
-if(STATE.records.length){renderStats(STATE.records);populateQueryAutocomplete()}
+if(STATE.records.length){renderStats(STATE.records);populateQueryAutocomplete();updateChipCounts()}
 }catch(e){
 $('dashTotalBadge').textContent='Erreur chargement data.json';
 $('cacheBadge').textContent='Erreur: verifier DATA_URL ou CORS';
@@ -747,7 +769,7 @@ try{
 const meta=await apiFetch('/records?limit=1&refine=categorie_produit:alimentation');
 const total=meta.total_count||0;const pages=Math.ceil(Math.min(total,3000)/100);
 const all=(await Promise.all(Array.from({length:pages},(_,i)=>apiFetch('/records?limit=100&offset='+(i*100)+'&refine=categorie_produit:alimentation&order_by=date_publication+desc')))).flatMap(d=>d.results||[])
-STATE.records=all;updateDashboard();doSearch(true);loadFacets();
+STATE.records=all;updateDashboard();doSearch(true);loadFacets();populateQueryAutocomplete();updateChipCounts();
 $('cacheBadge').textContent='Fallback: '+all.length+' fiches via API';
 }catch(e){$('dashTotalBadge').textContent='Erreur de chargement'}}
 
@@ -770,10 +792,35 @@ const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
 const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rappels_requete_'+new Date().toISOString().slice(0,10)+'.csv';a.click()}
 
 if($('queryRunBtn'))$('queryRunBtn').addEventListener('click',runUnifiedQuery);
-if($('queryClearBtn'))$('queryClearBtn').addEventListener('click',()=>{$('queryProduct').value='';$('queryRisk').value='';$('queryPeriod').value='0';$('quickChips').querySelectorAll('.quick-chip').forEach(c=>c.classList.remove('active'));$('queryTableBody').innerHTML='';$('queryEmpty').style.display='block';$('queryResultsBadge').textContent='0 résultats';$('recurrenceByBrandContainer').innerHTML='';});
+if($('queryClearBtn'))$('queryClearBtn').addEventListener('click',()=>{
+$('queryProduct').value='';$('queryRisk').value='';$('queryPeriod').value='0';
+$('quickChips').querySelectorAll('.quick-chip').forEach(c=>c.classList.remove('active'));
+ACTIVE_CHIPS.risk=null;ACTIVE_CHIPS.prod=null;clearQuery()});
 $('queryProduct').addEventListener('keypress',(e)=>{if(e.key==='Enter')runUnifiedQuery()});
 $('queryRisk').addEventListener('keypress',(e)=>{if(e.key==='Enter')runUnifiedQuery()});
-if($('quickChips'))$('quickChips').addEventListener('click',function(e){const chip=e.target.closest('.quick-chip');if(!chip)return;const wasActive=chip.classList.contains('active');$('quickChips').querySelectorAll('.quick-chip').forEach(c=>c.classList.remove('active'));if(!wasActive){chip.classList.add('active');$('queryProduct').value=chip.dataset.prod||'';$('queryRisk').value=chip.dataset.risk||'';$('queryPeriod').value='0';runUnifiedQuery()}else{$('queryProduct').value='';$('queryRisk').value='';$('queryTableBody').innerHTML='';$('queryEmpty').style.display='block';$('queryResultsBadge').textContent='0 résultats'}});
+let _qt;
+function debouncedQuery(){
+clearTimeout(_qt);
+$('quickChips').querySelectorAll('.quick-chip').forEach(c=>c.classList.remove('active'));
+ACTIVE_CHIPS.risk=null;ACTIVE_CHIPS.prod=null;
+_qt=setTimeout(()=>{if($('queryProduct').value.trim()||$('queryRisk').value.trim())runUnifiedQuery()},350)}
+$('queryProduct').addEventListener('input',debouncedQuery);
+$('queryRisk').addEventListener('input',debouncedQuery);
+if($('queryPeriod'))$('queryPeriod').addEventListener('change',()=>{if($('queryTableBody').innerHTML.trim())runUnifiedQuery()});
+if($('quickChips'))$('quickChips').addEventListener('click',function(e){
+const chip=e.target.closest('.quick-chip');if(!chip)return;
+const grp=chip.dataset.group||'risk';
+const wasActive=chip.classList.contains('active');
+if(ACTIVE_CHIPS[grp]){ACTIVE_CHIPS[grp].classList.remove('active');ACTIVE_CHIPS[grp]=null}
+if(!wasActive){
+chip.classList.add('active');ACTIVE_CHIPS[grp]=chip;
+$('queryProduct').value=(ACTIVE_CHIPS.prod?.dataset.prod)||'';
+$('queryRisk').value=(ACTIVE_CHIPS.risk?.dataset.risk)||'';
+$('queryPeriod').value='0';runUnifiedQuery()
+}else{
+$('queryProduct').value=(ACTIVE_CHIPS.prod?.dataset.prod)||'';
+$('queryRisk').value=(ACTIVE_CHIPS.risk?.dataset.risk)||'';
+if(ACTIVE_CHIPS.risk||ACTIVE_CHIPS.prod)runUnifiedQuery();else clearQuery()}});
 if($('exportQueryCsvBtn'))$('exportQueryCsvBtn').addEventListener('click',exportQueryCSV);
 
 init();
