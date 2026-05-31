@@ -69,9 +69,10 @@ body{padding-left:220px}#filterBar{position:sticky;top:0;z-index:80;background:v
 .modal-img{width:100%;aspect-ratio:3/4;object-fit:contain;border-radius:var(--radius-lg);background:var(--bg);border:1px solid var(--border)}.modal-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.modal-thumb{width:56px;height:56px;border-radius:var(--radius);border:2px solid transparent;cursor:pointer;overflow:hidden;transition:border-color var(--tf)}.modal-thumb:hover,.modal-thumb.active{border-color:var(--brand)}.modal-thumb img{width:100%;height:100%;object-fit:cover}
 .modal-title{font-size:20px;font-weight:700}.modal-sub{font-size:13px;color:var(--text2);margin-top:4px}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;margin-top:16px}.modal-field{display:flex;flex-direction:column;gap:2px}.modal-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}.modal-val{color:var(--text);line-height:1.5}.modal-full{grid-column:1/-1}.modal-section{border-top:1px solid var(--border);padding-top:14px;margin-top:6px}.modal-section h3{font-size:14px;font-weight:600;margin-bottom:8px}.modal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;border-top:1px solid var(--border);padding-top:16px}@media(max-width:768px){.modal-inner{grid-template-columns:1fr}}
 .section-sep{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin:0 0 16px 0;display:flex;align-items:center;gap:12px}.section-sep::after{content:'';flex:1;height:1px;background:var(--border)}
-.info-btn{margin-left:auto;width:18px;height:18px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text3);font-size:10px;cursor:default;position:relative;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-style:italic;font-family:Georgia,serif;line-height:1}
-.info-btn::before{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);right:0;background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:11px;color:var(--text2);white-space:pre-line;max-width:280px;min-width:180px;box-shadow:var(--shadow);z-index:300;display:none;font-weight:400;line-height:1.5;font-style:normal;font-family:'Inter',sans-serif;text-align:left}
-.info-btn:hover::before,.info-btn:focus-visible::before{display:block}
+.info-btn{margin-left:auto;width:20px;height:20px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text3);font-size:11px;cursor:pointer;position:relative;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-style:italic;font-family:Georgia,serif;line-height:1;transition:all var(--tf)}
+.info-btn:hover{background:var(--elevated);color:var(--text);border-color:var(--text3)}
+.info-btn.open{background:var(--brand);border-color:var(--brand);color:#fff}
+.info-tooltip{position:fixed;background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--text2);white-space:pre-line;max-width:300px;min-width:200px;box-shadow:var(--shadow);z-index:500;display:none;font-weight:400;line-height:1.6;text-align:left;pointer-events:none}
 .year-btns{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 0 12px}
 .year-btn{padding:3px 9px;border-radius:var(--radius-full);font-size:11px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all var(--tf)}.year-btn:hover,.year-btn.active{background:rgba(243,112,33,0.12);border-color:var(--brand);color:var(--brand)}
 .query-unified{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
@@ -319,6 +320,7 @@ Cette analyse sert à repérer des foyers territoriaux et la part nationale.">?<
 <div id="modalLeft"><div class="skeleton" style="height:300px"></div></div>
 <div id="modalRight"><div class="skeleton" style="height:300px"></div></div>
 </div></div>
+<div id="infoTooltip" class="info-tooltip" role="tooltip"></div>
 <div id="statusModal" class="modal" role="dialog" aria-modal="true" aria-label="Statut des donnees">
 <div class="modal-inner" style="grid-template-columns:1fr;max-width:500px">
 <button class="modal-x" id="statusModalClose" aria-label="Fermer">&times;</button>
@@ -903,6 +905,29 @@ $('queryProduct').value=(ACTIVE_CHIPS.prod?.dataset.prod)||'';
 $('queryRisk').value=(ACTIVE_CHIPS.risk?.dataset.risk)||'';
 if(ACTIVE_CHIPS.risk||ACTIVE_CHIPS.prod)runUnifiedQuery();else clearQuery()}});
 if($('exportQueryCsvBtn'))$('exportQueryCsvBtn').addEventListener('click',exportQueryCSV);
+
+// ── Info-btn tooltip (click-based, viewport-aware) ────────────────────────
+(function(){
+const tip=$('infoTooltip');let openBtn=null;
+function showTip(btn){
+  if(openBtn&&openBtn!==btn){openBtn.classList.remove('open')}
+  btn.classList.add('open');openBtn=btn;
+  tip.textContent=btn.dataset.tip||'';
+  tip.style.display='block';
+  const r=btn.getBoundingClientRect(),vw=window.innerWidth,vh=window.innerHeight;
+  const tw=Math.min(300,vw-24),th=tip.offsetHeight;
+  let left=r.right-tw,top=r.top-th-8;
+  if(left<12)left=12;
+  if(top<12)top=r.bottom+8;
+  if(top+th>vh-12)top=Math.max(12,r.top-th-8);
+  tip.style.left=left+'px';tip.style.top=top+'px';tip.style.maxWidth=tw+'px';}
+function hideTip(){if(openBtn)openBtn.classList.remove('open');openBtn=null;tip.style.display='none';}
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.info-btn');
+  if(btn){if(openBtn===btn){hideTip()}else{showTip(btn)}e.stopPropagation()}
+  else hideTip();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')hideTip();});
+})();
 
 init();
 </script>
