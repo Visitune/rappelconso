@@ -670,9 +670,12 @@ if(r.lien_vers_la_liste_des_produits)h+='<a href="'+esc(r.lien_vers_la_liste_des
 if(r.lien_vers_la_fiche_rappel)h+='<a href="'+esc(r.lien_vers_la_fiche_rappel)+'" target="_blank" class="btn btn--ghost btn--sm">Fiche rappel</a>';
 if(r.lien_vers_affichette_pdf)h+='<a href="'+esc(r.lien_vers_affichette_pdf)+'" target="_blank" class="btn btn--ghost btn--sm">Affichette PDF</a>';h+='</div>'}
 $('modalRight').innerHTML=h;}
-$('modalClose').addEventListener('click',()=>{$('detailModal').classList.remove('open');document.body.style.overflow=''});
-$('detailModal').addEventListener('click',function(e){if(e.target===this){this.classList.remove('open');document.body.style.overflow=''}});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){$('detailModal').classList.remove('open');document.body.style.overflow=''}});
+function closeModal(id){const m=$(id);if(m){m.classList.remove('open');document.body.style.overflow=''}}
+$('modalClose').addEventListener('click',()=>closeModal('detailModal'));
+$('detailModal').addEventListener('click',function(e){if(e.target===this)closeModal('detailModal')});
+if($('statusModalClose'))$('statusModalClose').addEventListener('click',()=>closeModal('statusModal'));
+if($('statusModal'))$('statusModal').addEventListener('click',function(e){if(e.target===this)closeModal('statusModal')});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal('detailModal');closeModal('statusModal')}});
 
 function renderStatsLegacy(data){
 const m=Array(12).fill(0);data.forEach(d=>{if(!d.date_publication)return;const dt=new Date(d.date_publication);if(!isNaN(dt))m[dt.getMonth()]++});makeBar($('chartSeason'),MONTHS,m);
