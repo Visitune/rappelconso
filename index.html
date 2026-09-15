@@ -265,6 +265,7 @@ Les filtres se combinent (ET logique). Le résumé sous la barre affiche ce qui 
 </div>
 <div class="filter-summary" id="filterSummary" aria-live="polite"></div>
 </div>
+<div id="freshnessBanner" style="display:none;margin:0 16px 12px;padding:10px 14px;border-radius:var(--radius);font-size:12px;line-height:1.5"></div>
 <div id="content">
 <div class="page" data-page="dashboard">
 <div class="page-header"><h1 class="page-title">Tableau de bord — Rappels Alimentaires</h1><div class="page-meta"><span class="badge badge--white" id="dashTotalBadge" aria-live="polite" aria-atomic="true">Chargement...</span><span class="badge badge--orange" id="cacheBadge" aria-live="polite" aria-atomic="true">0 fiches</span></div></div>
@@ -321,7 +322,8 @@ Les filtres se combinent (ET logique). Le résumé sous la barre affiche ce qui 
 <div class="pagination" id="searchPagination" role="navigation" aria-label="Pagination"></div></div>
 </div>
 <div class="page" data-page="analyses" hidden>
-<div class="page-header"><h1 class="page-title">Analyses Statistiques</h1><div class="page-meta"><span class="badge badge--white" id="statsBadge" aria-live="polite" aria-atomic="true">Données filtrées</span></div></div>
+<div class="page-header"><h1 class="page-title">Analyses Statistiques</h1><div class="page-meta"><span class="badge badge--white" id="statsBadge" aria-live="polite" aria-atomic="true">Données filtrées</span><button id="exportContingencyBtn" class="btn btn--ghost btn--sm">Export CSV (table catégorie×risque)</button></div></div>
+<div class="about-card" style="border-left:4px solid var(--info);margin-bottom:16px"><div style="font-weight:700;color:var(--info);margin-bottom:4px;font-size:13px">À propos de ces chiffres</div><div style="font-size:12px;color:var(--text2);line-height:1.6">Ce jeu ne contient que des <strong>rappels</strong>, pas de dénominateur d'exposition (produits mis en marché, volumes, intensité des contrôles). Un volume élevé de rappels peut refléter la taille du segment ou l'intensité des contrôles, pas un risque intrinsèque plus élevé — évitez de lire "le plus de rappels" comme "le plus dangereux". Les résidus (carte Chi² et tableau croisé) comparent le <em>profil</em> de risque d'une catégorie à la moyenne : ils sont insensibles à sa taille, ce qui en fait un indicateur plus honnête que les volumes bruts.</div></div>
 
 <p class="section-sep">Vue d'ensemble — Où sont les problèmes ?</p>
 <section style="display:grid;grid-template-columns:1fr 1.6fr;gap:var(--space-6);margin-bottom:var(--space-6)">
@@ -728,8 +730,8 @@ let d=STATE.records;const q=$('searchInput').value.trim().toLowerCase();
 const cats=STATE.filterCats||new Set();const risks=STATE.filterRisks||new Set();const legal=$('filterLegal').value;
 STATE.query=q;
 if(STATE.days>0){const ref=STATE.dataDate?new Date(STATE.dataDate):new Date();ref.setDate(ref.getDate()-STATE.days);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=ref)}
-if(STATE.chips.has('grave')&&risks.size===0)d=d.filter(r=>/listeria|salmonella|e.coli|stec|botulisme|brucellome/i.test(r.risques_encourus||''));
-if(STATE.chips.has('bacterien')&&!legal)d=d.filter(r=>r.nature_juridique_rappel==='imposé par arrêté préfectoral');
+if(STATE.chips.has('grave'))d=d.filter(r=>/listeria|salmonella|e.coli|stec|botulisme|brucellome/i.test(r.risques_encourus||''));
+if(STATE.chips.has('bacterien'))d=d.filter(r=>r.nature_juridique_rappel==='imposé par arrêté préfectoral');
 if(STATE.chips.has('recent')&&STATE.days===0){const ref=STATE.dataDate?new Date(STATE.dataDate):new Date();ref.setDate(ref.getDate()-30);d=d.filter(r=>r.date_publication&&new Date(r.date_publication)>=ref)}
 if(cats.size>0)d=d.filter(r=>cats.has(r.sous_categorie_produit));
 if(risks.size>0)d=d.filter(r=>{const rlist=(r.risques_encourus||'').split('|').map(x=>x.trim());return rlist.some(rsk=>risks.has(rsk))});
@@ -854,7 +856,7 @@ h+='<button class="pag-btn" data-page="'+(p+1)+'" '+(p>=pages?'disabled':'')+'>&
 
 qsa('.chip').forEach(c=>c.addEventListener('click',function(){
 const v=this.dataset.chip;
-if(v==='all'){qsa('.chip').forEach(x=>x.classList.remove('active'));this.classList.add('active');STATE.chips=new Set(['all']);STATE.filterCats.clear();STATE.filterRisks.clear();$('filterLegal').value='';STATE.days=0;qsa('[id*="Menu"] input[type="checkbox"]').forEach(x=>x.checked=false);qsa('.filter-toggle').forEach(b=>updateFilterBtn(b.id));qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').classList.add('active')}
+if(v==='all'){qsa('.chip').forEach(x=>x.classList.remove('active'));this.classList.add('active');STATE.chips=new Set(['all']);STATE.filterCats.clear();STATE.filterRisks.clear();$('filterLegal').value='';STATE.days=0;qsa('[id*="Menu"] input[type="checkbox"]').forEach(x=>x.checked=false);qsa('.filter-toggle').forEach(b=>updateFilterBtn(b.id));qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').forEach(x=>x.classList.add('active'))}
 else{STATE.chips.delete('all');qsa('.chip[data-chip="all"]').forEach(x=>x.classList.remove('active'));
 if(STATE.chips.has(v)){STATE.chips.delete(v);this.classList.remove('active')}else{STATE.chips.add(v);this.classList.add('active')}}
 if(STATE.chips.size===0){STATE.chips=new Set(['all']);qsa('.chip[data-chip="all"]').forEach(x=>x.classList.add('active'))}
@@ -866,7 +868,7 @@ $('clearFiltersBtn').addEventListener('click',function(){
 $('searchInput').value='';STATE.filterCats.clear();STATE.filterRisks.clear();$('filterLegal').value='';
 STATE.query='';STATE.days=0;STATE.chips=new Set(['all']);qsa('.chip').forEach(x=>x.classList.remove('active'));qsa('.chip[data-chip="all"]').forEach(x=>x.classList.add('active'));
 qsa('[id*="Menu"] input[type="checkbox"]').forEach(x=>x.checked=false);qsa('.filter-toggle').forEach(b=>updateFilterBtn(b.id));
-qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').classList.add('active');
+qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));qsa('.date-presets .btn[data-days="0"]').forEach(x=>x.classList.add('active'));
 STATE.page=1;onFilterChange()});
 qsa('.date-presets .btn').forEach(b=>b.addEventListener('click',function(){
 qsa('.date-presets .btn').forEach(x=>x.classList.remove('active'));this.classList.add('active');
@@ -918,58 +920,6 @@ if($('statusModalClose'))$('statusModalClose').addEventListener('click',()=>clos
 if($('statusModal'))$('statusModal').addEventListener('click',function(e){if(e.target===this)closeModal('statusModal')});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal('detailModal');closeModal('statusModal')}});
 
-function renderStatsLegacy(data){
-const m=Array(12).fill(0);data.forEach(d=>{if(!d.date_publication)return;const dt=new Date(d.date_publication);if(!isNaN(dt))m[dt.getMonth()]++});makeBar($('chartSeason'),MONTHS,m);
-const cnt={};data.forEach(d=>{const k=d.sous_categorie_produit||'Autre';cnt[k]=(cnt[k]||0)+1});
-const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);const total=sorted.reduce((s,x)=>s+x[1],0);
-let cumul=0;let ph='<div class="pareto-chart">';
-sorted.slice(0,15).forEach(([k,v])=>{cumul+=v;const p=v/total*100;ph+='<div class="pareto-bar"><span class="pareto-bar__label">'+esc(k)+'</span><div class="pareto-bar__track"><div class="pareto-bar__fill" style="width:'+p+'%;background:'+(cumul/total*100<=80?'var(--brand)':'var(--text3)')+'"></div></div><span class="pareto-bar__val">'+p.toFixed(1)+'%</span></div>'});
-ph+='</div>';$('paretoContainer').innerHTML=ph;
-const cr={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';if(!cr[c])cr[c]={};cr[c][r]=(cr[c][r]||0)+1});
-const cats=Object.keys(cr).sort((a,b)=>Object.values(cr[b]||{}).reduce((s,x)=>s+x,0)-Object.values(cr[a]||{}).reduce((s,x)=>s+x,0)).slice(0,6);const risks=Object.entries(Object.fromEntries(data.map(d=>[d.risques_encourus||'Non specifie',1]))).map(x=>x[0]).sort((a,b)=>{const ca=data.filter(d=>d.risques_encourus===a).length;const cb=data.filter(d=>d.risques_encourus===b).length;return cb-ca}).slice(0,6);
-const id=document.documentElement.getAttribute('data-theme')==='dark';let ch='<div style="overflow-x:auto;display:block"><div class="corr-grid" style="grid-template-columns:180px repeat('+risks.length+',140px);gap:2px;width:fit-content;min-width:100%"><div class="corr-cell corr-cell--header" style="font-weight:600;padding:12px 8px"></div>';
-risks.forEach(r=>{ch+='<div class="corr-cell corr-cell--header" style="font-weight:600;padding:12px 8px;white-space:normal;word-break:break-word;min-height:60px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px" title="'+esc(r)+'">'+esc(r.length>20?r.slice(0,20)+'...':r)+'</div>'});
-cats.forEach(c=>{ch+='<div class="corr-cell corr-cell--header" style="font-weight:600;padding:12px 8px;text-align:left;white-space:normal;word-break:break-word" title="'+esc(c)+'">'+esc(c.length>25?c.slice(0,25)+'...':c)+'</div>';
-risks.forEach(r=>{const v=cr[c]?.[r]||0;const max=Math.max(1,...Object.values(cr[c]||{}));const ins=v/max;const cellBg=v===0?'var(--surface)':'rgba(243,112,33,'+(id?ins*0.7:ins*0.5)+')';ch+='<div class="corr-cell" style="background:'+cellBg+';color:'+(ins>0.4?'#fff':'var(--text2)')+';min-height:50px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px" title="'+esc(c)+' × '+esc(r)+': '+v+' rappel'+(v>1?'s':'')+' ">'+v+'</div>'})});
-ch+='</div></div>';$('corrContainer').innerHTML=ch;
-const cc={},rc={},j={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Non specifie';cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1;if(!j[c])j[c]={};j[c][r]=(j[c][r]||0)+1});
-const catsAll=Object.entries(cc).sort((a,b)=>b[1]-a[1]);const risksAll=Object.entries(rc).sort((a,b)=>b[1]-a[1]);const n=data.length;
-buildYearSelector(data);
-const c2=catsAll.map(x=>x[0]),r2=risksAll.map(x=>x[0]);if(n<2||c2.length<2||r2.length<2){const msg='<div style="padding:16px;background:rgba(255,71,87,0.15);border-radius:var(--radius);border-left:4px solid var(--danger)"><div style="font-weight:600;color:var(--danger);margin-bottom:10px;font-size:13px">❌ Chi² IMPOSSIBLE — Données Insuffisantes</div><div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px"><div style="margin:6px 0"><strong>Catégories:</strong> '+c2.length+' trouvée(s) <strong style="color:var(--text3)">(besoin: ≥2)</strong></div><div style="margin:6px 0"><strong>Risques:</strong> '+r2.length+' trouvé(s) <strong style="color:var(--text3)">(besoin: ≥2)</strong></div></div><div style="padding:10px;background:var(--surface);border-radius:6px;border-left:3px solid var(--info);margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:var(--info);margin-bottom:4px">💡 Pourquoi?</div><div style="font-size:11px;color:var(--text2)">Chi² compare les relations entre catégories et risques. Avec seulement '+c2.length+' catégorie(s) et '+r2.length+' risque(s), il n\'y a rien à comparer!</div></div><div style="padding:10px;background:rgba(46,213,115,0.1);border-radius:6px;border-left:3px solid var(--success)"><div style="font-size:12px;font-weight:600;color:var(--success);margin-bottom:4px">✓ Solution</div><div style="font-size:11px;color:var(--text2)">Allez à <strong>Requêtes</strong> pour analyser une catégorie/risque spécifique</div></div></div>';$('chi2Container').innerHTML=msg;}else{
-let chi=0;c2.forEach(c=>{r2.forEach(r=>{const e=(cc[c]*rc[r])/n,o=j[c]?.[r]||0;if(e>0)chi+=((o-e)**2)/e})});
-const df=(c2.length-1)*(r2.length-1),pValue=chi>3.841?0.001:0.5,cv=Math.sqrt(chi/(n*Math.min(c2.length-1,r2.length-1)));
-let chi2Html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
-chi2Html+='<div style="padding:16px;background:var(--surface);border-radius:var(--radius);text-align:center;border-left:3px solid var(--brand)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Chi²</div><div style="font-size:24px;font-weight:700;color:var(--brand);margin-top:6px">'+chi.toFixed(2)+'</div><div style="font-size:10px;color:var(--text2);margin-top:4px">Indépendance</div></div>';
-chi2Html+='<div style="padding:16px;background:var(--surface);border-radius:var(--radius);text-align:center;border-left:3px solid var(--warning)"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">V de Cramer</div><div style="font-size:24px;font-weight:700;color:var(--warning);margin-top:6px">'+cv.toFixed(3)+'</div><div style="font-size:10px;color:var(--text2);margin-top:4px">Force du lien</div></div>';
-chi2Html+='<div style="padding:16px;background:var(--surface);border-radius:var(--radius);text-align:center;border-left:3px solid '+(chi>3.841?'var(--danger)':'var(--success)')+' "><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600">Résultat</div><div style="font-size:18px;font-weight:700;color:'+(chi>3.841?'var(--danger)':'var(--success)')+';margin-top:6px">'+(chi>3.841?'LIÉ ✓':'INDÉPENDANT ×')+'</div><div style="font-size:10px;color:var(--text2);margin-top:4px">p'+(chi>3.841?'&lt;':'≥')+'0.05</div></div>';
-chi2Html+='</div>';
-const forceLabel=cv<0.1?'très faible':cv<0.3?'faible':cv<0.5?'modéré':'FORT';
-const selectedCats=Array.from(STATE.filterCats);const selectedRisks=Array.from(STATE.filterRisks);
-const conclusion=chi>3.841?'<div style="padding:14px;margin-top:12px;background:rgba(255,71,87,0.1);border-radius:var(--radius);border-left:3px solid var(--danger)"><div style="font-size:12px;font-weight:600;color:var(--danger);margin-bottom:8px">✓ CONCLUSION: Lien Confirmé</div><div style="font-size:12px;color:var(--text2);line-height:1.6"><strong>Catégories:</strong> '+selectedCats.join(', ')+'<br/><strong>Risques:</strong> '+selectedRisks.join(', ')+'<br/><strong>Force du lien:</strong> '+forceLabel+' (V='+cv.toFixed(2)+')<br/><br/>Les '+selectedCats.length+' catégories sélectionnées ont des profils de risque DIFFÉRENTS pour les '+selectedRisks.length+' risques. Certaines catégories ont plus (ou moins) de certains risques.<br/><strong>👉 Action:</strong> Renforcer les contrôles pour la catégorie à risque identifiée.</div></div>':'<div style="padding:14px;margin-top:12px;background:rgba(46,213,115,0.1);border-radius:var(--radius);border-left:3px solid var(--success)"><div style="font-size:12px;font-weight:600;color:var(--success);margin-bottom:8px">× CONCLUSION: Pas de Lien</div><div style="font-size:12px;color:var(--text2);line-height:1.6"><strong>Catégories:</strong> '+selectedCats.join(', ')+'<br/><strong>Risques:</strong> '+selectedRisks.join(', ')+'<br/><strong>Relation:</strong> Aléatoire (V='+cv.toFixed(2)+')<br/><br/>Les '+selectedCats.length+' catégories ont des profils de risque SIMILAIRES. La répartition des risques est aléatoire, pas liée à la catégorie.<br/><strong>💡 Conseil:</strong> Les contrôles standard s\'appliquent de la même manière à toutes les catégories.</div></div>';
-chi2Html+=conclusion;$('chi2Container').innerHTML=chi2Html}
-const tc={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);tc[m]=(tc[m]||0)+1});
-const tr=Object.entries(tc).sort((a,b)=>a[0].localeCompare(b[0]));const vals=tr.map(x=>x[1]),labels=tr.map(x=>x[0].slice(5));
-if(vals.length<2){$('chartTrend').style.display='none';return}$('chartTrend').style.display='block';
-const recent3m=vals.slice(-3).reduce((s,x)=>s+x,0)/3;const prev3m=vals.slice(-6,-3).reduce((s,x)=>s+x,0)/3;const trendPct=((recent3m-prev3m)/prev3m*100).toFixed(1);
-const trendSvg=trendPct>0?'<svg style="display:inline;width:22px;height:22px;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>':'<svg style="display:inline;width:22px;height:22px;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>';const trendColor=trendPct>0?'var(--danger)':'var(--success)';
-let th='<div style="text-align:center;padding:20px"><div style="font-size:36px;font-weight:700;color:'+trendColor+'">'+trendSvg+' '+trendPct+'%</div><div style="font-size:14px;color:var(--text2);margin-top:12px">'+(trendPct>0?'AUGMENTATION':'DIMINUTION')+'</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+recent3m.toFixed(0)+' rappels/mois actuellement<br/>vs '+prev3m.toFixed(0)+' précédemment</div></div>';
-$('trendIndicatorContainer').innerHTML=th;
-const voluntary=data.filter(r=>r.nature_juridique_rappel==='volontaire (sans arrêté préfectoral)').length;const voluntary_pct=(voluntary/data.length*100).toFixed(1);
-let complianceHtml='<div style="text-align:center;padding:20px"><div style="font-size:36px;font-weight:700;color:var(--success)">'+voluntary_pct+'%</div><div style="font-size:14px;color:var(--text2);margin-top:12px">Volontaires</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+voluntary+'/'+data.length+' rappels<br/>= Bonne autorégulation</div></div>';
-$('complianceContainer').innerHTML=complianceHtml;
-const riskByCat={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';const r=d.risques_encourus||'Unknown';if(!riskByCat[c])riskByCat[c]={};riskByCat[c][r]=(riskByCat[c][r]||0)+1});
-const criticalRisks=/listeria|salmonella|e.coli|stec|botulisme/i;const riskFreqMap={};data.forEach(d=>{const r=d.risques_encourus||'';if(r)riskFreqMap[r]=(riskFreqMap[r]||0)+1});const risksByFrequency=Object.entries(riskFreqMap).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);let rsh='<div style="display:flex;flex-direction:column;gap:8px">';
-risksByFrequency.slice(0,6).forEach(risk=>{const isCritical=criticalRisks.test(risk);const cnt=data.filter(d=>d.risques_encourus===risk).length;const pct=(cnt/data.length*100).toFixed(1);const badge=isCritical?'<span style="color:var(--danger);font-weight:700;font-size:10px;letter-spacing:.5px">● CRITIQUE</span>':'<span style="color:var(--warning);font-weight:700;font-size:10px;letter-spacing:.5px">● MODÉRÉ</span>';rsh+='<div style="padding:10px;background:var(--surface);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-size:11px;font-weight:600">'+badge+'</div><div style="font-size:11px;color:var(--text2);margin-top:2px">'+risk.substring(0,35)+'</div></div><div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--brand)">'+pct+'%</div><div style="font-size:10px;color:var(--text3)">'+cnt+'</div></div></div>'});
-rsh+='</div>';$('riskSeverityContainer').innerHTML=rsh;
-const topCats3=Object.entries(riskByCat).sort((a,b)=>Object.values(b[1]).reduce((s,x)=>s+x,0)-Object.values(a[1]).reduce((s,x)=>s+x,0)).slice(0,5);let crsh='<div style="display:flex;flex-direction:column;gap:8px">';
-topCats3.forEach(([cat,risks])=>{const topRisk=Object.entries(risks).sort((a,b)=>b[1]-a[1])[0];const pct=(topRisk[1]/Object.values(risks).reduce((s,x)=>s+x,0)*100).toFixed(0);crsh+='<div style="padding:10px;background:var(--elevated);border-radius:var(--radius);border-left:3px solid var(--brand)"><div style="font-size:12px;font-weight:600;color:var(--text)">'+cat+'</div><div style="font-size:11px;color:var(--text2);margin-top:4px">→ '+topRisk[0].substring(0,40)+'</div><div style="font-size:10px;color:var(--text3);margin-top:2px">'+pct+'% des rappels de cette catégorie</div></div>'});
-crsh+='</div>';$('categoryRiskContainer').innerHTML=crsh;
-const nn=vals.length,idx=vals.map((_,i)=>i),mx=idx.reduce((a,b)=>a+b)/nn,my=vals.reduce((a,b)=>a+b)/nn;let num=0,den=0;idx.forEach(i=>{num+=(i-mx)*(vals[i]-my);den+=(i-mx)**2});
-const slope=den?num/den:0,intercept=my-slope*mx,trend=vals.map((_,i)=>intercept+slope*i);
-const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-if(window.cm&&window.cm.chartTrend)window.cm.chartTrend.destroy();
-window.cm.chartTrend=new Chart($('chartTrend'),{type:'line',data:{labels,datasets:[{label:'Rappels',data:vals,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.3,pointRadius:2},{label:'Tendance (pente='+slope.toFixed(2)+')',data:trend,borderColor:'#F37021',borderWidth:2,borderDash:[5,5],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10},padding:12}}},scales:{x:{grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}},y:{grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
-
 function normalizeRisks(riskStr){if(!riskStr)return[];return riskStr.split('|').map(r=>r.trim()).filter(r=>r.length>0)}
 
 function mean(a){return a.length?a.reduce((s,x)=>s+x,0)/a.length:0}
@@ -1003,16 +953,33 @@ ph+='</div><div class="method-note">Seuil 80% atteint après '+(paretoAt||sorted
 const cc={},rc={},j={};data.forEach(d=>{const c=d.sous_categorie_produit||'Autre';normalizeRisks(d.risques_encourus||'Non spécifié').forEach(r=>{cc[c]=(cc[c]||0)+1;rc[r]=(rc[r]||0)+1;if(!j[c])j[c]={};j[c][r]=(j[c][r]||0)+1})});
 const catsAll=Object.entries(cc).sort((a,b)=>b[1]-a[1]),risksAll=Object.entries(rc).sort((a,b)=>b[1]-a[1]);
 const pairTotal=Object.values(rc).reduce((s,x)=>s+x,0);
-let residuals=[],chi=0,expectedLow=0,cells=0;catsAll.forEach(([c])=>{risksAll.forEach(([r])=>{const e=(cc[c]*rc[r])/pairTotal,o=j[c]?.[r]||0;if(e>0){chi+=((o-e)**2)/e;const res=(o-e)/Math.sqrt(e);residuals.push({c,r,o,e,res});if(e<5)expectedLow++;cells++}})});
-const df=(catsAll.length-1)*(risksAll.length-1),pValue=df>0?chiSquarePValue(chi,df):1,cv=df>0?Math.sqrt(chi/(pairTotal*Math.min(catsAll.length-1,risksAll.length-1))):0;
+let residuals=[],chi=0,expectedLow=0,cells=0;catsAll.forEach(([c])=>{risksAll.forEach(([r])=>{const e=(cc[c]*rc[r])/pairTotal,o=j[c]?.[r]||0;if(e>0){chi+=((o-e)**2)/e;
+// Résidu ajusté (Haberman) plutôt que le résidu de Pearson brut (o-e)/√e : ce dernier n'a pas une
+// variance unitaire dès que les marges de la table sont déséquilibrées (cas quasi systématique ici,
+// certaines catégories/risques pesant beaucoup plus que d'autres), ce qui rend les comparaisons entre
+// cellules trompeuses. Le résidu ajusté est asymptotiquement N(0,1), ce qui permet un vrai test par cellule.
+const res=(o-e)/Math.sqrt(e*(1-cc[c]/pairTotal)*(1-rc[r]/pairTotal));const pCell=chiSquarePValue(res*res,1);residuals.push({c,r,o,e,res,pCell});if(e<5)expectedLow++;cells++}})});
+// Correction de Benjamini-Hochberg (FDR) : avec ~cells tests simultanés, ~5% seraient "significatifs"
+// par pur hasard au seuil brut de 0.05 — sans correction, le panneau "écarts significatifs" afficherait
+// un nombre de faux positifs proportionnel au nombre de couples catégorie×risque testés.
+const FDR_Q=0.05;const sortedP=residuals.map(x=>x.pCell).filter(p=>p!=null).sort((a,b)=>a-b);
+let bhThreshold=0;sortedP.forEach((p,i)=>{if(p<=((i+1)/sortedP.length)*FDR_Q)bhThreshold=p});
+residuals.forEach(x=>{x.sigFDR=x.pCell<=bhThreshold});
+const df=(catsAll.length-1)*(risksAll.length-1),pValue=df>0?chiSquarePValue(chi,df):1;
+const phi2=chi/pairTotal,rN=catsAll.length,cN=risksAll.length;
+const phi2Adj=Math.max(0,phi2-((rN-1)*(cN-1))/(pairTotal-1)),rAdj=rN-((rN-1)**2)/(pairTotal-1),cAdj=cN-((cN-1)**2)/(pairTotal-1);
+// V de Cramér débiaisé (Bergsma 2013) : le V brut est mécaniquement surestimé sur une table de cette
+// taille (24 x ~57) même sous indépendance stricte ; la correction retire ce biais d'échantillonnage.
+const cv=Math.min(rAdj-1,cAdj-1)>0?Math.sqrt(phi2Adj/Math.min(rAdj-1,cAdj-1)):0;
+STATE.lastContingency={residuals,n:pairTotal,rows:total,df,chi,pValue,cv,cells,expectedLow,generatedAt:new Date().toISOString()};
 const cats=catsAll.slice(0,7).map(x=>x[0]),risks=risksAll.slice(0,7).map(x=>x[0]);let ch='<div style="overflow-x:auto;display:block"><div class="corr-grid" style="grid-template-columns:190px repeat('+risks.length+',145px);gap:2px;width:fit-content;min-width:100%"><div class="corr-cell corr-cell--header"></div>';
 risks.forEach(r=>{ch+='<div class="corr-cell corr-cell--header" style="white-space:normal;word-break:break-word;min-height:62px;text-align:center" title="'+esc(r)+'">'+esc(r.length>22?r.slice(0,22)+'...':r)+'</div>'});
-cats.forEach(c=>{ch+='<div class="corr-cell corr-cell--header" style="justify-content:flex-start;text-align:left;white-space:normal;word-break:break-word" title="'+esc(c)+'">'+esc(c.length>27?c.slice(0,27)+'...':c)+'</div>';risks.forEach(r=>{const hit=residuals.find(x=>x.c===c&&x.r===r),res=hit?hit.res:0,v=hit?hit.o:0;const ins=Math.min(1,Math.abs(res)/4);const color=res>0?'243,112,33':'59,130,246';const bg=v===0?'var(--surface)':'rgba('+color+','+(isDark?0.25+ins*0.55:0.15+ins*0.45)+')';ch+='<div class="corr-cell" style="background:'+bg+';color:'+(ins>0.55?'#fff':'var(--text2)')+';min-height:52px;font-weight:700" title="'+esc(c)+' x '+esc(r)+' | observé='+v+' attendu='+(hit?hit.e.toFixed(1):'0')+' résidu='+(hit?hit.res.toFixed(2):'0')+'">'+v+'<small style="display:block;margin-left:4px;color:inherit;opacity:.75">r='+(hit?hit.res.toFixed(1):'0')+'</small></div>'})});
-ch+='</div></div>';$('corrContainer').innerHTML=ch;
+cats.forEach(c=>{ch+='<div class="corr-cell corr-cell--header" style="justify-content:flex-start;text-align:left;white-space:normal;word-break:break-word" title="'+esc(c)+'">'+esc(c.length>27?c.slice(0,27)+'...':c)+'</div>';risks.forEach(r=>{const hit=residuals.find(x=>x.c===c&&x.r===r),res=hit?hit.res:0,v=hit?hit.o:0;const ins=Math.min(1,Math.abs(res)/4);const color=res>0?'243,112,33':'59,130,246';const bg=v===0?'var(--surface)':'rgba('+color+','+(isDark?0.25+ins*0.55:0.15+ins*0.45)+')';const sig=hit&&hit.sigFDR;ch+='<div class="corr-cell" style="background:'+bg+';color:'+(ins>0.55?'#fff':'var(--text2)')+';min-height:52px;font-weight:700'+(sig?';outline:2px solid var(--text);outline-offset:-2px':'')+'" title="'+esc(c)+' x '+esc(r)+' | observé='+v+' attendu='+(hit?hit.e.toFixed(1):'0')+' résidu ajusté='+(hit?hit.res.toFixed(2):'0')+(sig?' | significatif (FDR 5%)':'')+'">'+v+'<small style="display:block;margin-left:4px;color:inherit;opacity:.75">'+(sig?'★ ':'')+'d='+(hit?hit.res.toFixed(1):'0')+'</small></div>'})});
+ch+='</div></div><div class="method-note">Cases entourées (★) : écart significatif après correction pour tests multiples (Benjamini-Hochberg, q=5%). d = résidu ajusté, en écarts-types.</div>';$('corrContainer').innerHTML=ch;
 if(total<2||catsAll.length<2||risksAll.length<2){$('chi2Container').innerHTML='<div class="method-note">Chi² impossible: il faut au moins 2 catégories et 2 risques dans la sélection.</div>'}
-else{const linked=pValue<0.05,force=cv<0.1?'très faible':cv<0.3?'faible':cv<0.5?'modérée':'forte';$('chi2Container').innerHTML='<div class="mini-metric-grid"><div class="mini-metric"><span>Chi²</span><b>'+chi.toFixed(1)+'</b></div><div class="mini-metric"><span>ddl</span><b>'+df+'</b></div><div class="mini-metric '+(linked?'severity-high':'severity-low')+'"><span>p-value</span><b>'+pValue.toExponential(2)+'</b></div></div><div class="mini-metric-grid"><div class="mini-metric"><span>V Cramer</span><b>'+cv.toFixed(3)+'</b></div><div class="mini-metric"><span>Force</span><b style="font-size:16px">'+force+'</b></div><div class="mini-metric '+(expectedLow/cells>0.2?'severity-med':'severity-low')+'"><span>Cellules &lt;5</span><b>'+pct(expectedLow/cells*100)+'%</b></div></div><div class="method-note">'+(linked?'Lien statistique détecté entre catégories et risques.':'Pas de lien statistique significatif au seuil 5%.')+' Les résidus indiquent les couples responsables du signal.</div>'}
-const topRes=residuals.filter(x=>x.o>0).sort((a,b)=>Math.abs(b.res)-Math.abs(a.res)).slice(0,8);
-$('residualsContainer').innerHTML=listRows(topRes.map(x=>analysisRow(x.c+' x '+x.r,'observé '+x.o+' | attendu '+x.e.toFixed(1)+' | '+(x.res>0?'surreprésenté':'sous-représenté'),'r='+x.res.toFixed(2),Math.abs(x.res)>=2?'severity-high':'severity-med')));
+else{const linked=pValue<0.05,force=cv<0.1?'très faible':cv<0.3?'faible':cv<0.5?'modérée':'forte',nSig=residuals.filter(x=>x.sigFDR).length;$('chi2Container').innerHTML='<div class="mini-metric-grid"><div class="mini-metric"><span>Chi²</span><b>'+chi.toFixed(1)+'</b></div><div class="mini-metric"><span>ddl</span><b>'+df+'</b></div><div class="mini-metric '+(linked?'severity-high':'severity-low')+'"><span>p-value</span><b>'+pValue.toExponential(2)+'</b></div></div><div class="mini-metric-grid"><div class="mini-metric"><span>V Cramer (débiaisé)</span><b>'+cv.toFixed(3)+'</b></div><div class="mini-metric"><span>Force</span><b style="font-size:16px">'+force+'</b></div><div class="mini-metric '+(expectedLow/cells>0.2?'severity-med':'severity-low')+'"><span>Cellules &lt;5</span><b>'+pct(expectedLow/cells*100)+'%</b></div></div><div class="method-note">Avec n='+pairTotal.toLocaleString('fr-FR')+', un chi² significatif est quasi automatique même pour un écart négligeable — ce n\'est pas la question utile. Ce qui compte : <strong>'+nSig+' couple(s) catégorie×risque</strong> restent significatifs après correction pour tests multiples (Benjamini-Hochberg, q=5%), listés ci-dessous. Lisez le V débiaisé et les résidus, pas le verdict binaire.</div>'}
+const topRes=residuals.filter(x=>x.o>=10).sort((a,b)=>Math.abs(b.res)-Math.abs(a.res)).slice(0,10);
+$('residualsContainer').innerHTML=(topRes.length?listRows(topRes.map(x=>analysisRow(x.c+' x '+x.r,'observé '+x.o+' | attendu '+x.e.toFixed(1)+' | '+(x.res>0?'surreprésenté':'sous-représenté')+(x.sigFDR?' | significatif (FDR 5%)':' | non significatif après correction'),'d='+x.res.toFixed(2),x.sigFDR?'severity-high':'severity-med'))):'<div class="method-note">Aucun couple avec au moins 10 observations dans la sélection.</div>')+'<div class="method-note">Triés par écart absolu (résidu ajusté d), limité aux couples avec ≥10 observations. Seuls les couples marqués « significatif » restent au-delà du hasard une fois corrigé pour '+cells+' tests simultanés.</div>';
 if(vals.length<2){$('chartTrend').style.display='none'}else{$('chartTrend').style.display='block';const recent3m=mean(vals.slice(-3)),prev3m=mean(vals.slice(-6,-3));const trendPct=prev3m?((recent3m-prev3m)/prev3m*100):0;const trendColor=trendPct>20?'var(--danger)':trendPct<-20?'var(--success)':'var(--warning)';$('trendIndicatorContainer').innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:36px;font-weight:700;color:'+trendColor+'">'+trendPct.toFixed(1)+'%</div><div style="font-size:14px;color:var(--text2);margin-top:12px">'+(trendPct>=0?'AUGMENTATION':'DIMINUTION')+'</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+recent3m.toFixed(0)+' rappels/mois vs '+prev3m.toFixed(0)+'</div></div>';const idx=vals.map((_,i)=>i),mx=mean(idx),my=mean(vals);let num=0,den=0;idx.forEach(i=>{num+=(i-mx)*(vals[i]-my);den+=(i-mx)**2});const slope=den?num/den:0,intercept=my-slope*mx,trend=vals.map((_,i)=>intercept+slope*i),ma3=vals.map((_,i)=>i<2?null:mean(vals.slice(i-2,i+1)));if(window.cm&&window.cm.chartTrend)window.cm.chartTrend.destroy();window.cm=window.cm||{};window.cm.chartTrend=new Chart($('chartTrend'),{type:'line',data:{labels,datasets:[{label:'Rappels',data:vals,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.3,pointRadius:2},{label:'Moyenne mobile 3 mois',data:ma3,borderColor:'#2ED573',borderWidth:2,pointRadius:0,fill:false},{label:'Tendance linéaire (pente='+slope.toFixed(2)+')',data:trend,borderColor:'#F37021',borderWidth:2,borderDash:[5,5],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10},padding:12}}},scales:{x:{grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10},maxTicksLimit:18}},y:{grid:{color:isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)'},ticks:{color:isDark?'#9CA3B5':'#6B7280',font:{size:10}}}}}})}
 const baseMean=mean(vals),baseSd=sd(vals);const anomalies=tr.map(([k,v])=>{const prev=tr.find(([kk])=>kk===String(Number(k.slice(0,4))-1)+k.slice(4));return{k,v,z:baseSd?(v-baseMean)/baseSd:0,yoy:prev?((v-prev[1])/prev[1]*100):null}}).sort((a,b)=>Math.abs(b.z)-Math.abs(a.z)).slice(0,5);
 $('anomalyContainer').innerHTML=listRows(anomalies.map(x=>analysisRow(x.k,'volume '+x.v+' | moyenne '+baseMean.toFixed(1)+(x.yoy!=null?' | N-1 '+x.yoy.toFixed(0)+'%':''),'z='+x.z.toFixed(2),Math.abs(x.z)>=2?'severity-high':'severity-med')));
@@ -1156,6 +1123,19 @@ STATE.records=merged;
 if(merged.length){STATE.dataDate=merged[0].date_publication||'';}
 const now=new Date();STATE.lastLoadTime=now.toLocaleString('fr-FR');
 const lastDataDate=merged.length && merged[0].date_publication?new Date(merged[0].date_publication).toLocaleDateString('fr-FR'):'—';
+// La fusion API (14 derniers jours) rafraîchit toujours la date la plus récente affichée,
+// même quand le cache statique data.json (généré par le cron quotidien) est bloqué depuis
+// des semaines — d'où un calcul de fraîcheur séparé sur le cache brut, seul indicateur fiable
+// de l'état réel du pipeline de mise à jour.
+const cacheDates=data.map(r=>r.date_publication).filter(Boolean).sort();
+const cacheDate=cacheDates.length?new Date(cacheDates[cacheDates.length-1]):null;
+const cacheAgeHours=cacheDate?(now-cacheDate)/36e5:Infinity;
+const fb=$('freshnessBanner');
+if(fb){
+if(cacheAgeHours>168){fb.style.display='block';fb.style.background='rgba(255,71,87,0.12)';fb.style.borderLeft='3px solid var(--danger)';fb.style.color='var(--danger)';fb.innerHTML='⚠️ <strong>Cache de données obsolète</strong> — dernière mise à jour du pipeline le '+(cacheDate?cacheDate.toLocaleDateString('fr-FR'):'?')+' ('+Math.round(cacheAgeHours/24)+' j). Les 14 derniers jours sont complétés en direct, mais un écart peut exister entre ces deux périodes.'}
+else if(cacheAgeHours>48){fb.style.display='block';fb.style.background='rgba(255,165,2,0.12)';fb.style.borderLeft='3px solid var(--warning)';fb.style.color='var(--warning)';fb.innerHTML='⚠️ Cache de données daté du '+(cacheDate?cacheDate.toLocaleDateString('fr-FR'):'?')+' ('+Math.round(cacheAgeHours/24)+' j) — mise à jour automatique quotidienne attendue.'}
+else{fb.style.display='none'}
+}
 const badge=newRecords.length>0?` (+${newRecords.length})`:'';
 $('cacheBadge').innerHTML=merged.length+' fiches'+badge+'<br><small style="font-size:10px;opacity:0.7">Maj: '+lastDataDate+'</small>';
 $('cacheBadge').style.cursor='pointer';$('cacheBadge').title='Cliquez pour voir le statut détaillé';
@@ -1188,6 +1168,23 @@ const prodList=$('queryProductList');
 if(prodList){prodList.innerHTML='';[...cats,...brands].forEach(v=>{const o=document.createElement('option');o.value=v;prodList.appendChild(o)})}
 const riskList=$('queryRiskList');
 if(riskList){riskList.innerHTML='';risks.forEach(v=>{const o=document.createElement('option');o.value=v;riskList.appendChild(o)})}}
+
+function exportContingencyCSV(){
+const lc=STATE.lastContingency;
+if(!lc||!lc.residuals.length){alert('Aucune table à exporter — ouvrez la page Analyses avec au moins 2 catégories et 2 risques dans la sélection.');return}
+const headers=['Categorie','Risque','Observe','Attendu','Residu_ajuste','P_valeur_cellule','Significatif_FDR_5pct'];
+const lines=[headers.join(';')];
+lc.residuals.forEach(x=>{lines.push([x.c,x.r,x.o,x.e.toFixed(2),x.res.toFixed(3),x.pCell.toExponential(3),x.sigFDR?'oui':'non'].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';'))});
+lines.push('');
+lines.push('# Méthodologie');
+lines.push('# Source: RappelConso (data.economie.gouv.fr), export généré le '+new Date().toLocaleString('fr-FR'));
+lines.push('# n (couples categorie x risque, une fiche multi-risque compte pour chacun de ses risques) = '+lc.n+' | fiches sources = '+lc.rows);
+lines.push('# Chi2 = '+lc.chi.toFixed(2)+' | ddl = '+lc.df+' | p-value = '+lc.pValue.toExponential(3)+' | V de Cramer debiaise = '+lc.cv.toFixed(3));
+lines.push('# Cellules avec effectif attendu < 5 = '+pct(lc.expectedLow/lc.cells*100)+'% (approximation asymptotique du Chi2 fragile au-dela de 20%)');
+lines.push('# Residu_ajuste (Haberman) : ecart standardise N(0,1). Significatif_FDR_5pct : passe la correction de Benjamini-Hochberg (q=5%) sur les '+lc.cells+' cellules testees simultanement.');
+lines.push('# Avertissement : ce jeu ne contient que des rappels, sans denominateur d\'exposition. Un volume/residu eleve reflete un profil de risque relatif, pas un risque absolu.');
+const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rappelconso_contingence_'+new Date().toISOString().slice(0,10)+'.csv';a.click()}
 
 function exportQueryCSV(){
 const rows=Array.from($('queryTableBody').querySelectorAll('tr'));
@@ -1229,6 +1226,7 @@ $('queryProduct').value=(ACTIVE_CHIPS.prod?.dataset.prod)||'';
 $('queryRisk').value=(ACTIVE_CHIPS.risk?.dataset.risk)||'';
 if(ACTIVE_CHIPS.risk||ACTIVE_CHIPS.prod)runUnifiedQuery();else clearQuery()}});
 if($('exportQueryCsvBtn'))$('exportQueryCsvBtn').addEventListener('click',exportQueryCSV);
+if($('exportContingencyBtn'))$('exportContingencyBtn').addEventListener('click',exportContingencyCSV);
 if($('drillClose'))$('drillClose').addEventListener('click',drillClear);
 
 // ── Info-btn tooltip (click-based, viewport-aware) ────────────────────────
