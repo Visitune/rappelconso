@@ -135,8 +135,15 @@ function renderFacts(d){
     host.setAttribute('aria-label','Faits marquants');
     anchor.parentNode.insertBefore(host,anchor);
   }
-  var f=computeFacts(d);
-  host.hidden=!f.length;
+  var f=computeFacts(d),page=document.querySelector('.page[data-page="dashboard"]');
+  if(page)page.classList.toggle('sel-empty',!f.length);
+  if(!f.length){
+    host.hidden=false;
+    host.innerHTML='<div class="card__header">Aucune fiche ne correspond à ces filtres</div><p class="facts-empty">Élargissez la période ou retirez un filtre. <button type="button" class="btn btn--ghost btn--sm" id="factsClear">Effacer les filtres</button></p>';
+    $('factsClear').addEventListener('click',function(){$('clearFiltersBtn').click()});
+    return;
+  }
+  host.hidden=false;
   host.innerHTML='<div class="card__header">Faits marquants</div><ul class="facts-list">'+f.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>';
 }
 

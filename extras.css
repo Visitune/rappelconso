@@ -115,3 +115,12 @@
 /* ── Contraste du thème clair (WCAG AA) ── */
 [data-theme="light"]{--text3:#556070}
 [data-theme="light"] .badge--orange,[data-theme="light"] .quick-chip.active,[data-theme="light"] .chip.active{color:#9A4208}
+
+/* ── Sélection vide ── */
+.facts-empty{font-size:13px;color:var(--text2);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.page[data-page="dashboard"].sel-empty section:not(#factsBar):not(.grid-responsive),.page[data-page="dashboard"].sel-empty #drillPanel{display:none!important}
+
+/* ── Menus de filtres : fond opaque et largeur lisible ── */
+.filter-menu{background:var(--bg)!important;min-width:min(340px,calc(100vw - 24px));box-shadow:0 12px 32px rgba(0,0,0,.35);border-color:var(--text3)!important}
+.filter-menu label{align-items:flex-start;line-height:1.35}
+.filter-menu label input{margin-top:2px;flex-shrink:0}

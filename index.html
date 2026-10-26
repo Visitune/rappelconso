@@ -638,21 +638,23 @@ if($('exportDataBtn'))$('exportDataBtn').addEventListener('click',exportData);
 
 async function apiFetch(path,retries=2){for(let i=0;i<=retries;i++){try{const r=await fetch(API+path);if(!r.ok&&r.status<500)throw new Error('API '+r.status);if(!r.ok)continue;return await r.json()}catch(e){if(i===retries)throw e;await new Promise(r=>setTimeout(r,1e3*(i+1)))}}throw new Error('API unreachable')}
 
-async function loadFacets(){try{
-const[cats,risks,legals]=await Promise.all([
-apiFetch('/records?select=sous_categorie_produit,count(*)&group_by=sous_categorie_produit&limit=50&refine=categorie_produit:alimentation&order_by=count(*) desc'),
-apiFetch('/records?select=risques_encourus,count(*)&group_by=risques_encourus&limit=50&refine=categorie_produit:alimentation&order_by=count(*) desc'),
-apiFetch('/records?select=nature_juridique_rappel,count(*)&group_by=nature_juridique_rappel&limit=10&refine=categorie_produit:alimentation&order_by=count(*) desc')
-]);
-STATE.facets.cats=cats.results||[];STATE.facets.risks=risks.results||[];STATE.facets.legals=legals.results||[];
+function loadFacets(){try{
+const cats={},risks={},legals={};
+STATE.records.forEach(r=>{
+if(r.sous_categorie_produit)cats[r.sous_categorie_produit]=(cats[r.sous_categorie_produit]||0)+1;
+if(r.nature_juridique_rappel)legals[r.nature_juridique_rappel]=(legals[r.nature_juridique_rappel]||0)+1;
+new Set(normalizeRisks(r.risques_encourus)).forEach(x=>{risks[x]=(risks[x]||0)+1})});
+const toArr=(o,key)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([k,c])=>({[key]:k,'count(*)':c}));
+STATE.facets.cats=toArr(cats,'sous_categorie_produit');STATE.facets.risks=toArr(risks,'risques_encourus');STATE.facets.legals=toArr(legals,'nature_juridique_rappel');
 populateFilters()}catch(e){console.error('Facets err',e)}}
 function populateFilters(){
 STATE.filterCats=new Set();STATE.filterRisks=new Set();
-const popMulti=(btnId,menuId,arr)=>{const menu=$(menuId);menu.innerHTML='';const isRisk=btnId==='filterRiskBtn';const filterSet=isRisk?STATE.filterRisks:STATE.filterCats;const allValues=arr.map(a=>Object.values(a)[0]).filter(v=>v);const btnGroup=document.createElement('div');btnGroup.style.cssText='padding:8px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap';const selectAllBtn=document.createElement('button');selectAllBtn.textContent='Tous';selectAllBtn.style.cssText='flex:1;min-width:50px;padding:6px 12px;background:var(--brand);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600';selectAllBtn.addEventListener('click',()=>{allValues.forEach(v=>filterSet.add(v));document.querySelectorAll('#'+menuId+' input[type="checkbox"]').forEach(inp=>{inp.checked=true});updateFilterBtn(btnId);onFilterChange()});const clearBtn=document.createElement('button');clearBtn.textContent='Aucun';clearBtn.style.cssText='flex:1;min-width:50px;padding:6px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600';clearBtn.addEventListener('click',()=>{filterSet.clear();document.querySelectorAll('#'+menuId+' input[type="checkbox"]').forEach(inp=>{inp.checked=false});updateFilterBtn(btnId);onFilterChange()});btnGroup.appendChild(selectAllBtn);btnGroup.appendChild(clearBtn);menu.appendChild(btnGroup);arr.forEach(a=>{const v=Object.values(a)[0];const c=a['count(*)'];if(!v)return;const label=document.createElement('label');const inp=document.createElement('input');inp.type='checkbox';inp.value=v;inp.addEventListener('change',()=>{if(inp.checked)filterSet.add(v);else filterSet.delete(v);updateFilterBtn(btnId);onFilterChange()});label.appendChild(inp);label.appendChild(document.createTextNode(v+' ('+c+')'));menu.appendChild(label)});$(btnId).addEventListener('click',e=>{e.stopPropagation();const m=$(menuId);m.style.display=m.style.display==='none'?'block':'none'})};
+const popMulti=(btnId,menuId,arr)=>{const menu=$(menuId);menu.innerHTML='';const isRisk=btnId==='filterRiskBtn';const filterSet=isRisk?STATE.filterRisks:STATE.filterCats;const allValues=arr.map(a=>Object.values(a)[0]).filter(v=>v);const btnGroup=document.createElement('div');btnGroup.style.cssText='padding:8px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap';const selectAllBtn=document.createElement('button');selectAllBtn.textContent='Tous';selectAllBtn.style.cssText='flex:1;min-width:50px;padding:6px 12px;background:var(--brand);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600';selectAllBtn.addEventListener('click',()=>{allValues.forEach(v=>filterSet.add(v));document.querySelectorAll('#'+menuId+' input[type="checkbox"]').forEach(inp=>{inp.checked=true});updateFilterBtn(btnId);onFilterChange()});const clearBtn=document.createElement('button');clearBtn.textContent='Aucun';clearBtn.style.cssText='flex:1;min-width:50px;padding:6px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600';clearBtn.addEventListener('click',()=>{filterSet.clear();document.querySelectorAll('#'+menuId+' input[type="checkbox"]').forEach(inp=>{inp.checked=false});updateFilterBtn(btnId);onFilterChange()});btnGroup.appendChild(selectAllBtn);btnGroup.appendChild(clearBtn);menu.appendChild(btnGroup);arr.forEach(a=>{const v=Object.values(a)[0];const c=a['count(*)'];if(!v)return;const label=document.createElement('label');const inp=document.createElement('input');inp.type='checkbox';inp.value=v;inp.addEventListener('change',()=>{if(inp.checked)filterSet.add(v);else filterSet.delete(v);updateFilterBtn(btnId);onFilterChange()});label.appendChild(inp);label.appendChild(document.createTextNode(v+' ('+c+')'));menu.appendChild(label)});$(btnId).addEventListener('click',e=>{e.stopPropagation();const m=$(menuId),open=m.style.display!=='block';$('filterCatMenu').style.display='none';$('filterRiskMenu').style.display='none';m.style.display=open?'block':'none'})};
 if($('filterCatBtn')){popMulti('filterCatBtn','filterCatMenu',STATE.facets.cats);popMulti('filterRiskBtn','filterRiskMenu',STATE.facets.risks)}
 const legalSel=$('filterLegal');if(legalSel){const current=legalSel.value;legalSel.innerHTML='<option value="">Nature juridique</option>';STATE.facets.legals.forEach(a=>{const v=a.nature_juridique_rappel||Object.values(a)[0],c=a['count(*)'];if(!v)return;const o=document.createElement('option');o.value=v;o.textContent=v+(c?' ('+c+')':'');legalSel.appendChild(o)});legalSel.value=current}
 updateFilterChipCounts();updateFilterSummary();
-document.addEventListener('click',()=>{$('filterCatMenu').style.display='none';$('filterRiskMenu').style.display='none'})}
+document.addEventListener('click',e=>{if(e.target.closest('#filterCatMenu,#filterRiskMenu'))return;$('filterCatMenu').style.display='none';$('filterRiskMenu').style.display='none'});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('filterCatMenu').style.display='none';$('filterRiskMenu').style.display='none'}})}
 function updateFilterBtn(btnId){const count=btnId==='filterCatBtn'?STATE.filterCats.size:STATE.filterRisks.size;const isCat=btnId==='filterCatBtn';const svg=isCat?'<svg style="width:13px;height:13px;flex-shrink:0;pointer-events:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>':'<svg style="width:13px;height:13px;flex-shrink:0;pointer-events:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';$(btnId).innerHTML=svg+(isCat?'Sous-catégories':'Risques')+' ('+count+')'}
 
 function setSetFilter(kind,value){
@@ -726,6 +728,9 @@ function updateFilterChipCounts(){
   qsa('.chip').forEach(ch=>{let b=ch.querySelector('.chip-count');if(!b){b=document.createElement('span');b.className='chip-count';ch.appendChild(b)}const n=defs[ch.dataset.chip]||0;b.textContent=n>999?Math.round(n/1000)+'k':n});
 }
 
+const _hay=new WeakMap();
+function plain(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()}
+function hay(r){let h=_hay.get(r);if(h===undefined){h=plain([r.marque_produit,r.libelle,r.motif_rappel,r.sous_categorie_produit,r.risques_encourus,r.modeles_ou_references].join(' | '));_hay.set(r,h)}return h}
 function getFilteredRecords(){
 let d=STATE.records;const q=$('searchInput').value.trim().toLowerCase();
 const cats=STATE.filterCats||new Set();const risks=STATE.filterRisks||new Set();const legal=$('filterLegal').value;
@@ -737,7 +742,7 @@ if(STATE.chips.has('recent')&&STATE.days===0){const ref=STATE.dataDate?new Date(
 if(cats.size>0)d=d.filter(r=>cats.has(r.sous_categorie_produit));
 if(risks.size>0)d=d.filter(r=>{const rlist=(r.risques_encourus||'').split('|').map(x=>x.trim());return rlist.some(rsk=>risks.has(rsk))});
 if(legal)d=d.filter(r=>r.nature_juridique_rappel===legal);
-if(q)d=d.filter(r=>(r.marque_produit||'').toLowerCase().includes(q)||(r.libelle||'').toLowerCase().includes(q)||(r.motif_rappel||'').toLowerCase().includes(q)||(r.sous_categorie_produit||'').toLowerCase().includes(q));
+if(q){const nq=plain(q);d=d.filter(r=>hay(r).includes(nq))}
 return d}
 
 function onFilterChange(){
@@ -751,7 +756,7 @@ function switchPage(name){
 qsa('.side-link').forEach(x=>{x.classList.toggle('active',x.dataset.page===name);x.setAttribute('aria-current',x.dataset.page===name?'page':'false')});
 qsa('.page').forEach(x=>x.hidden=x.dataset.page!==name);
 STATE.currentPage=name;
-$('filterBar').style.display=(name==='query')?'none':'';
+$('filterBar').style.display=(name==='query'||name==='about')?'none':'';
 if(name==='dashboard')updateDashboard()
 else if(name==='search')doSearch(true)
 else if(name==='analyses'){const d=getFilteredRecords();$('statsBadge').textContent=d.length+' fiches filtrées';renderStats(d)}
@@ -760,7 +765,7 @@ else if(name==='about'){}}
 qsa('.side-link').forEach(a=>a.addEventListener('click',function(){switchPage(this.dataset.page)}));
 
 function updateDashboard(){
-const d=getFilteredRecords();if(!d.length)return;const r=d.length;
+const d=getFilteredRecords();if(!d.length){['kpiTotal','kpiRisky','kpiClosed','kpiBrands'].forEach(id=>{$(id).textContent='0'});['kpiRate','kpiSeverity'].forEach(id=>{$(id).textContent='—'});$('dashTotalBadge').textContent='0 fiche';return}const r=d.length;
 animKpi($('kpiTotal'),r);
 $('dashTotalBadge').textContent=r.toLocaleString('fr-FR')+' fiches';
 const bacterial=d.filter(x=>/listeria|salmonella|e.coli|stec|botulisme|brucellome/i.test(x.risques_encourus||'')).length;animKpi($('kpiRisky'),bacterial);
