@@ -571,8 +571,9 @@ async function refreshData(){
     const resp=await fetch(DATA_URL+'?t='+Date.now());
     if(!resp.ok)throw new Error('HTTP '+resp.status);
     const data=await resp.json();
-    STATE.records=data;
-    STATE.lastLoadTime=new Date().toLocaleString('fr-FR');
+    const{merged,fresh}=await mergeWithApi(data);
+    applyDataState(data,merged,fresh);
+    updateFilterChipCounts();updateChipCounts();populateQueryAutocomplete();
     btn.innerHTML='✓';btn.style.color='var(--success)';
     setTimeout(()=>{btn.innerHTML=old;btn.style.color='';btn.disabled=false},2000);
     updateDashboard();onFilterChange();
@@ -782,18 +783,19 @@ const catCnt={};data.forEach(d=>{const k=d.sous_categorie_produit||'Autre';catCn
 const catSorted=Object.entries(catCnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
 const catColors=catSorted.map((_,i)=>PALETTE[i%PALETTE.length]);
 makeBar($('chartCat'),catSorted.map(x=>x[0].length>22?x[0].slice(0,22)+'...':x[0]),catSorted.map(x=>x[1]),catColors);
-if(window.cm?.chartCat){window.cm.chartCat.options.onClick=(e,els)=>{if(!els.length)return;const cat=catSorted[els[0].index][0];setSetFilter('cat',cat);drillToCat(cat)};window.cm.chartCat.update()}
+if(window.cm?.chartCat){window.cm.chartCat.options.onClick=(e,els)=>{if(!els.length)return;const cat=catSorted[els[0].index][0];setTimeout(()=>{setSetFilter('cat',cat);drillToCat(cat)},0)};window.cm.chartCat.update()}
 
 const riskCnt={};data.forEach(d=>{const k=d.risques_encourus||'Non specifie';riskCnt[k]=(riskCnt[k]||0)+1});
 const riskSorted=Object.entries(riskCnt).sort((a,b)=>b[1]-a[1]).slice(0,12);
 const riskColors=riskSorted.map((_,i)=>PALETTE[i%PALETTE.length]);
 makeDoughnut($('chartRisk'),riskSorted.map(x=>x[0].length>25?x[0].slice(0,25)+'...':x[0]),riskSorted.map(x=>x[1]),riskColors);
-if(window.cm?.chartRisk){window.cm.chartRisk.options.onClick=(e,els)=>{if(!els.length)return;normalizeRisks(riskSorted[els[0].index][0]).forEach(r=>STATE.filterRisks.add(r));document.querySelectorAll('#filterRiskMenu input[type="checkbox"]').forEach(inp=>{inp.checked=STATE.filterRisks.has(inp.value)});updateFilterBtn('filterRiskBtn');STATE.chips.delete('all');qsa('.chip[data-chip="all"]').forEach(x=>x.classList.remove('active'));STATE.page=1;onFilterChange()};window.cm.chartRisk.update()}
+if(window.cm?.chartRisk){window.cm.chartRisk.options.onClick=(e,els)=>{if(!els.length)return;const ri=els[0].index;setTimeout(()=>{const rk=normalizeRisks(riskSorted[ri][0]);const allIn=rk.every(r=>STATE.filterRisks.has(r));rk.forEach(r=>allIn?STATE.filterRisks.delete(r):STATE.filterRisks.add(r));document.querySelectorAll('#filterRiskMenu input[type="checkbox"]').forEach(inp=>{inp.checked=STATE.filterRisks.has(inp.value)});updateFilterBtn('filterRiskBtn');if(STATE.filterRisks.size||STATE.filterCats.size){STATE.chips.delete('all');qsa('.chip[data-chip="all"]').forEach(x=>x.classList.remove('active'))}else if(STATE.chips.size===0){STATE.chips=new Set(['all']);qsa('.chip[data-chip="all"]').forEach(x=>x.classList.add('active'))}STATE.page=1;onFilterChange()},0)};window.cm.chartRisk.update()}
 
 const legalCnt={};data.forEach(d=>{const k=d.nature_juridique_rappel||'Autre';legalCnt[k]=(legalCnt[k]||0)+1});
 const legalSorted=Object.entries(legalCnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
 const legalColors=[PALETTE[0],PALETTE[1],PALETTE[2],PALETTE[3],PALETTE[4],PALETTE[5]];
 makeDoughnut($('chartLegal'),legalSorted.map(x=>x[0].length>20?x[0].slice(0,20)+'...':x[0]),legalSorted.map(x=>x[1]),legalColors);
+if(window.cm?.chartLegal){window.cm.chartLegal.options.onClick=(e,els)=>{if(!els.length)return;const v=legalSorted[els[0].index][0];setTimeout(()=>{const sel=$('filterLegal');sel.value=sel.value===v?'':v;STATE.page=1;onFilterChange()},0)};window.cm.chartLegal.update()}
 
 const MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const timeCnt={};data.forEach(d=>{if(!d.date_publication)return;const m=d.date_publication.slice(0,7);timeCnt[m]=(timeCnt[m]||0)+1});
@@ -882,7 +884,10 @@ $('searchPagination').addEventListener('click',function(e){
 const btn=e.target.closest('.pag-btn');if(!btn||btn.disabled)return;
 STATE.page=parseInt(btn.dataset.page);doSearch(false);
 window.scrollTo({top:$('search').offsetTop-80,behavior:'smooth'})});
-document.addEventListener('click',function(e){const b=e.target.closest('[data-id]');if(b&&b.dataset.id)openModal(b.dataset.id)});
+document.addEventListener('click',function(e){
+let b=e.target.closest('[data-id]');
+if(!b){const tr=e.target.closest('#searchBody tr,#queryTableBody tr');if(tr&&!String(window.getSelection()).trim())b=tr.querySelector('[data-id]')}
+if(b&&b.dataset.id)openModal(b.dataset.id)});
 
 async function openModal(id){
 $('detailModal').classList.add('open');document.body.style.overflow='hidden';
@@ -1026,14 +1031,16 @@ c.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('active'));btn.cla
 const ACTIVE_CHIPS={risk:null,prod:null};
 
 function nfc(s){return(s||'').normalize('NFC')}
+function qRegex(s){try{return new RegExp(s,'i')}catch(e){const B=String.fromCharCode(92);return new RegExp(Array.from(s).map(c=>('.*+?^${}()|[]'.includes(c)||c===B)?B+c:c).join(''),'i')}}
+function qProd(re,d){return re.test(nfc(d.sous_categorie_produit))||re.test(nfc(d.marque_produit))||re.test(nfc(d.libelle))}
 function runUnifiedQuery(){
 const pv=nfc($('queryProduct').value).trim();
 const rv=nfc($('queryRisk').value).trim();
 const days=parseInt($('queryPeriod').value)||0;
 let res=STATE.records;
 if(days>0){const cut=new Date();cut.setDate(cut.getDate()-days);res=res.filter(r=>r.date_publication&&new Date(r.date_publication)>=cut)}
-if(pv){try{const re=new RegExp(pv,'i');res=res.filter(d=>re.test(nfc(d.sous_categorie_produit))||re.test(nfc(d.marque_produit))||re.test(nfc(d.libelle)))}catch(e){alert('Regex produit invalide: '+e.message);return}}
-if(rv){try{const re=new RegExp(rv,'i');res=res.filter(d=>re.test(nfc(d.risques_encourus)))}catch(e){alert('Regex risque invalide: '+e.message);return}}
+if(pv){const re=qRegex(pv);res=res.filter(d=>qProd(re,d))}
+if(rv){const re=qRegex(rv);res=res.filter(d=>re.test(nfc(d.risques_encourus)))}
 renderQueryResults(res)}
 
 function clearQuery(){
@@ -1048,8 +1055,8 @@ const chips=$('quickChips');if(!chips||!STATE.records.length)return;
 chips.querySelectorAll('.quick-chip').forEach(c=>{
 const pv=c.dataset.prod||'';const rv=c.dataset.risk||'';
 let res=STATE.records;
-try{if(pv){const re=new RegExp(nfc(pv),'i');res=res.filter(d=>re.test(nfc(d.sous_categorie_produit))||re.test(nfc(d.marque_produit)))}}catch(e){}
-try{if(rv){const re=new RegExp(nfc(rv),'i');res=res.filter(d=>re.test(nfc(d.risques_encourus)))}}catch(e){}
+if(pv){const re=qRegex(nfc(pv));res=res.filter(d=>qProd(re,d))}
+if(rv){const re=qRegex(nfc(rv));res=res.filter(d=>re.test(nfc(d.risques_encourus)))}
 let b=c.querySelector('.chip-cnt');
 if(!b){b=document.createElement('span');b.className='chip-cnt';c.appendChild(b)}
 b.textContent='·'+(res.length>999?Math.round(res.length/1000)+'k':res.length)})}
@@ -1105,18 +1112,14 @@ console.log('API alimentation fetch failed completely',e);
 return [];
 }
 }}
-async function init(){
-$('dashTotalBadge').textContent='Chargement data.json...';
-try{
-const resp=await fetch(DATA_URL);
-if(!resp.ok)throw new Error('HTTP '+resp.status);
-const data=await resp.json();
-$('progressLabel').textContent='Fusion API...';
+async function mergeWithApi(data){
 const apiRecords=await fetchApiAlimentation();
 const dataIds=new Set(data.map(r=>r.id));
 const newRecords=apiRecords.filter(r=>!dataIds.has(r.id));
 const merged=[...data,...newRecords];
 merged.sort((a,b)=>new Date(b.date_publication||0)-new Date(a.date_publication||0));
+return{merged,fresh:newRecords}}
+function applyDataState(data,merged,newRecords){
 STATE.records=merged;
 if(merged.length){STATE.dataDate=merged[0].date_publication||'';}
 const now=new Date();STATE.lastLoadTime=now.toLocaleString('fr-FR');
@@ -1137,11 +1140,21 @@ else{fb.style.display='none'}
 const badge=newRecords.length>0?` (+${newRecords.length})`:'';
 $('cacheBadge').innerHTML=merged.length+' fiches'+badge+'<br><small style="font-size:10px;opacity:0.7">Maj: '+lastDataDate+'</small>';
 $('cacheBadge').style.cursor='pointer';$('cacheBadge').title='Cliquez pour voir le statut détaillé';
-$('cacheBadge').addEventListener('click',showUpdateStatus);
 $('dashTotalBadge').textContent=merged.length.toLocaleString('fr-FR')+' fiches';
 $('menuBadgeSearch').textContent=merged.length>999?Math.round(merged.length/1000)+'k':merged.length;$('menuBadgeDash').textContent=merged.length>999?Math.round(merged.length/1000)+'k':merged.length;
 $('aboutCache').textContent=merged.length+' fiches ('+data.length+' cache'+badge+')';
 $('progressFill').style.width='100%';$('progressLabel').textContent=merged.length+' fiches';
+}
+async function init(){
+$('dashTotalBadge').textContent='Chargement data.json...';
+try{
+const resp=await fetch(DATA_URL);
+if(!resp.ok)throw new Error('HTTP '+resp.status);
+const data=await resp.json();
+$('progressLabel').textContent='Fusion API...';
+const{merged,fresh:newRecords}=await mergeWithApi(data);
+applyDataState(data,merged,newRecords);
+$('cacheBadge').addEventListener('click',showUpdateStatus);
 updateDashboard();doSearch(true);loadFacets();
 if(STATE.records.length){renderStats(STATE.records);populateQueryAutocomplete();updateChipCounts();updateFilterChipCounts();updateFilterSummary()}
 }catch(e){

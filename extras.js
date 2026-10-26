@@ -10,6 +10,8 @@ var ICON={
   link:ico('<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'),
   print:ico('<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'),
   present:ico('<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>'),
+  theme:ico('<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'),
+  refresh:ico('<path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>'),
   image:ico('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>')
 };
 var CHIP_LABEL={grave:'Contamination bactérienne',bacterien:'Rappels obligatoires',recent:'30 derniers jours'};
@@ -307,10 +309,14 @@ function addTools(){
     var t=document.createElement('div');t.className='page-tools';
     t.innerHTML='<button type="button" class="btn btn--ghost btn--sm" data-act="link" title="Copier le lien de cette vue (filtres inclus)" aria-label="Copier le lien de cette vue">'+ICON.link+'<span>Lien</span></button>'+
       '<button type="button" class="btn btn--ghost btn--sm" data-act="print" title="Imprimer ou enregistrer en PDF" aria-label="Imprimer ou enregistrer en PDF">'+ICON.print+'<span>PDF</span></button>'+
+      '<button type="button" class="btn btn--ghost btn--sm tool-mobile" data-act="theme" title="Basculer clair / sombre" aria-label="Basculer le thème clair ou sombre">'+ICON.theme+'<span>Thème</span></button>'+
+      '<button type="button" class="btn btn--ghost btn--sm tool-mobile" data-act="refresh" title="Recharger les données" aria-label="Recharger les données">'+ICON.refresh+'<span>Actualiser</span></button>'+
       '<button type="button" class="btn btn--primary btn--sm" data-act="present" title="Mode présentation plein écran" aria-label="Lancer le mode présentation">'+ICON.present+'<span>Présenter</span></button>';
     t.addEventListener('click',function(e){
       var b=e.target.closest('button[data-act]');if(!b)return;
       if(b.dataset.act==='link')copyLink();
+      else if(b.dataset.act==='theme')toggleTheme();
+      else if(b.dataset.act==='refresh')refreshData();
       else if(b.dataset.act==='print')window.print();
       else openPresent();
     });
