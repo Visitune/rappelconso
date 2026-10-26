@@ -12,7 +12,7 @@
 .rc-toast.show{opacity:1;transform:translate(-50%,0)}
 
 /* ── Faits marquants ── */
-.facts-card{margin-top:var(--space-6);border-left:4px solid var(--brand)}
+.facts-card{margin-top:var(--space-6)}
 .facts-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 24px;font-size:13px;color:var(--text2)}
 .facts-list li{line-height:1.5;padding-left:14px;position:relative}
 .facts-list li::before{content:'';position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--brand)}
@@ -47,8 +47,39 @@
 .pres-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:10px}
 .pres-bar i{display:block;height:100%;background:var(--brand);transition:width .25s ease}
 
+/* ── Finitions de l'existant ── */
+.kpi__value,.link-badge,.badge,.chip-cnt,.filter-pill,.analysis-value,td,.chi2-value{font-variant-numeric:tabular-nums}
+.filter-toggle{white-space:nowrap}
+.badge--clip{display:inline-block;max-width:128px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+.badge--clip.badge--risk-wide,td:nth-child(4) .badge--clip{max-width:165px}
+#searchContent td:nth-child(3){min-width:150px}
+.clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+.mini-metric-grid>*{min-width:0}
+.mini-metric{padding:10px 6px}
+.mini-metric b{display:block;font-size:clamp(15px,1.5vw,20px);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.mini-metric span{overflow-wrap:anywhere}
+.chi2-cards{gap:10px}
+.chi2-card{min-width:0;padding:14px 8px}
+.chi2-value{font-size:clamp(16px,1.7vw,24px);overflow-wrap:anywhere}
+.meter-row{display:flex;flex-direction:column;gap:6px}
+.meter-row__head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.meter-row__name{font-weight:600;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meter-row__val{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);flex-shrink:0}
+.meter-row__val small{color:var(--text3);font-size:11px}
+.meter{height:6px;border-radius:3px;background:var(--elevated);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--danger);border-radius:3px;transition:width .4s ease}
+.page[data-page="query"].is-empty .query-viz{display:none!important}
+
 /* ── KPI : 6 cartes sur une ligne dès ~1000 px (évite la 6e orpheline) ── */
 .page[data-page="dashboard"] .grid-responsive{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-4)}
+
+/* ── Mobile : les span en ligne des cartes créaient une colonne fantôme de 42 px ── */
+@media(max-width:680px){
+  .page[data-page="dashboard"] section>.chart-card{grid-column:1/-1!important}
+  .page[data-page="dashboard"] .grid-responsive{grid-template-columns:repeat(2,1fr)!important;gap:10px}
+  .page[data-page="dashboard"] .kpi{padding:12px}
+  .page[data-page="dashboard"] .kpi__icon{margin-bottom:6px}
+}
 
 /* ── Zones tactiles et mobile ── */
 @media(max-width:768px){
@@ -80,3 +111,7 @@
   .page[data-page="dashboard"] section,.page[data-page="analyses"] section{grid-template-columns:1fr 1fr!important}
   .page[data-page="dashboard"] .chart-card[style*="1/-1"]{grid-column:1/-1!important}
 }
+
+/* ── Contraste du thème clair (WCAG AA) ── */
+[data-theme="light"]{--text3:#556070}
+[data-theme="light"] .badge--orange,[data-theme="light"] .quick-chip.active,[data-theme="light"] .chip.active{color:#9A4208}

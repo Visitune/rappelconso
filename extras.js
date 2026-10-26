@@ -21,6 +21,8 @@ function toast(msg){
   t.textContent=msg;t.classList.add('show');
   clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('show')},2200);
 }
+// « listeria monocytogenes (agent responsable de la listériose) » -> « Listeria monocytogenes »
+function nice(t){t=String(t).replace(/\s*\(.*?\)\s*/g,' ').replace(/\s+/g,' ').trim();return t.charAt(0).toUpperCase()+t.slice(1)}
 function fmtN(n){return Number(n).toLocaleString('fr-FR')}
 function dataDateLabel(){
   var d=STATE.dataDate?new Date(STATE.dataDate):null;
@@ -110,8 +112,8 @@ function computeFacts(d){
   var fr=function(s){return new Date(s).toLocaleDateString('fr-FR')};
   var pc=function(x){return Math.round(x/n*100)};
   out.push('<strong>'+fmtN(n)+'</strong> rappel'+(n>1?'s':'')+(maxD?' publié'+(n>1?'s':'')+' du <strong>'+fr(minD)+'</strong> au <strong>'+fr(maxD)+'</strong>':'')+'.');
-  var tc=top(cat);if(tc)out.push('Catégorie la plus touchée : <strong>'+esc(tc[0])+'</strong>, '+pc(tc[1])+' % des fiches ('+fmtN(tc[1])+').');
-  var tr=top(risk);if(tr)out.push('Danger le plus cité : <strong>'+esc(tr[0])+'</strong>, présent dans '+pc(tr[1])+' % des fiches.');
+  var tc=top(cat);if(tc)out.push('Catégorie la plus touchée : <strong>'+esc(nice(tc[0]))+'</strong>, '+pc(tc[1])+' % des fiches ('+fmtN(tc[1])+').');
+  var tr=top(risk);if(tr)out.push('Danger le plus cité : <strong>'+esc(nice(tr[0]))+'</strong>, présent dans '+pc(tr[1])+' % des fiches.');
   if(bact)out.push('Contaminations bactériennes graves (Listeria, Salmonella, E. coli, botulisme…) : <strong>'+pc(bact)+' %</strong> des rappels ('+fmtN(bact)+').');
   if(maxD){
     var ref=new Date(maxD).getTime(),D=90*864e5,cur=0,prev=0;
@@ -121,7 +123,7 @@ function computeFacts(d){
       out.push('Sur les 90 derniers jours : <strong>'+fmtN(cur)+'</strong> rappels, <span class="'+(v>0?'up':'down')+'">'+(v>0?'+':'')+v+' %</span> par rapport aux 90 jours précédents ('+fmtN(prev)+').');
     }
   }
-  var tb=top(brand);if(tb&&tb[1]>1)out.push('Marque la plus rappelée : <strong>'+esc(tb[0])+'</strong> ('+fmtN(tb[1])+' fiches).');
+  var tb=top(brand);if(tb&&tb[1]>1)out.push('Marque la plus rappelée : <strong>'+esc(nice(tb[0]))+'</strong> ('+fmtN(tb[1])+' fiches).');
   return out;
 }
 function renderFacts(d){
@@ -167,7 +169,12 @@ function exportPng(card){
     toast('Image téléchargée');
   },'image/png');
 }
+function syncQueryEmpty(){
+  var pg=document.querySelector('.page[data-page="query"]'),b=$('queryResultsBadge');
+  if(pg&&b)pg.classList.toggle('is-empty',/^\s*0\s/.test(b.textContent));
+}
 function decorateCards(){
+  syncQueryEmpty();
   document.querySelectorAll('.card').forEach(function(card){
     var h=card.querySelector('.card__header'),cv=card.querySelector('canvas');
     if(!h||!cv||h.closest('.card')!==card)return;
