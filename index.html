@@ -63,7 +63,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle
 .side-footer{border-top:1px solid var(--border);padding:12px 16px;display:flex;flex-direction:column;gap:8px;align-items:center}
 .side-footer .btn--xs{width:34px;height:34px;min-height:34px;padding:0;border-radius:8px}.vp-wordmark{font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--brand)}
 .side-visipilot{width:100%;padding:10px 0 6px;border-top:1px solid var(--border);margin-top:4px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
-.side-visipilot-logo{display:inline-flex;text-decoration:none;opacity:0.85;transition:opacity var(--tf)}.side-visipilot-logo:hover{opacity:1}
+.side-visipilot-logo{display:inline-flex;text-decoration:none;opacity:1;transition:opacity var(--tf)}.side-visipilot-logo:hover{opacity:1}
 .side-rc-link{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--text3);text-decoration:none;padding:3px 10px;border-radius:var(--radius-full);border:1px solid var(--border);transition:all var(--tf);background:var(--surface)}
 .side-rc-link:hover{color:var(--brand);border-color:var(--brand);background:rgba(243,112,33,0.08)}
 .side-rc-link svg{flex-shrink:0}
@@ -200,7 +200,7 @@ tbody tr{animation:row-in 0.15s ease both}
 </div>
 <div class="side-visipilot">
 <a href="https://visipilot.com" target="_blank" rel="noopener" class="side-visipilot-logo" title="Développé par VisiPilot.com">
-<img src="https://visipilot.com/logovisipilot-300x81-1.png" alt="VisiPilot" style="height:20px;width:auto;display:block" loading="lazy" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'vp-wordmark',textContent:'VisiPilot'}))">
+<img src="logo.png" width="300" height="81" alt="VisiPilot" style="height:30px;width:auto;display:block" loading="lazy" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'vp-wordmark',textContent:'VisiPilot'}))">
 </a>
 <a href="https://rappelconso.fr" target="_blank" rel="noopener" class="side-rc-link" title="Site officiel RappelConso">
 <svg style="width:10px;height:10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -448,7 +448,7 @@ Cette analyse sert à repérer des foyers territoriaux et la part nationale.">?<
 <!-- VisiPilot -->
 <div class="about-card">
 <div class="about-section-title" style="margin-bottom:14px">
-<a href="https://visipilot.com" target="_blank" rel="noopener" style="text-decoration:none"><img src="https://visipilot.com/logovisipilot-300x81-1.png" alt="VisiPilot" style="height:32px;width:auto;display:block" loading="lazy" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'vp-wordmark',textContent:'VisiPilot'}))"></a>
+<a href="https://visipilot.com" target="_blank" rel="noopener" style="text-decoration:none"><img src="logo.png" width="300" height="81" alt="VisiPilot" style="height:32px;width:auto;display:block" loading="lazy" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'vp-wordmark',textContent:'VisiPilot'}))"></a>
 </div>
 <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 12px">
 <a href="https://visipilot.com" target="_blank" rel="noopener" style="color:var(--brand);font-weight:600">VisiPilot.com</a>  propose des conseils en food safety et la transformation de données publiques / métier en tableaux de bord interactifs. Cette application RappelConso illustre notre approche&nbsp;: rendre des données complexes lisibles, actionnables et accessibles sans infrastructure serveur.
@@ -498,10 +498,10 @@ Source des données
 Architecture — Comment ça fonctionne
 </div>
 <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text2);line-height:1.5">
-<div class="about-item"><strong>Couche 1 — Cache statique</strong><span>Un script Python (<code>update_data.py</code>) interroge l'API chaque nuit, pagine tous les résultats et stocke un fichier <code>data.json</code> (~16 Mo). Ce fichier est servi statiquement — aucun serveur requis.</span></div>
+<div class="about-item"><strong>Couche 1 — Cache statique</strong><span>Un script Python (<code>update_data.py</code>) télécharge chaque nuit l'export complet de l'API et stocke un fichier <code>data.json</code> (~20 Mo). Ce fichier est servi statiquement — aucun serveur requis.</span></div>
 <div class="about-item"><strong>Couche 2 — Fusion temps réel</strong><span>Au chargement, l'app récupère les rappels des 14 derniers jours via l'API publique et fusionne les nouvelles fiches avec le cache local par déduplication sur l'identifiant unique.</span></div>
 <div class="about-item"><strong>Couche 3 — Calculs client</strong><span>Toute l'analyse (Chi², résidus, z-score, score de criticité, saisonnalité...) est calculée en JavaScript dans le navigateur, sur les données filtrées actives.</span></div>
-<div class="about-item"><strong>Déploiement</strong><span>Application HTML/CSS/JS autonome. Aucune dépendance serveur. Fonctionne en local ou sur GitHub Pages. CI/CD via GitHub Actions.</span></div>
+<div class="about-item"><strong>Déploiement</strong><span>Application HTML/CSS/JS autonome. Aucune dépendance serveur. Hébergé sur Vercel, mise à jour des données par GitHub Actions.</span></div>
 </div>
 </div>
 
