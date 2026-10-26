@@ -60,6 +60,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle
 .sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;z-index:100;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}.side-brand{padding:24px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}.side-logo{width:36px;height:36px;border-radius:var(--radius);background:var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0}.side-title{font-weight:700;font-size:15px}.side-sub{font-size:10px;color:var(--text3);margin-top:2px}
 .side-nav{display:flex;flex-direction:column;gap:2px;padding:12px;flex:1}.side-link{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all var(--tf)}.side-link:hover,.side-link.active{color:var(--text);background:var(--elevated)}.side-link.active{color:var(--brand);background:rgba(243,112,33,0.08)}.side-link .link-badge{margin-left:auto;font-size:10px;padding:1px 6px;border-radius:var(--radius-full);background:var(--surface);color:var(--text3)}
 .side-footer{border-top:1px solid var(--border);padding:12px 16px;display:flex;flex-direction:column;gap:8px;align-items:center}
+.side-footer .btn--xs{width:34px;height:34px;min-height:34px;padding:0;border-radius:8px}.vp-wordmark{font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--brand)}
 .side-visipilot{width:100%;padding:10px 0 6px;border-top:1px solid var(--border);margin-top:4px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
 .side-visipilot-logo{display:inline-flex;text-decoration:none;opacity:0.85;transition:opacity var(--tf)}.side-visipilot-logo:hover{opacity:1}
 .side-rc-link{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--text3);text-decoration:none;padding:3px 10px;border-radius:var(--radius-full);border:1px solid var(--border);transition:all var(--tf);background:var(--surface)}
@@ -198,7 +199,7 @@ tbody tr{animation:row-in 0.15s ease both}
 </div>
 <div class="side-visipilot">
 <a href="https://visipilot.com" target="_blank" rel="noopener" class="side-visipilot-logo" title="Développé par VisiPilot.com">
-<img src="https://visipilot.com/logovisipilot-300x81-1.png" alt="VisiPilot" style="height:20px;width:auto;display:block" loading="lazy">
+<img src="https://visipilot.com/logovisipilot-300x81-1.png" alt="VisiPilot" style="height:20px;width:auto;display:block" loading="lazy" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'vp-wordmark',textContent:'VisiPilot'}))">
 </a>
 <a href="https://rappelconso.fr" target="_blank" rel="noopener" class="side-rc-link" title="Site officiel RappelConso">
 <svg style="width:10px;height:10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -447,7 +448,7 @@ Cette analyse sert à repérer des foyers territoriaux et la part nationale.">?<
 <!-- VisiPilot -->
 <div class="about-card">
 <div class="about-section-title" style="margin-bottom:14px">
-<a href="https://visipilot.com" target="_blank" rel="noopener" style="text-decoration:none"><img src="https://visipilot.com/logovisipilot-300x81-1.png" alt="VisiPilot" style="height:32px;width:auto;display:block" loading="lazy"></a>
+<a href="https://visipilot.com" target="_blank" rel="noopener" style="text-decoration:none"><img src="https://visipilot.com/logovisipilot-300x81-1.png" alt="VisiPilot" style="height:32px;width:auto;display:block" loading="lazy" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'vp-wordmark',textContent:'VisiPilot'}))"></a>
 </div>
 <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 12px">
 <a href="https://visipilot.com" target="_blank" rel="noopener" style="color:var(--brand);font-weight:600">VisiPilot.com</a>  propose des conseils en food safety et la transformation de données publiques / métier en tableaux de bord interactifs. Cette application RappelConso illustre notre approche&nbsp;: rendre des données complexes lisibles, actionnables et accessibles sans infrastructure serveur.
@@ -564,7 +565,7 @@ function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>f
 function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('rc-theme',t)}
 function toggleTheme(){const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';setTheme(t);if(window.cm){Object.values(window.cm).forEach(c=>{try{c.destroy()}catch(_){}});window.cm={}}if(STATE.records.length){updateDashboard();renderStats(getFilteredRecords())}}
 async function refreshData(){
-  const btn=$('refreshDataBtn');btn.disabled=true;const old=btn.textContent;
+  const btn=$('refreshDataBtn');btn.disabled=true;const old=btn.innerHTML;
   try{
     btn.innerHTML='<svg class="icon icon-sm" style="animation:spin 0.8s linear infinite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>';
     const resp=await fetch(DATA_URL+'?t='+Date.now());
