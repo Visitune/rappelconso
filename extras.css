@@ -1,0 +1,82 @@
+/* Extras RappelConso : barre d'outils, faits marquants, carte de chaleur, mode présentation, impression */
+
+/* ── Barre d'outils des pages ── */
+.page-tools{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.page-tools .btn{gap:6px}
+.png-btn{margin-left:auto;width:28px;padding:0;flex-shrink:0}
+.png-btn+.info-btn{margin-left:0}
+.png-btn:hover{color:var(--brand);border-color:var(--brand)}
+
+/* ── Toast ── */
+.rc-toast{position:fixed;left:50%;bottom:72px;transform:translate(-50%,12px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:var(--radius-full);font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:3000;max-width:calc(100vw - 32px);text-align:center}
+.rc-toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ── Faits marquants ── */
+.facts-card{margin-top:var(--space-6);border-left:4px solid var(--brand)}
+.facts-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 24px;font-size:13px;color:var(--text2)}
+.facts-list li{line-height:1.5;padding-left:14px;position:relative}
+.facts-list li::before{content:'';position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--brand)}
+.facts-list strong{color:var(--text);font-weight:700}
+.facts-list .up{color:var(--danger);font-weight:700}
+.facts-list .down{color:var(--success);font-weight:700}
+
+/* ── Mode présentation ── */
+#presentOverlay{position:fixed;inset:0;z-index:5000;background:var(--bg);color:var(--text);display:flex;flex-direction:column;padding:20px clamp(16px,4vw,56px)}
+#presentOverlay[hidden]{display:none}
+.pres-top,.pres-foot{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text3)}
+.pres-top{justify-content:space-between;margin-bottom:8px}
+.pres-brand{font-weight:700;color:var(--brand);letter-spacing:.02em}
+.pres-close{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:22px;line-height:1}
+.pres-stage{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;overflow:auto}
+.pres-title{font-size:clamp(22px,3.4vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.pres-sub{font-size:clamp(13px,1.6vw,20px);color:var(--text2);max-width:960px}
+.pres-img{width:auto;height:auto;max-width:100%;max-height:calc(100vh - 230px);object-fit:contain;border-radius:var(--radius-lg);background:var(--card);padding:clamp(8px,2vw,24px);border:1px solid var(--border)}
+.pres-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;width:100%;max-width:960px}
+.pres-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 12px}
+.pres-kpi b{display:block;font-size:clamp(28px,4.4vw,56px);font-weight:800;color:var(--brand);line-height:1.1}
+.pres-kpi span{font-size:clamp(11px,1.2vw,15px);color:var(--text2)}
+.pres-facts{list-style:none;text-align:left;display:flex;flex-direction:column;gap:clamp(10px,1.8vh,20px);max-width:960px;font-size:clamp(15px,2.2vw,28px);line-height:1.35;color:var(--text2)}
+.pres-facts li{padding-left:22px;position:relative}
+.pres-facts li::before{content:'';position:absolute;left:0;top:.5em;width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.pres-facts strong{color:var(--text)}
+.pres-facts .up{color:var(--danger);font-weight:700}.pres-facts .down{color:var(--success);font-weight:700}
+.pres-foot{justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+.pres-nav{display:flex;gap:8px}
+.pres-nav button{min-width:48px;min-height:44px;border-radius:var(--radius);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:18px}
+.pres-nav button:disabled{opacity:.35}
+.pres-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:10px}
+.pres-bar i{display:block;height:100%;background:var(--brand);transition:width .25s ease}
+
+/* ── KPI : 6 cartes sur une ligne dès ~1000 px (évite la 6e orpheline) ── */
+.page[data-page="dashboard"] .grid-responsive{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-4)}
+
+/* ── Zones tactiles et mobile ── */
+@media(max-width:768px){
+  .page-tools .btn span{display:none}
+  .page-tools .btn{min-width:40px;padding:8px 10px}
+  .png-btn{width:34px;min-height:34px}
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+@media(max-width:600px){
+  #filterBar{position:static!important}
+  .page-tools{margin-left:0;width:100%}
+  .rc-toast{bottom:76px}
+  .pres-nav button{min-width:56px}
+}
+
+/* ── Impression / PDF ── */
+.print-only{display:none}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{padding:0!important;background:#fff!important;color:#111!important}
+  .sidebar,#filterBar,.page-tools,.png-btn,.info-btn,.rc-toast,#presentOverlay,.drill-panel .drill-close,.modal,#infoTooltip,#freshnessBanner{display:none!important}
+  .print-only{display:block!important;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #F37021}
+  .print-only h1{font-size:18px;color:#111}
+  .print-only p{font-size:11px;color:#444}
+  .page{padding:0!important;max-width:none!important}
+  .card{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;background:#fff!important;border-color:#ddd!important}
+  .chart-card{max-height:none!important}
+  .page[data-page="dashboard"] section,.page[data-page="analyses"] section{grid-template-columns:1fr 1fr!important}
+  .page[data-page="dashboard"] .chart-card[style*="1/-1"]{grid-column:1/-1!important}
+}

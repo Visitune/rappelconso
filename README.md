@@ -13,6 +13,16 @@ Dashboard interactif: 12,945+ rappels alimentaires (2021-2026 dans le cache loca
 | **Requêtes** | Regex avancées: `viandes`, `listeria`, `viandes\|salmonella` |
 | **À propos** | Infos source |
 
+## Présenter et partager (extras.js / extras.css)
+
+Sur le Dashboard et les Analyses, la barre d'outils en haut à droite propose :
+
+- **Lien** : copie une URL qui reproduit la vue (filtres, période, page) via le hash `#cat=…&risk=…&d=90`. Les filtres sont aussi restaurés à l'ouverture d'un lien.
+- **PDF** : impression A4 paysage avec en-tête (filtres actifs, date des données). Le thème passe automatiquement en clair pendant l'impression.
+- **Présenter** : mode plein écran, une diapositive par graphique (titre, faits marquants, graphiques en haute résolution). Flèches / espace pour naviguer, Échap pour quitter, balayage sur mobile.
+- **Export PNG** : bouton sur chaque graphique (titre, filtres, date des données et source incrustés).
+- **Faits marquants** : phrases calculées sur la sélection en cours (catégorie et danger dominants, part bactérienne, tendance sur 90 jours).
+
 ## Filtres: Comment les Utiliser
 
 ### ✅ Gardent Chi²
